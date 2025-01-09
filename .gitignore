@@ -51,3 +51,6 @@ rsconnect/
 
 # Files
 *_files/
+
+# Template
+/template/
