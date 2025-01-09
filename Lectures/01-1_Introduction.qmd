@@ -1,0 +1,225 @@
+---
+title: "Reproducible Data Analysis for Biomedical Research"
+subtitle: "Or: How to use computers to make your scientific life easier"
+author:
+  - name: Kevin Middleton
+    email: middletonk@missouri.edu
+    affiliations: Division of Biological Sciences
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: false
+    chalkboard: true
+    standalone: true
+    slide-number: true
+    show-slide-number: all
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+```
+
+
+# Welcome {background-color="#40666e"}
+
+
+## Where are you?
+
+### Reproducible Data Analysis for Biomedical Research
+
+- Tucker Hall 322
+- Tuesday and Thursday 12:30 - 1:45
+
+
+## Who am I?
+
+Kevin Middleton (he/him)
+
+- Grew up in Florida, lived all over since college
+- MU 13 years (10 in Medicine, 3 in Biology)
+- Biologist by training
+- Engineer, statistician, and programmer by avocation
+
+
+## Am I qualified to teach this class?
+
+- Probably
+- Taught undergraduates, post-bacs, graduate students these skills for 15+ years
+
+:::{.callout-note}
+## Why am I teaching this class?
+
+- These skills are increasingly important for you as scientists
+- They will make you a more informed human
+- I think it's worthwhile to learn
+:::
+
+
+## Who are you?
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Goals {background-color="#40666e"}
+
+
+## What do we want to accomplish? (Narrow view)
+
+- Begin to learn about the research process
+- Begin data analysis / statistics
+- Begin data presentation / graphing
+- Begin presenting / writing about science
+- Begin to use computers to make your scientific life easier
+
+
+## What do we want to accomplish? (Wide view)
+
+> I'm convinced that coding (the earlier you start, the better) changes the cognitive way one looks at a quantifiable phenomenon. It changes the modality the brain thinks of how to interpret a problem and how to model it (when possible). It forces you to think logically/algorithmically and it allows you to learn better new arguments when this learning is necessary. While the comprehension of specific statistical tests is specifically linked to particular problems, general coding skills allow us to imagine (and to realize) simulated experiments, toy examples, etc. I think the benefit is cognitive besides the advantages for scientific rigor/reproducibility and of course for the scientific community.
+> -- <cite>Paolo Piras</cite>
+
+
+## What do we want to accomplish? (Wide view)
+
+:::{.alert}
+Expand the ways in which you think about and interact with science
+:::
+
+- Become a better citizen of science
+    - We are all consumers
+    - You don't have to be a producer (but it's great if you are)
+
+
+## Learning Objectives
+
+1.	Describe the processes involved in reproducible research.
+2.	Discuss research study design, including considerations of biological sex, race, and ethnicity.
+3.	Design studies with appropriate power to answer research questions.
+4.	Manage data and maintain data integrity.
+5.	Carry out statistical analyses using data relevant to their research questions and interpret those analyses.
+6.	Create publication-quality figures for reports, posters, and presentations
+7.	Write about and present statistical analyses.
+
+
+## Desired Student Outcomes
+
+1.	Appreciate that research is a set of skills that can be learned and learn that everyone has a place in research.
+2.	Accept that uncertainty is an inherent property the world and variation is pervasive in nature. We try to make decisions with statistics in the face of that uncertainty and variation.
+3.	Recognize that all aspects of science – from planning to presentation – are collaborative and recognize the benefits of diverse points of view in the scientific process.
+
+
+## Premise
+
+*Axiom 1*: Quantitative potential is distributed equally among different groups, irrespective of geographic, demographic, and economic boundaries.
+
+*Axiom 2*. Everyone can have joyful, meaningful, and empowering quantitative experiences.
+
+*Axiom 3*. Quantitative methods are powerful, malleable tools that can be shaped and used differently by various communities to serve their needs.
+
+*Axiom 4*. Every student deserves to be treated with dignity and respect.
+
+::: aside
+Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity in Combinatorics" (*Notices of the AMS* 63: 1164-1170)
+:::
+
+
+# Expectations {background-color="#40666e"}
+
+
+## Expectations for you
+
+-	Be an active participant in class.
+-	Be present with your group.
+-	Ask questions (I will provide a way to ask questions anonymously).
+-	Be prepared for discussion.
+-	Be willing to fail and keep trying. This process is part of learning. Confusion is your mind adjusting to new information.
+-	Accept that making mistakes is part of the process of learning.
+
+
+## Expectations for me
+
+- Listen
+- Be responsive
+- Adapt
+
+
+## Asking questions
+
+- Class
+- Canvas
+- Email: (middletonk@missouri.edu)
+- Office: Tucker Hall Room 224 (or 222)
+- [Anonymously](https://forms.office.com/r/k27q3HWQwa) via web
+
+![](images/Anonymous_Question.png)
+
+
+## Check-Ins: 3, 7, and 11 weeks
+
+- How are you doing?
+- What is working or not working for you?
+- How is the pace?
+- What challenges do you have?
+- How can I do better?
+
+
+# Tools {background-color="#40666e"}
+
+
+## What tools will we use?
+
+- R: statistical programming language
+- RStudio: Interface for R
+- [RMarkdown](https://rmarkdown.rstudio.com/)
+- Hellbender computer cluster
+
+
+## R
+
+## RStudio
+
+## RMarkdown
+
+[Markup language](https://en.wikipedia.org/wiki/Markup_language): Mix R code with text, images, etc. in a plain text file
+
+> "A markup language is a set of rules governing what markup information may be included in a document and how it is combined with the content of the document in a way to facilitate use by humans and computer programs."
+
+
+## Hellbender
+
+[Hellbender](https://docs.itrss.umsystem.edu/pub/hpc/hellbender):
+
+> "Hellbender is the latest High Performance Computing (HPC) resource available to researchers and students (with sponsorship by a PI) within the UM-System."
+
+> "Hellbender consists of 208 mixed x86-64 CPU nodes (112 AMD, 96 Intel) providing 18,688 cores as well as 28 GPU nodes consisting of a mix of Nvidia GPU's (see hardware section for more details). Hellbender is attached to our Research Data Ecosystem ('RDE') that consists of 8PB of high performance and general purpose research storage. RDE can be accessible from other devices outside of Hellbender to create a single research data location across different computational environments."
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Data {background-color="#40666e"}
+
+
+## Role of data in science
+
+
+# Data {background-color="#40666e"}
+
+
+
+# Data analysis workflow {background-color="#40666e"}
+
+
+# To Do {background-color="#40666e"}
+
+- Check that you have access to OnDemand
+- Start an RStudio session
+
+
+# Questions {background-color="#f8c471"}
