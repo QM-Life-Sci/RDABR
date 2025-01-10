@@ -1,6 +1,6 @@
 ---
 title: "Randomness"
-subtitle: "Introduction to R"
+subtitle: "Introduction to R, RStudio, and Hellbender"
 author:
   - name: Kevin Middleton
     email: middletonk@missouri.edu
@@ -14,7 +14,7 @@ format:
     chalkboard: true
     standalone: true
     slide-number: true
-    show-slide-number: all
+    show-slide-number: print
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
@@ -33,3 +33,6 @@ csl: evolution.csl
 
 ## Nature of science – why we do statistics
 
+# Hellbender setup {background-color="#40666e"}
+
+## File systems

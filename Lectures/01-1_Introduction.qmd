@@ -14,7 +14,7 @@ format:
     chalkboard: true
     standalone: true
     slide-number: true
-    show-slide-number: all
+    show-slide-number: print
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
@@ -58,10 +58,17 @@ Kevin Middleton (he/him)
 - These skills are increasingly important for you as scientists
 - They will make you a more informed human
 - I think it's worthwhile to learn
+- You might find that you really enjoy it 
 :::
 
 
 ## Who are you?
+
+- Preferred name
+- Pronouns
+- Major(s)
+- Career plans
+- Favorite place to eat in Columbia?
 
 
 # Questions {background-color="#f8c471"}
@@ -82,7 +89,7 @@ Kevin Middleton (he/him)
 ## What do we want to accomplish? (Wide view)
 
 > I'm convinced that coding (the earlier you start, the better) changes the cognitive way one looks at a quantifiable phenomenon. It changes the modality the brain thinks of how to interpret a problem and how to model it (when possible). It forces you to think logically/algorithmically and it allows you to learn better new arguments when this learning is necessary. While the comprehension of specific statistical tests is specifically linked to particular problems, general coding skills allow us to imagine (and to realize) simulated experiments, toy examples, etc. I think the benefit is cognitive besides the advantages for scientific rigor/reproducibility and of course for the scientific community.
-> -- <cite>Paolo Piras</cite>
+> -- <cite>Paolo Piras (2024)</cite>
 
 
 ## What do we want to accomplish? (Wide view)
@@ -144,9 +151,10 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 
 ## Expectations for me
 
-- Listen
-- Be responsive
+- Listen to you
+- Be responsive to your questions
 - Adapt
+- Be prompt and prepared
 
 
 ## Asking questions
@@ -160,13 +168,21 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 ![](images/Anonymous_Question.png)
 
 
-## Check-Ins: 3, 7, and 11 weeks
+## Three-week check-in
 
 - How are you doing?
 - What is working or not working for you?
 - How is the pace?
 - What challenges do you have?
 - How can I do better?
+
+Maybe again later in the semester
+
+
+# Canvas {background-color="#40666e"}
+
+
+# General schedule {background-color="#40666e"}
 
 
 # Tools {background-color="#40666e"}
@@ -198,6 +214,66 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 > "Hellbender is the latest High Performance Computing (HPC) resource available to researchers and students (with sponsorship by a PI) within the UM-System."
 
 > "Hellbender consists of 208 mixed x86-64 CPU nodes (112 AMD, 96 Intel) providing 18,688 cores as well as 28 GPU nodes consisting of a mix of Nvidia GPU's (see hardware section for more details). Hellbender is attached to our Research Data Ecosystem ('RDE') that consists of 8PB of high performance and general purpose research storage. RDE can be accessible from other devices outside of Hellbender to create a single research data location across different computational environments."
+
+
+## {background-image="https://mdc.mo.gov/sites/default/files/styles/species_banner/public/mo_nature/media/images/2011/09/easternhellbender_09-26-11.jpg" background-size="100%"}
+
+
+## {background-image="https://hvacrschool.com/wp-content/webp-express/webp-images/uploads/2022/12/server_room-1536x1024.jpg.webp" background-size="100%"}
+
+
+## Hellbender
+
+- [OnDemand](https://ondemand.rnet.missouri.edu/pun/sys/dashboard): Also linked from Canvas
+- Log in with your PawPrint / 2-factor authentication
+
+![](images/OnDemand.png){fig-align="center"}
+
+
+# Questions {background-color="#f8c471"}
+
+
+# "Artificial Intelligence" {background-color="#40666e"}
+
+## Artificial intelligence is not intelligence
+
+- We (unfortunately) use human words to describe LLMs: "intelligence", "learn", "understand", "think", "know", "hallucinate"
+- LLMs generate responses based on probabilities (what character/word comes next?), which are derived from their training data.
+- [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs)
+
+:::{.callout-note}
+## Probability
+Predict what $y$ is if $x = 3$.
+
+$$y = 2x + 3$$
+:::
+
+
+## What are the next two numbers in the sequence?
+
+$$1, 3, 5, 7$$
+or
+
+$$1, 3, 5, 7, 17, 19, 21$$
+
+LLMs can answer the first but not the second.
+
+
+## Ways in which large language models can fail you
+
+- Outdated or incorrect information: LLMs are trained on historical data, which might have changed or be incorrect
+- Debugging challenges: If your code doesn't work, then figuring out why will be more challenging
+- Short circuit the development of problem-solving skills in our learn-by-doing approach
+    - Be willing to fail and keep trying.
+- Limiting creativity and innovation: There are many ways to solve a coding challenge
+- Inability to explain code: If you don't code it yourself, you will have greater challenges explaining it
+
+
+## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
+
+- Generative AI may be used in this course. The content you submit is your responsibility. AI-generated content can be inaccurate, offensive, and biased. Be sure your work accurately reflects your understanding and avoids these pitfalls.
+- You are responsible for understanding what you submit. Simply copying an AI-generated solution does not contribute to gaining understanding.
+- If you use AI, please acknowledge it with some variation of this statement: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 
 # Questions {background-color="#f8c471"}
