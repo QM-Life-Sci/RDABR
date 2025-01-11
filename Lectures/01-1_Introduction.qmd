@@ -235,6 +235,7 @@ Maybe again later in the semester
 
 # "Artificial Intelligence" {background-color="#40666e"}
 
+
 ## Artificial intelligence is not intelligence
 
 - We (unfortunately) use human words to describe LLMs: "intelligence", "learn", "understand", "think", "know", "hallucinate"
@@ -242,8 +243,9 @@ Maybe again later in the semester
 - [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs)
 
 :::{.callout-note}
-## Probability
-Predict what $y$ is if $x = 3$.
+
+## Predicting based on probability
+Predict $y$ if $x = 3$.
 
 $$y = 2x + 3$$
 :::
@@ -262,11 +264,11 @@ LLMs can answer the first but not the second.
 ## Ways in which large language models can fail you
 
 - Outdated or incorrect information: LLMs are trained on historical data, which might have changed or be incorrect
+- Inability to explain code: If you don't code it yourself, you will have greater challenges explaining it
 - Debugging challenges: If your code doesn't work, then figuring out why will be more challenging
 - Short circuit the development of problem-solving skills in our learn-by-doing approach
     - Be willing to fail and keep trying.
 - Limiting creativity and innovation: There are many ways to solve a coding challenge
-- Inability to explain code: If you don't code it yourself, you will have greater challenges explaining it
 
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
