@@ -263,19 +263,25 @@ LLMs can answer the first but not the second.
 
 ## Ways in which large language models can fail you
 
-- Outdated or incorrect information: LLMs are trained on historical data, which might have changed or be incorrect
-- Inability to explain code: If you don't code it yourself, you will have greater challenges explaining it
-- Debugging challenges: If your code doesn't work, then figuring out why will be more challenging
-- Short circuit the development of problem-solving skills in our learn-by-doing approach
+- *Outdated and/or incorrect information*: LLMs are trained on historical data, which might have changed or be incorrect
+- *Inability to explain*: If you don't code it yourself, you will have greater challenges explaining it
+- *Debugging challenges*: If your code doesn't work, then figuring out why will be more challenging
+- *Short circuit* the development of problem-solving skills in our learn-by-doing approach
     - Be willing to fail and keep trying.
-- Limiting creativity and innovation: There are many ways to solve a coding challenge
+- *Limiting you creativity and innovation*: There are many ways to solve a coding challenge
 
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
 
-- Generative AI may be used in this course. The content you submit is your responsibility. AI-generated content can be inaccurate, offensive, and biased. Be sure your work accurately reflects your understanding and avoids these pitfalls.
+- Generative AI may be used in this course. The content you submit is your responsibility. Be sure your work accurately reflects your understanding and avoids these pitfalls.
 - You are responsible for understanding what you submit. Simply copying an AI-generated solution does not contribute to gaining understanding.
-- If you use AI, please acknowledge it with some variation of this statement: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
+
+## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
+
+If you use AI please acknowledge it with some variation of this statement:
+
+> "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 
 # Questions {background-color="#f8c471"}
