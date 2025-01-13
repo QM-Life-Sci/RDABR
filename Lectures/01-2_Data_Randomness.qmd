@@ -1,5 +1,5 @@
 ---
-title: "Randomness"
+title: "Data and Randomness"
 subtitle: "Introduction to R, RStudio, and Hellbender"
 author:
   - name: Kevin Middleton
@@ -24,6 +24,22 @@ csl: evolution.csl
 #| label: setup
 #| echo: false
 ```
+
+
+# Data {background-color="#40666e"}
+
+
+## Role of data in science
+
+
+# Data {background-color="#40666e"}
+
+
+
+# Data analysis workflow {background-color="#40666e"}
+
+
+# Questions {background-color="#f8c471"}
 
 
 # Randomness {background-color="#40666e"}
