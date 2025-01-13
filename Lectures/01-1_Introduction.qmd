@@ -33,24 +33,28 @@ csl: evolution.csl
 
 ### Reproducible Data Analysis for Biomedical Research
 
-- Tucker Hall 322
 - Tuesday and Thursday 12:30 - 1:45
+- Tucker Hall 322
 
 
 ## Who am I?
 
 Kevin Middleton (he/him)
 
-- Grew up in Florida, lived all over since college
+- Grew up in Florida
+- North Carolina $\rightarrow$ Rhode Island $\rightarrow$ California $\rightarrow$ Rhode Island $\rightarrow$ California $\rightarrow$ Missouri
 - MU 13 years (10 in Medicine, 3 in Biology)
 - Biologist by training
 - Engineer, statistician, and programmer by avocation
 
 
+## {background-image="images/Lab_research.jpg" background-size="100%"}
+
+
 ## Am I qualified to teach this class?
 
 - Probably
-- Taught undergraduates, post-bacs, graduate students these skills for 15+ years
+- Taught undergraduates, post-bacs, and graduate students these skills for 15+ years
 
 :::{.callout-note}
 ## Why am I teaching this class?
@@ -62,12 +66,12 @@ Kevin Middleton (he/him)
 :::
 
 
+
 ## Who are you?
 
-- Preferred name
-- Pronouns
+- Preferred name & Pronouns
 - Major(s)
-- Career plans
+- Future plans
 - Favorite place to eat in Columbia?
 
 
@@ -88,9 +92,13 @@ Kevin Middleton (he/him)
 
 ## What do we want to accomplish? (Wide view)
 
-> I'm convinced that coding (the earlier you start, the better) changes the cognitive way one looks at a quantifiable phenomenon. It changes the modality the brain thinks of how to interpret a problem and how to model it (when possible). It forces you to think logically/algorithmically and it allows you to learn better new arguments when this learning is necessary. While the comprehension of specific statistical tests is specifically linked to particular problems, general coding skills allow us to imagine (and to realize) simulated experiments, toy examples, etc. I think the benefit is cognitive besides the advantages for scientific rigor/reproducibility and of course for the scientific community.
-> -- <cite>Paolo Piras (2024)</cite>
+> I'm convinced that coding ... changes the cognitive way one looks at a quantifiable phenomenon. It changes the modality the brain thinks of how to interpret a problem and how to model it (when possible). It forces you to think logically/algorithmically and it allows you to learn better new arguments when this learning is necessary.
 
+> While the comprehension of specific statistical tests is specifically linked to particular problems, general coding skills allow us to imagine (and to realize) simulated experiments, toy examples, etc. I think the benefit is cognitive besides the advantages for scientific rigor/reproducibility and of course for the scientific community.
+
+::: {.right}
+Paolo Piras (2024)
+:::
 
 ## What do we want to accomplish? (Wide view)
 
@@ -132,7 +140,7 @@ Expand the ways in which you think about and interact with science
 *Axiom 4*. Every student deserves to be treated with dignity and respect.
 
 ::: aside
-Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity in Combinatorics" (*Notices of the AMS* 63: 1164-1170)
+Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity in Combinatorics" (2017; *Notices of the AMS* 63: 1164-1170)
 :::
 
 
@@ -142,10 +150,11 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 ## Expectations for you
 
 -	Be an active participant in class.
--	Be present with your group.
--	Ask questions (I will provide a way to ask questions anonymously).
--	Be prepared for discussion.
--	Be willing to fail and keep trying. This process is part of learning. Confusion is your mind adjusting to new information.
+-	Be present with your classmates.
+-	Ask questions.
+-	Be prepared for class/discussion.
+-	Be willing to fail and keep trying.
+    - This process is part of learning. Confusion is your mind adjusting to new information.
 -	Accept that making mistakes is part of the process of learning.
 
 
@@ -179,10 +188,10 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 Maybe again later in the semester
 
 
-# Canvas {background-color="#40666e"}
+# Let's look at canvas {background-color="#40666e"}
 
 
-# General schedule {background-color="#40666e"}
+# Planned schedule {background-color="#40666e"}
 
 
 # Tools {background-color="#40666e"}
@@ -198,11 +207,19 @@ Maybe again later in the semester
 
 ## R
 
+> [R](https://www.r-project.org/) is a free software environment for statistical computing and graphics.
+
+> The term “environment” is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
+
+
 ## RStudio
+
+![](images/RStudio.png)
+
 
 ## RMarkdown
 
-[Markup language](https://en.wikipedia.org/wiki/Markup_language): Mix R code with text, images, etc. in a plain text file
+[Markup language](https://en.wikipedia.org/wiki/Markup_language): Mix R code with text, images, etc. in a **plain text file**
 
 > "A markup language is a set of rules governing what markup information may be included in a document and how it is combined with the content of the document in a way to facilitate use by humans and computer programs."
 
@@ -230,6 +247,12 @@ Maybe again later in the semester
 ![](images/OnDemand.png){fig-align="center"}
 
 
+# To Do {background-color="#40666e"}
+
+- Check that you have access to [OnDemand](https://ondemand.rnet.missouri.edu/pun/sys/dashboard)
+- Start an RStudio session
+
+
 # Questions {background-color="#f8c471"}
 
 
@@ -243,6 +266,7 @@ Maybe again later in the semester
 - [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs)
 
 :::{.callout-note}
+
 
 ## Predicting based on probability
 Predict $y$ if $x = 3$.
@@ -286,24 +310,3 @@ If you use AI please acknowledge it with some variation of this statement:
 
 # Questions {background-color="#f8c471"}
 
-
-# Data {background-color="#40666e"}
-
-
-## Role of data in science
-
-
-# Data {background-color="#40666e"}
-
-
-
-# Data analysis workflow {background-color="#40666e"}
-
-
-# To Do {background-color="#40666e"}
-
-- Check that you have access to OnDemand
-- Start an RStudio session
-
-
-# Questions {background-color="#f8c471"}
