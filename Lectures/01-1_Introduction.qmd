@@ -194,6 +194,9 @@ Maybe again later in the semester
 # Planned schedule {background-color="#40666e"}
 
 
+# Wellbeing {background-color="#40666e"}
+
+
 # Tools {background-color="#40666e"}
 
 
@@ -209,7 +212,7 @@ Maybe again later in the semester
 
 > [R](https://www.r-project.org/) is a free software environment for statistical computing and graphics.
 
-> The term “environment” is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
+> The term "environment" is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
 
 
 ## RStudio
