@@ -192,6 +192,12 @@ $selection-bg: #26351c !default;
   }
 }
 
+// References hanging indent
+#refs.references.csl-bib-body {
+  padding-left: 22px ;
+  text-indent: -22px ;
+}
+
 // Move "hamburger" menu button to top right
 
 .reveal .slide-menu-button {
