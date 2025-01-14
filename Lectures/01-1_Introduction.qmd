@@ -154,8 +154,10 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 -	Ask questions.
 -	Be prepared for class/discussion.
 -	Be willing to fail and keep trying.
-    - This process is part of learning. Confusion is your mind adjusting to new information.
+    - This process is part of learning.
+    - Confusion is your mind adjusting to new information.
 -	Accept that making mistakes is part of the process of learning.
+- Be proactive about communicating your needs
 
 
 ## Expectations for me
@@ -175,6 +177,13 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 - [Anonymously](https://forms.office.com/r/k27q3HWQwa) via web
 
 ![](images/Anonymous_Question.png)
+
+
+## Course communications from me
+
+- Canvas announcements and messages
+    - Sign up for email notifications
+- Emails (very rarely)
 
 
 ## Three-week check-in
@@ -264,7 +273,7 @@ Maybe again later in the semester
 
 ## Artificial intelligence is not intelligence
 
-- We (unfortunately) use human words to describe LLMs: "intelligence", "learn", "understand", "think", "know", "hallucinate"
+- We (unfortunately) use human terms to describe LLMs: "intelligence", "learn", "understand", "think", "know", "hallucinate"
 - LLMs generate responses based on probabilities (what character/word comes next?), which are derived from their training data.
 - [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs)
 
@@ -306,9 +315,14 @@ LLMs can answer the first but not the second.
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
 
-If you use AI please acknowledge it with some variation of this statement:
+If you use AI, please acknowledge it with some variation of this statement:
 
 > "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
+
+## Before you ask AI, ask yourself ...
+
+... how will this help me learn?
 
 
 # Questions {background-color="#f8c471"}
