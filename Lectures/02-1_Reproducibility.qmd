@@ -1,10 +1,5 @@
 ---
-title: "Data and Randomness"
-subtitle: "Introduction to R, RStudio, and Hellbender"
-author:
-  - name: Kevin Middleton
-    email: middletonk@missouri.edu
-    affiliations: Division of Biological Sciences
+title: "Unit 2: Reproducibility and Data Analysis Workflow"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -29,12 +24,6 @@ csl: evolution.csl
 # Data {background-color="#40666e"}
 
 
-## Role of data in science
-
-
-# Data {background-color="#40666e"}
-
-
 
 # Data analysis workflow {background-color="#40666e"}
 
@@ -42,13 +31,8 @@ csl: evolution.csl
 # Questions {background-color="#f8c471"}
 
 
-# Randomness {background-color="#40666e"}
+## References
 
-## Role of randomness in science
+::: {#refs}
+:::
 
-
-## Nature of science – why we do statistics
-
-# Hellbender setup {background-color="#40666e"}
-
-## File systems

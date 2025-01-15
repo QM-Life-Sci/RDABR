@@ -1,0 +1,84 @@
+---
+title: "Unit 1: Introduction to R, RStudio, and Hellbender"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: false
+    chalkboard: true
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+```
+
+
+# Think about something you know how to do {background-color="#40666e"}
+
+
+# Introduction to R {background-color="#40666e"}
+
+
+## Learning a programming language
+
+Like learning a foreign language.
+
+- Practice
+- Struggle
+- Gradual proficiency
+- Nothing will help you as much as hands-on experience
+
+
+## What do you mean "programming"?
+
+Modern Scientist == Programmer
+
+- 95% of your analysis time is spent _not_ doing statistics.
+    - Wrangling data
+    - Plotting data
+- Invest time now in learning the logic of programming. Save time later.
+- Reproducibility. You always know what you did.
+    - Code with comments reads as a step-by-step of your analysis
+- This is a process.
+    - It takes time to become comfortable.
+
+
+## Why program?
+
+> If you have done something twice, you are likely to do it again.
+
+:::{.right}
+Brian Kernighan and Rob Pike
+:::
+
+
+## Good things about programming with data
+
+- Forces you to be explicit.
+    - R won't give unless you ask.
+- Forces you to have a record of your analysis.
+    - Add to/modify your data and rerun
+    - No point and click confusion
+- Allows you to keep versions of your analysis
+    - Revert to an older version
+
+
+# Hellbender Introduction {background-color="#40666e"}
+
+
+## File systems
+
+
+## References
+
+::: {#refs}
+:::
+

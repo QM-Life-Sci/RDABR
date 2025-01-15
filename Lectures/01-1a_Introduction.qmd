@@ -33,7 +33,7 @@ csl: evolution.csl
 
 ### Reproducible Data Analysis for Biomedical Research
 
-- Tuesday and Thursday 12:30 - 1:45
+- Tuesdays and Thursdays 12:30 - 1:45
 - Tucker Hall 322
 
 
@@ -64,7 +64,6 @@ Kevin Middleton (he/him)
 - I think it's worthwhile to learn
 - You might find that you really enjoy it 
 :::
-
 
 
 ## Who are you?
@@ -99,6 +98,7 @@ Kevin Middleton (he/him)
 ::: {.right}
 Paolo Piras (2024)
 :::
+
 
 ## What do we want to accomplish? (Wide view)
 
@@ -203,6 +203,30 @@ Maybe again later in the semester
 # Planned schedule {background-color="#40666e"}
 
 
+## Your coding partner
+
+- Work together
+- Help each other problem solve
+- Rotates every two weeks
+- Self- and Peer-evaluations
+
+
+## General Weekly Plan
+
+Tuesday
+
+- "Lecture", demos, discussion
+- Previous week's problem set due
+- Sit with your partner
+
+Thursday
+
+- Finish up Tuesday material
+- Review / questions
+- Start problem set in pairs
+- Discuss questions you have
+
+
 # Wellbeing {background-color="#40666e"}
 
 
@@ -277,9 +301,8 @@ Maybe again later in the semester
 - LLMs generate responses based on probabilities (what character/word comes next?), which are derived from their training data.
 - [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs)
 
+
 :::{.callout-note}
-
-
 ## Predicting based on probability
 Predict $y$ if $x = 3$.
 
