@@ -1,5 +1,6 @@
 ---
-title: "Unit 1: Introduction to R, RStudio, and Hellbender"
+title: "Unit 1: Tools for Reproducible Data Analysis"
+subtitle: "Introduction to R, RStudio, and Hellbender and setting up your environment"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -21,10 +22,83 @@ csl: evolution.csl
 ```
 
 
-# Think about something you know how to do {background-color="#40666e"}
+# Tools {background-color="#40666e"}
 
 
-# Introduction to R {background-color="#40666e"}
+## What tools will we use?
+
+- R: statistical programming language
+- RStudio: Interface for R ([Introduction to RStudio Server](https://book.cds101.com/rstudio-server.html))
+- [RMarkdown](https://rmarkdown.rstudio.com/)
+- Hellbender computer cluster
+
+
+## R
+
+> [R](https://www.r-project.org/) is a free software environment for statistical computing and graphics.
+
+> The term "environment" is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
+
+- Specifically designed for statistics and data analysis
+- Increasingly a standard tool for life scientists
+- Free, now and forever
+
+
+## RStudio
+
+- Graphical interface to R
+- R runs within RStudio
+- R can run outside of RStudio
+
+![](images/RStudio.png){fig-align="center"}
+
+
+## RMarkdown
+
+[Markup language](https://en.wikipedia.org/wiki/Markup_language): Mix R code with text, images, etc. in a **plain text file**
+
+> "A markup language is a set of rules governing what markup information may be included in a document and how it is combined with the content of the document in a way to facilitate use by humans and computer programs."
+
+Many uses for plain text files
+
+- Compact
+- "Portable": work on all different kinds of computer systems
+- Good for version tracking
+
+
+## Hellbender
+
+[Hellbender](https://docs.itrss.umsystem.edu/pub/hpc/hellbender):
+
+> "Hellbender is the latest High Performance Computing (HPC) resource available to researchers and students (with sponsorship by a PI) within the UM-System."
+
+> "Hellbender consists of 208 mixed x86-64 CPU nodes (112 AMD, 96 Intel) providing 18,688 cores as well as 28 GPU nodes consisting of a mix of Nvidia GPU's (see hardware section for more details). Hellbender is attached to our Research Data Ecosystem ('RDE') that consists of 8PB of high performance and general purpose research storage. RDE can be accessible from other devices outside of Hellbender to create a single research data location across different computational environments."
+
+
+## {background-image="https://mdc.mo.gov/sites/default/files/styles/species_banner/public/mo_nature/media/images/2011/09/easternhellbender_09-26-11.jpg" background-size="100%"}
+
+
+## {background-image="https://hvacrschool.com/wp-content/webp-express/webp-images/uploads/2022/12/server_room-1536x1024.jpg.webp" background-size="100%"}
+
+
+## Hellbender
+
+- OnDemand
+    - [https://ondemand.rnet.missouri.edu/pun/sys/dashboard](https://ondemand.rnet.missouri.edu/pun/sys/dashboard)
+    - Also linked from Canvas
+- Log in with your PawPrint / 2-factor authentication
+
+![](images/OnDemand.png){fig-align="center"}
+
+
+# Programming {background-color="#40666e"}
+
+
+## Think about something you know how to do {background-color="#40666e"}
+
+- What is it?
+- How did you learn it?
+- At what point did you call yourself an "expert"?
 
 
 ## Learning a programming language
@@ -33,14 +107,13 @@ Like learning a foreign language.
 
 - Practice
 - Struggle
-- Gradual proficiency
+- Gradually gain proficiency
 - Nothing will help you as much as hands-on experience
 
 
-## What do you mean "programming"?
+## Modern scientists are programmers
 
-Modern Scientist == Programmer
-
+- Most code written for yourself or your collaborators
 - 95% of your analysis time is spent _not_ doing statistics.
     - Wrangling data
     - Plotting data
@@ -51,30 +124,170 @@ Modern Scientist == Programmer
     - It takes time to become comfortable.
 
 
-## Why program?
+## Why write code?
 
 > If you have done something twice, you are likely to do it again.
 
 :::{.right}
-Brian Kernighan and Rob Pike
+Kernighan and Pike [-@Kernighan1984-au]
+:::
+
+:::{.alert}
+You will develop skills for adapting code from a problem you have solved before.
+
+- Recognize the similarities between new problems and old problems
+- Analysis, plots, etc.
 :::
 
 
-## Good things about programming with data
+## Benefits of programming for data analysis
 
-- Forces you to be explicit.
+- Forces you to be explicit in what you want to do
     - R won't give unless you ask.
 - Forces you to have a record of your analysis.
     - Add to/modify your data and rerun
-    - No point and click confusion
+    - No point and click confusion or ambiguity
 - Allows you to keep versions of your analysis
     - Revert to an older version
 
 
-# Hellbender Introduction {background-color="#40666e"}
+# Introduction to R {background-color="#40666e"}
 
 
-## File systems
+## Starting RStudio through OnDemand
+
+![](images/OnDemand_RStudio.png){fig-align="center"}
+
+
+## Starting RStudio
+
+![](images/RStudio_Login.png){fig-align="center"}
+
+
+## Starting RStudio
+
+![](images/RStudio_Connect.png){fig-align="center"}
+
+
+## Starting RStudio
+
+![](images/RStudio_Bare.png){fig-align="center"}
+
+
+## Panes and tabs of an RStudio window
+
+- Code
+- Console
+- Plots
+- Help
+- Files
+- Packages
+- Environment
+- Others that we won't use often
+
+
+# RStudio {background-color="#40666e"}
+
+## R Console Pane: `>`
+
+- Interactive
+- Enter and run code
+- Run code from Rmd files
+
+
+## Source Pane
+
+- Text editor
+- Work in an Rmd file and send code to the console
+
+
+## Setting up RStudio
+
+`Tools -> Global Options`
+
+- Disable saving and restoring `.RData`
+- Code editing
+- Appearance
+- Pane layout
+- RMarkdown output
+
+
+## "Base R" and R Packages
+
+- "Base R" is a set of code that is built-in
+- R's utility is extended via packages
+    - Over 20,000 on the main CRAN repository
+- Loading packages is usually one of the first steps of an analysis
+    - `library(...)` near the top of your Rmd
+
+
+## Installing some packages
+
+- Install once, use often
+    - No need to reinstall
+    - Don't include install code in your Rmd files
+- `tidyverse`
+- `cowplot`
+
+
+## Swirl
+
+[Swirl](https://swirlstats.com/) is an interactive R package for learning R basics
+
+```{r}
+#| eval: false
+#| echo: true
+
+# Install swirl
+install.packages("swirl") # <1>
+
+library("swirl")
+swirl()
+```
+1. Only run this line once.
+
+
+![](images/Swirl.png){fig-align="center"}
+
+
+# File systems {background-color="#40666e"}
+
+
+## What is your mental model for how are files stored on a computer?
+
+- How do you organize files (if you organize files)?
+
+
+## Working directory
+
+![](images/RStudio_Working_Directory.png){fig-align="center"}
+
+- All file system operations work relative to the working directory
+
+
+## RStudio Projects
+
+![](images/RStudio_Project.png){fig-align="center"}
+
+- Organize files (data, code, output, figures, etc.) for a single project
+- Working within projects will always set the working directory correctly
+
+
+## File organization
+
+Working directory model means that we need to be aware of where files are stored
+
+Possible directory structure:
+
+```
+  /Project
+    /Raw_Data
+    /Processed_Data
+    /Code
+    /Plots
+```
+
+Some examples...
 
 
 ## References

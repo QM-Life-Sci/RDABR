@@ -31,6 +31,7 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 
 ## Breeding Mice for High Activity
 
+![](https://biology.ucr.edu/people/faculty/Garland/MusonWheel-EQ.jpg){fig-align="center"}
 
 
 ## Breeding Mice for High Activity
@@ -226,20 +227,32 @@ Assumptions of most statistical analyses
 ## Independent and identically distributed (IID)
 
 - All observations are independent of one another
-- All observations come from the same underlying probability distribution (normal, binomial, etc.)
+- All observations come from the same underlying probability distribution (distributions in Unit 2)
 
-Standard assumption of most statistical tests.
+:::{.alert}
+Standard assumptions of most statistical tests.
+:::
 
 
-## Random sampling
+## Sampling design for a forest
 
 Randomly select 20 trees (left) or randomly select 20 square areas with 0 or more trees (right).
 
 ![](https://i.imgur.com/KcKmZYi.png){fig-align="center" width=80%}
 
-:::{.center}
-What are the benefits and drawbacks of each?
+:::: {.columns}
+
+::: {.column width="50%"}
+- What are the benefits and drawbacks of each?
+- Are individual trees independent?
 :::
+
+::: {.column width="50%"}
+- Are areas independent?
+- Are trees *within* areas independent?
+:::
+
+::::
 
 
 ## References
