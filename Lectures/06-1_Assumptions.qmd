@@ -1,0 +1,38 @@
+---
+title: "Unit 6: Assumptions"
+subtitle: "Summarizing data and models"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: false
+    chalkboard: true
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+```
+
+
+# Assumptions {background-color="#40666e"}
+
+
+# Summarizing data and models {background-color="#40666e"}
+
+
+# Questions {background-color="#f8c471"}
+
+
+## References
+
+::: {#refs}
+:::
+
