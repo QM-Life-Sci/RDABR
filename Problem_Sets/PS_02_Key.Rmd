@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 01'
+title: 'Problem Set 02'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
 output:
@@ -17,7 +17,7 @@ output:
 library(tidyverse)
 ```
 
-> "...the descriptive and analytical power of an adequate programming language amply repays the considerable effort required for its mastery." Ken Iverson (1962)
+> "...the descriptive and analytical power of an adequate programming language amply repays the considerable effort required for its mastery." Ken Iverson^[Iverson, K. E. 1962. A Programming Language. John Wiley & Sons Inc.]
 
 
 ## How to use the problem sets
@@ -235,7 +235,7 @@ which(v9 != 1)
 
 Computers only infrequently store numbers internally as integers ([computer algebra systems](https://en.wikipedia.org/wiki/Computer_algebra_system) do this), particularly after any kind of numeric operation.
 
-In contrast, numbers^[If you have experience with this, we a talking about floating point numbers.] are often rounded to some level of accuracy (R uses about 53 decimal places). For example:
+In contrast, numbers^[If you have experience with this, we are talking about floating point numbers.] are often rounded to some level of accuracy (R uses about 53 decimal places). For example:
 
 ```{r}
 a <- sqrt(2)
