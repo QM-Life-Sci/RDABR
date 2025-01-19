@@ -21,6 +21,7 @@ csl: evolution.csl
 #| echo: false
 
 library(tidyverse)
+theme_set(theme_classic())
 ```
 
 
@@ -231,7 +232,7 @@ FIXME
 How can we *estimate* the proportion of water?
 :::
 
-![](images/Earth.jpg){fig-align="center"}
+![](images/earth.jpg){fig-align="center"}
 
 :::{.center}
 What are your ideas?
@@ -244,16 +245,57 @@ What are your ideas?
 - Yes / No
 - Affected / Unaffected
 - Success / Failure
+- Alive / Dead
+- 0 / 1
+
+Can be summarized by counts
 
 
-## Simulating binomial distributions: `rbinom()`
+## Simulating from binomial distributions: `rbinom()`
 
-- `?rbinom`
+10 samples of 1 "trial", where the probability is 0.5
 
 ```{r}
 #| echo: true
 
-rbinom(10, 1, prob = 0.5)
+rbinom(n = 10, size = 1, prob = 0.5)
+```
+
+. . .
+
+10 samples of 10 "trials", where the probability is 0.5
+
+- Each sample is the count of "successes"
+
+```{r}
+#| echo: true
+
+rbinom(n = 10, size = 10, prob = 0.5)
+```
+
+
+## Lots of trials
+
+- 10 samples of 10 "trials", where the probability is 0.5
+
+```{r}
+#| echo: true
+
+x = rbinom(n = 10000, size = 10, prob = 0.5)
+```
+
+- What will be the *most* frequent number?
+- What will be the *least* frequent numbers?
+
+
+## Lots of trials
+
+```{r}
+#| output-location: slide
+
+ggplot(data = tibble(x), aes(x)) +
+  geom_histogram(fill = "navy") +
+  scale_x_continuous(breaks = 0:10)
 ```
 
 
