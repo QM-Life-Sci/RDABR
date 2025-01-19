@@ -42,7 +42,7 @@ csl: evolution.csl
 Kevin Middleton (he/him)
 
 - Grew up in Florida
-- North Carolina $\rightarrow$ Rhode Island $\rightarrow$ California $\rightarrow$ Rhode Island $\rightarrow$ California $\rightarrow$ Missouri
+- North Carolina $\rightarrow$ Rhode Island (10 years) $\rightarrow$ California (1 year) $\rightarrow$ Rhode Island (1 year) $\rightarrow$ California (5 years) $\rightarrow$ Missouri
 - MU 13 years (10 in Medicine, 3 in Biology)
 - Biologist by training
 - Engineer, statistician, and programmer by avocation
@@ -71,7 +71,7 @@ Kevin Middleton (he/him)
 - Preferred name & Pronouns
 - Major(s)
 - Future plans
-- Favorite place to eat in Columbia?
+- Favorite place in Columbia and why?
 
 
 # Questions {background-color="#f8c471"}

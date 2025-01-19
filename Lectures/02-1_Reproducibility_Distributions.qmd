@@ -1,0 +1,360 @@
+---
+title: "Unit 2: Reproducibility and Distributions"
+subtitle: "Data analysis workflow"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: false
+    chalkboard: true
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+```
+
+
+# Reproducibility {background-color="#40666e"}
+
+
+## Reproducible vs. replicable research
+
+1. *Reproducible* - Given only 1) the raw data and 2) the scripts (i.e., code), one can produce the same set of results and figures. Not almost the same set, the **SAME SET**.
+1. *Replicable* - Can one repeat the same experiment and reach the same conclusion?
+
+Often these terms are often used more generally or interchangeably. 
+
+
+## "Replication crisis"
+
+FIXME
+
+
+## What is reproducible research?
+
+> "By reproducible, I mean that your work can be repeated by other researchers and they can arrive at the same results. For this to be the case, your work must be well documented, and your methods, code, and data all need to be available so that other researchers have the materials to reproduce everything." 
+
+:::{.right}
+Buffalo [-@Buffalo2015-ah]
+:::
+
+
+## R Markdown (`Rmd`) / Quarto (`qmd`)
+
+- Text-based markup languages (i.e., HTML)
+- Variant of markdown
+- Render to different formats (PDF, HTML, Word)
+- Inline code
+    - Your text and analysis coexist together in one file
+- Resources
+    - Markdown information
+    - Guides and Tutorials
+    
+
+# What constitutes "data" {background-color="#40666e"}
+
+FIXME
+
+# Role of data in science {background-color="#40666e"}
+
+FIXME
+
+## Foundational Principles of Data Management
+
+FAIR Guidelines [@Wilkinson2016-tf]
+
+1. **F**indability
+2. **A**ccessibility
+3. **I**nteroperability
+4. **R**eusability (Reproducibility)
+
+Essential for long term data useability, sharing, and stewardship.
+
+
+## FAIR principles for image data
+
+![](images/Prigent.png){fig-align="center"}
+
+
+:::{.right}
+Prigent et al. [-@Prigent2022-iq]
+:::
+
+
+# Data analysis workflow {background-color="#40666e"}
+
+## Analysis workflow
+
+1. Enter data (e.g., Excel) or save data from equipment
+1. Load raw data and perform manipulations
+    * Create categorical variables where applicable
+    * Combine and transform variables
+1. Plot raw data to look for mistakes, extreme values, etc.
+    * Fix errors
+    * Explore your data
+1. Statistical analysis
+1. Interpretation
+    * More analysis
+1. Make tables and figures for publication
+
+
+## Analysis workflow
+
+![](../images/Workflow.drawio.png){fig-align="center" width="80%"}
+
+
+# Clean coding practices {background-color="#40666e"}
+
+## Writing clean code
+
+Code should be understandable by others (and your future self)
+
+- Clean
+- Readable
+- Well annotated
+
+How would you format an essay?
+
+
+## Whitespace makes code readable
+
+- Separate elements and processes with spaces and line breaks
+- Limit line length
+- Use indenting to group code
+
+Difficult to read:
+
+```{r}
+#| eval: false
+#| echo: true
+
+tvtest<-lmer(sqrt(tv)~Region*log(DD5_TOT)+(1|Population/Sample_ID)+
+(1|Year),data=tvdat)
+summary(tvtest)
+ggplot(tvdat,aes(x=log(DD5_TOT),y=sqrt(tv),col=Region))+
+geom_point(shape=1,size=3,alpha=1/3)+ geom_smooth(aes(col=Region),method='lm')+
+xlab(bquote('log(Degree Days above' ~5^o~C*')'))+ylab('sqrt(Terminal Velocity (m/s))')
+```
+
+
+## Whitespace makes code readable
+
+- Separate elements and processes with spaces and line breaks
+- Limit line length
+- Use indenting to group code (Ctrl/Cmd - I to auto-indent in RStudio)
+
+Easier to read:
+
+```{r}
+#| echo: true
+#| eval: false
+
+tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
+                          (1 | Population/Sample_ID) + 
+                          (1 | Year),
+               data = tvdat)
+
+summary(tvtest)
+
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+  geom_point(shape = 1, size = 3, alpha = 1/3) +
+  geom_smooth(aes(col = Region), method = 'lm') + 
+  xlab(bquote('log(Degree Days above' ~5^o~C*')')) +
+  ylab('sqrt(Terminal Velocity (m/s))')
+```
+
+
+## Comments are messages to your future self
+
+- Explain the reason & functionality of the code
+- Any useful messages
+
+```{r}
+#| echo: true
+#| eval: false
+
+# Linear mixed model
+# Random effects: Sample nested in Population and Year
+tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
+                 (1 |Population/Sample_ID) + 
+                 (1 |Year),
+               data = tvdat)
+
+# Summary output of the model
+summary(tvtest)
+
+# Plot tv vs. dd5_tot colored by Region
+# alpha = transparency, smaller is more transparent
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+  geom_point(shape = 1, size = 3, alpha = 1/3) +
+  geom_smooth(aes(col = Region), method = 'lm') + 
+  xlab(bquote('log(Degree Days above' ~5^o~C*')')) +
+  ylab('sqrt(Terminal Velocity (m/s))')
+```
+
+
+## Markdown-based analyses
+
+- More than just comments
+- Add context to your analysis
+- Narrative, figures, tables, etc. all in one document
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Random Samples and Science {background-color="#40666e"}
+
+
+## Randomness
+
+- Inherent to (almost) all processes
+
+FIXME
+
+## {background-video="images/earth.mp4" background-video-loop="true" background-video-muted="true"}
+
+
+## How much of the Earth is covered by water?
+
+:::{.alert}
+How can we *estimate* the proportion of water?
+:::
+
+![](images/Earth.jpg){fig-align="center"}
+
+:::{.center}
+What are your ideas?
+:::
+
+
+## Binomial distributions
+
+- Water / Land
+- Yes / No
+- Affected / Unaffected
+- Success / Failure
+
+
+## Simulating binomial distributions: `rbinom()`
+
+- `?rbinom`
+
+```{r}
+#| echo: true
+
+rbinom(10, 1, prob = 0.5)
+```
+
+
+## Normal distribution
+
+![](images/Heights.png)
+
+
+:::{.right}
+Schilling et al. [-@Schilling2002-mm]
+:::
+
+
+## National Health and Nutrition Examination Survey (NHANES)
+
+- Assess the health and nutrition status of a broad cross-section of the United States population
+- [Many measured variables](https://wwwn.cdc.gov/nchs/nhanes/Default.aspx)
+- Started in 1960s
+- Most recently in 2-year batches
+
+
+## Heights for 6,465 individuals
+
+```{r}
+NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |> 
+  filter(Sex == "Male") |> 
+  select(-Sex) |> 
+  arrange(Height)
+NHANES$Height
+```
+
+
+## Heights for 6,465 individuals
+
+```{r}
+ggplot(NHANES, aes(x = Age, y = Height)) +
+  geom_point(size = 1, show.legend = FALSE, alpha = 0.25,
+             position = position_jitter(width = 0.25, seed = 3847293),
+             color = "firebrick4") +
+  scale_x_continuous(breaks = seq(0, 80, by = 5)) +
+  labs(x = "Age (y)", y = "Height (cm)") +
+  theme_classic()
+```
+
+
+## Distribution of heights (age > 20)
+
+```{r}
+NHANES_20 <- NHANES |> filter(Age > 20)
+
+ggplot(NHANES_20, aes(Height)) +
+  geom_histogram(bins = 30, show.legend = FALSE,
+                 fill = "firebrick4") +
+  labs(x = "Height (cm)", y = "Count") +
+  theme_classic()
+```
+
+
+## Extremes of heights (age > 20)
+
+:::: {.columns}
+
+::: {.column width="40%"}
+```{r}
+head(NHANES_20) |> knitr::kable()
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+tail(NHANES_20) |> knitr::kable()
+```
+:::
+
+::::
+
+
+## Normal distribution
+
+```{r}
+ggplot(NHANES_20, aes(Height)) +
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "firebrick4", 
+                 alpha = 0.5,
+                 bins = 30) +
+  geom_line(data = tibble(
+    Height = seq(min(NHANES_20$Height),
+                 max(NHANES_20$Height),
+                 length.out = 100),
+    y = dnorm(Height, mean = mean(NHANES_20$Height),
+              sd = sd(NHANES_20$Height))),
+    aes(Height, y), linewidth = 1.5, color = "#2D5DA1") +
+  theme_classic() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank())
+
+```
+
+
+## References
+
+::: {#refs}
+:::
+

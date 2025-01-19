@@ -25,6 +25,12 @@ csl: evolution.csl
 # Variation {background-color="#40666e"}
 
 
+## Most biological variables are normally distributed
+
+What are your ideas?
+
+
+
 # Questions {background-color="#f8c471"}
 
 
