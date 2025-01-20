@@ -1,6 +1,6 @@
 ---
 title: "Unit 1: Tools for Reproducible Data Analysis"
-subtitle: "Introduction to R, RStudio, and Hellbender and setting up your environment"
+subtitle: "Introduction to R, RStudio, and Hellbender"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -94,7 +94,7 @@ Many uses for plain text files
 # Programming {background-color="#40666e"}
 
 
-## Think about something you know how to do {background-color="#40666e"}
+## Think about something you know how to do
 
 - What is it?
 - How did you learn it?
@@ -143,7 +143,7 @@ You will develop skills for adapting code from a problem you have solved before.
 ## Benefits of programming for data analysis
 
 - Forces you to be explicit in what you want to do
-    - R won't give unless you ask.
+    - R won't give unless you ask
 - Forces you to have a record of your analysis.
     - Add to/modify your data and rerun
     - No point and click confusion or ambiguity
@@ -151,7 +151,7 @@ You will develop skills for adapting code from a problem you have solved before.
     - Revert to an older version
 
 
-# Introduction to R {background-color="#40666e"}
+# Introduction to RStudio {background-color="#40666e"}
 
 
 ## Starting RStudio through OnDemand
@@ -185,8 +185,6 @@ You will develop skills for adapting code from a problem you have solved before.
 - Environment
 - Others that we won't use often
 
-
-# RStudio {background-color="#40666e"}
 
 ## R Console Pane: `>`
 
@@ -225,7 +223,7 @@ You will develop skills for adapting code from a problem you have solved before.
 
 - Install once, use often
     - No need to reinstall
-    - Don't include install code in your Rmd files
+    - Don't include `install.package()` in your files
 - `tidyverse`
 - `cowplot`
 

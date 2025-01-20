@@ -54,14 +54,14 @@ Kevin Middleton (he/him)
 ## Am I qualified to teach this class?
 
 - Probably
-- Taught undergraduates, post-bacs, and graduate students these skills for 15+ years
+- Taught undergraduates, post-bacs, and graduate students for 15+ years
 
 :::{.callout-note}
 ## Why am I teaching this class?
 
 - These skills are increasingly important for you as scientists
-- They will make you a more informed human
-- I think it's worthwhile to learn
+- A basic understanding of statistics will make you a more informed consumer
+- Learning for the sake of learning
 - You might find that you really enjoy it 
 :::
 
