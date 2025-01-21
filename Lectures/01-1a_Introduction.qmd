@@ -125,7 +125,7 @@ Expand the ways in which you think about and interact with science
 ## Desired Student Outcomes
 
 1.	Appreciate that research is a set of skills that can be learned and learn that everyone has a place in research.
-2.	Accept that uncertainty is an inherent property the world and variation is pervasive in nature. We try to make decisions with statistics in the face of that uncertainty and variation.
+2.	Accept that uncertainty is an inherent property of the world and variation is pervasive in nature. We try to make decisions with statistics in the face of that uncertainty and variation.
 3.	Recognize that all aspects of science – from planning to presentation – are collaborative and recognize the benefits of diverse points of view in the scientific process.
 
 

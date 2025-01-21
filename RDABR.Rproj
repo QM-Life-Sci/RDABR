@@ -1,5 +1,4 @@
 Version: 1.0
-ProjectId: 7dbe8eba-37f2-4dcc-94b1-679d8948a300
 
 RestoreWorkspace: Default
 SaveWorkspace: Default
@@ -12,5 +11,3 @@ Encoding: UTF-8
 
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
-
-ProjectName: RDABR
