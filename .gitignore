@@ -54,3 +54,4 @@ rsconnect/
 
 # Template
 /template/
+.DS_Store
