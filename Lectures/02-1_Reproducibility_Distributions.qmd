@@ -250,7 +250,9 @@ What are your ideas?
 :::
 
 
-## Sampling from the globe
+## Collecting data
+
+Sampling from the globe
 
 ![](images/earth.jpg){fig-align="center"}
 
@@ -265,6 +267,13 @@ What are your ideas?
 - 0 / 1
 
 Can be summarized by counts and converted to proportions
+
+
+## Simulate data to test your intuition
+
+1. Know the answer
+2. Simulate data
+3. Check that your answer agrees
 
 
 ## Simulating from binomial distributions: `rbinom()`
@@ -416,7 +425,7 @@ tail(NHANES_20) |> knitr::kable()
 ::::
 
 
-## Normal distribution
+## Heights (mostly) follow a normal distribution
 
 ```{r}
 ggplot(NHANES_20, aes(Height)) +
