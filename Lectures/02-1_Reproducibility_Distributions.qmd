@@ -25,6 +25,15 @@ theme_set(theme_classic())
 ```
 
 
+# Notes
+
+- Major headline: how does the field verify this? How do we trust science?
+    - Superconductivity
+    - CRISPR
+- What would you need to be able to follow along someone's science/analysis?
+- 
+
+
 # Reproducibility {background-color="#40666e"}
 
 
@@ -187,8 +196,8 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 # Linear mixed model
 # Random effects: Sample nested in Population and Year
 tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
-                 (1 |Population/Sample_ID) + 
-                 (1 |Year),
+                 (1 | Population / Sample_ID) + 
+                 (1 | Year),
                data = tvdat)
 
 # Summary output of the model
@@ -209,6 +218,7 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 - More than just comments
 - Add context to your analysis
 - Narrative, figures, tables, etc. all in one document
+    - Your micropublication project
 
 
 # Questions {background-color="#f8c471"}
@@ -217,11 +227,12 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 # Random Samples and Science {background-color="#40666e"}
 
 
-## Randomness
+## Randomness and Sampling
 
 - Inherent to (almost) all processes
+    - Almost nothing is deterministic
+- Sampling lets us learn information about the world
 
-FIXME
 
 ## {background-video="images/earth.mp4" background-video-loop="true" background-video-muted="true"}
 
@@ -239,6 +250,11 @@ What are your ideas?
 :::
 
 
+## Sampling from the globe
+
+![](images/earth.jpg){fig-align="center"}
+
+
 ## Binomial distributions
 
 - Water / Land
@@ -248,7 +264,7 @@ What are your ideas?
 - Alive / Dead
 - 0 / 1
 
-Can be summarized by counts
+Can be summarized by counts and converted to proportions
 
 
 ## Simulating from binomial distributions: `rbinom()`
@@ -258,6 +274,7 @@ Can be summarized by counts
 ```{r}
 #| echo: true
 
+set.seed(234626)
 rbinom(n = 10, size = 1, prob = 0.5)
 ```
 
@@ -270,6 +287,7 @@ rbinom(n = 10, size = 1, prob = 0.5)
 ```{r}
 #| echo: true
 
+set.seed(32463)
 rbinom(n = 10, size = 10, prob = 0.5)
 ```
 
@@ -281,22 +299,47 @@ rbinom(n = 10, size = 10, prob = 0.5)
 ```{r}
 #| echo: true
 
-x = rbinom(n = 10000, size = 10, prob = 0.5)
+set.seed(234627)
+x <- rbinom(n = 10000, size = 10, prob = 0.5)
 ```
 
 - What will be the *most* frequent number?
 - What will be the *least* frequent numbers?
 
+. . .
+
+```{r}
+#| echo: true
+
+x[1:100]
+```
+
+
+## Lots of trials
+
+Sum the counts of each value with `table()`
+
+```{r}
+#| echo: true
+
+x_tab <- table(x)
+x_tab
+```
+
 
 ## Lots of trials
 
 ```{r}
-#| output-location: slide
-
-ggplot(data = tibble(x), aes(x)) +
-  geom_histogram(fill = "navy") +
-  scale_x_continuous(breaks = 0:10)
+ggplot(data = tibble(Count = as.numeric(x_tab),
+                     Successes = 0:10),
+       aes(x = Successes, y = Count)) +
+  geom_bar(stat = "identity", fill = "navy") +
+  scale_x_continuous(breaks = 0:10) +
+  labs(x = "n Successes in 10 Trials")
 ```
+
+
+## Summarizing global sampling
 
 
 ## Normal distribution
