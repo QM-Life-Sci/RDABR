@@ -266,7 +266,7 @@ Sampling from the globe
 - Alive / Dead
 - 0 / 1
 
-Can be summarized by counts and converted to proportions
+Summarized by counts and converted to proportions
 
 
 ## Simulate data to test your intuition
