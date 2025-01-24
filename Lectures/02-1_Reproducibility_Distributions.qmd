@@ -25,13 +25,38 @@ theme_set(theme_classic())
 ```
 
 
-# Notes
+# How is science verified? {background-color="#40666e"}
 
-- Major headline: how does the field verify this? How do we trust science?
-    - Superconductivity
-    - CRISPR
-- What would you need to be able to follow along someone's science/analysis?
-- 
+## October 14, 2020
+
+![](images/BCS_1.png)
+
+
+## September 26, 2022
+
+![](images/BCS_2.png)
+
+
+## 12 years to retraction
+
+![](images/MMR_Lancet.png)
+
+
+## CRISPR-Cas9 (2012)
+
+![](images/CRISPR.png)
+
+
+## Nobel Prize (2020)
+
+![](images/CRISPR_Nobel.png)
+
+
+## What information would you need to follow other scientists' experiments?
+
+:::{.alert}
+Have you tried to do this before?
+:::
 
 
 # Reproducibility {background-color="#40666e"}
@@ -45,9 +70,31 @@ theme_set(theme_classic())
 Often these terms are often used more generally or interchangeably. 
 
 
-## "Replication crisis"
+## "Replication crisis" in science
 
-FIXME
+
+
+## "Replication crisis" in cancer biology
+
+![](images/Cancer_Replicability_1.png)
+
+- 1/4 of 193 experiments could be replicated
+- Effect sizes in those that were replicated were 85% smaller than reported
+
+:::{.right}
+Errington et al. [-@Errington2021-as]
+:::
+
+
+## "Replication crisis" in science
+
+![](images/Cancer_Replicability_2.png){fig-align="center" width="50%"}
+
+![](images/Cancer_Replicability_3.png){fig-align="center" width="80%"}
+
+:::{.right}
+Errington et al. [-@Errington2021-as]
+:::
 
 
 ## What is reproducible research?
@@ -58,11 +105,15 @@ FIXME
 Buffalo [-@Buffalo2015-ah]
 :::
 
+:::{.alert}
+Reproducible data analysis is a step toward reproducible research.
+:::
+
 
 ## R Markdown (`Rmd`) / Quarto (`qmd`)
 
 - Text-based markup languages (i.e., HTML)
-- Variant of markdown
+- Variant of [markdown](https://www.markdownguide.org/)
 - Render to different formats (PDF, HTML, Word)
 - Inline code
     - Your text and analysis coexist together in one file
@@ -75,9 +126,11 @@ Buffalo [-@Buffalo2015-ah]
 
 FIXME
 
+
 # Role of data in science {background-color="#40666e"}
 
 FIXME
+
 
 ## Foundational Principles of Data Management
 
@@ -230,8 +283,8 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 ## Randomness and Sampling
 
 - Inherent to (almost) all processes
-    - Almost nothing is deterministic
-- Sampling lets us learn information about the world
+    - Almost nothing is deterministic in the natural world
+- *Sampling* lets us learn *information* about the world despite the *uncertainty*
 
 
 ## {background-video="images/earth.mp4" background-video-loop="true" background-video-muted="true"}
@@ -250,9 +303,11 @@ What are your ideas?
 :::
 
 
-## Collecting data
+## Collecting data: Sampling from the globe
 
-Sampling from the globe
+- Do all observations have the same set of possible outcomes?
+- Do all observations have an equal chance of being included?
+- Are observations independent of one another?
 
 ![](images/earth.jpg){fig-align="center"}
 
@@ -271,9 +326,11 @@ Summarized by counts and converted to proportions
 
 ## Simulate data to test your intuition
 
-1. Know the answer
-2. Simulate data
+1. Define the question *and* the expected answer
+2. Simulate data following the question
 3. Check that your answer agrees
+
+Simulation is how we know that statistical tests "work" and are not biased (conservative or anticonservative).
 
 
 ## Simulating from binomial distributions: `rbinom()`
@@ -284,10 +341,19 @@ Summarized by counts and converted to proportions
 #| echo: true
 
 set.seed(234626)
-rbinom(n = 10, size = 1, prob = 0.5)
+(x <- rbinom(n = 10, size = 1, prob = 0.5))
 ```
 
 . . .
+
+```{r}
+#| echo: true
+
+mean(x)
+```
+
+
+## Simulating from binomial distributions: `rbinom()`
 
 10 samples of 10 "trials", where the probability is 0.5
 
@@ -297,11 +363,20 @@ rbinom(n = 10, size = 1, prob = 0.5)
 #| echo: true
 
 set.seed(32463)
-rbinom(n = 10, size = 10, prob = 0.5)
+(x <- rbinom(n = 10, size = 10, prob = 0.5))
 ```
 
 
-## Lots of trials
+. . .
+
+```{r}
+#| echo: true
+
+mean(x / 10)
+```
+
+
+## Many trials
 
 - 10 samples of 10 "trials", where the probability is 0.5
 
@@ -324,7 +399,7 @@ x[1:100]
 ```
 
 
-## Lots of trials
+## Many trials
 
 Sum the counts of each value with `table()`
 
@@ -336,7 +411,7 @@ x_tab
 ```
 
 
-## Lots of trials
+## Many trials
 
 ```{r}
 ggplot(data = tibble(Count = as.numeric(x_tab),
