@@ -20,17 +20,27 @@ csl: evolution.csl
 #| echo: false
 
 library(tidyverse)
+theme_set(theme_classic(base_size = 20))
 ```
 
 
 # R Basics {background-color="#40666e"}
 
+
+## Basic R syntax
+
+- Relatively compact
+    - Often subtle
+- We can learn the basics in a lecture or two
+
+
 ## Kinds of data in R
 
-- Character ("a", "Female", "The quick brown fox")
-- Numeric (1.25, 1e6) or integer (1)
-- Logical (`TRUE` or `FALSE`)
-- Factor (categorical)
+- Numeric: 1.25, 1e6
+- Integer: 1, 2, 41
+- Character: "a", "Female", "The quick brown fox"
+- Logical: `TRUE` or `FALSE`
+- Factor: categorical (character)
 
 
 ## Common R objects
@@ -52,7 +62,16 @@ Use `<-` for assign.
 #| echo: true
 
 x <- 65
+y <- 3.348723
+z <- 22/3
+a <- "Hello world"
+b <- TRUE
 ```
+
+:::{.callout-note}
+Base R uses single assignment. Packages have implemented multiple assignment.
+:::
+
 
 ## Vectors
 
@@ -61,26 +80,35 @@ x <- 65
 
 x <- c(112, 2.2, 7, 14.1)
 x
-x[2]  # <1>
+x[2]
 sort(x)
 ```
 
-1. R starts indexing at 1, not zero.
+:::{.callout-important}
+R starts indexing at 1, not at zero (e.g., C, python).
+:::
 
 
-## Vectors
+## Vectors and sequences
+
+- `:` generates sequences of integers
+- `seq()` is more flexible
+    - `by = `
+    - `length.out = `
 
 ```{r}
 #| echo: true
 
 y1 <- 1:10
-y2 <- seq(1, 10, length = 20)
+y2 <- seq(1, 10, length.out = 20)
 y1[1:3]   # <1>
 y2[1:3]
 ```
 
-1. R sequences include the beginning and end. 1:3 is 1, 2, 3.
-
+:::{.callout-note}
+## Sequences in R
+R sequences include the beginning and end. 1:3 is 1, 2, 3.
+:::
 
 ## Vectors
 
@@ -238,10 +266,4 @@ class(MM)
 ```
 
 R interprets what to do based on an object's class
-
-
-## References
-
-::: {#refs}
-:::
 

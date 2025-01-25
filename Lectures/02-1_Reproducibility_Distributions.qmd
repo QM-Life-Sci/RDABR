@@ -21,7 +21,7 @@ csl: evolution.csl
 #| echo: false
 
 library(tidyverse)
-theme_set(theme_classic())
+theme_set(theme_classic(base_size = 20))
 ```
 
 
@@ -52,10 +52,10 @@ theme_set(theme_classic())
 ![](images/CRISPR_Nobel.png)
 
 
-## What information would you need to follow other scientists' experiments?
+## What information would you need to follow an experiments?
 
 :::{.alert}
-Have you tried to do this before?
+In what context have you tried to do this before?
 :::
 
 
@@ -72,6 +72,10 @@ Often these terms are often used more generally or interchangeably.
 
 ## "Replication crisis" in science
 
+![](images/Replication_crisis.png)
+
+- [New Scientist](https://www.newscientist.com/article/mg25433810-400-the-replication-crisis-has-spread-through-science-can-it-be-fixed/)
+- Korbmacher et al. [-@Korbmacher2023-de] - Psychology
 
 
 ## "Replication crisis" in cancer biology
@@ -122,17 +126,25 @@ Reproducible data analysis is a step toward reproducible research.
     - Guides and Tutorials
     
 
+## Markdown-based analyses
+
+- More than just comments
+- Add context to your analysis
+- Narrative, figures, tables, etc. all in one document
+    - Your micropublication project
+
+
 # What constitutes "data" {background-color="#40666e"}
 
-FIXME
+
+## Role of data in science
+
+**Data**: The raw material for doing statistics are data, which come in a variety of forms.
+
+**Information**: The goal of statistics is to gain information, make a decision, or explain (*using data*).
 
 
-# Role of data in science {background-color="#40666e"}
-
-FIXME
-
-
-## Foundational Principles of Data Management
+## Foundational principles of data management
 
 FAIR Guidelines [@Wilkinson2016-tf]
 
@@ -141,7 +153,7 @@ FAIR Guidelines [@Wilkinson2016-tf]
 3. **I**nteroperability
 4. **R**eusability (Reproducibility)
 
-Essential for long term data useability, sharing, and stewardship.
+Essential for long term data use, sharing, and curation.
 
 
 ## FAIR principles for image data
@@ -178,6 +190,7 @@ Prigent et al. [-@Prigent2022-iq]
 
 # Clean coding practices {background-color="#40666e"}
 
+
 ## Writing clean code
 
 Code should be understandable by others (and your future self)
@@ -186,14 +199,10 @@ Code should be understandable by others (and your future self)
 - Readable
 - Well annotated
 
-How would you format an essay?
+How would you format a document that someone else would read?
 
 
 ## Whitespace makes code readable
-
-- Separate elements and processes with spaces and line breaks
-- Limit line length
-- Use indenting to group code
 
 Difficult to read:
 
@@ -211,10 +220,6 @@ xlab(bquote('log(Degree Days above' ~5^o~C*')'))+ylab('sqrt(Terminal Velocity (m
 
 
 ## Whitespace makes code readable
-
-- Separate elements and processes with spaces and line breaks
-- Limit line length
-- Use indenting to group code (Ctrl/Cmd - I to auto-indent in RStudio)
 
 Easier to read:
 
@@ -237,23 +242,31 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 ```
 
 
+## Whitespace makes code readable
+
+- Separate elements and processes with spaces and line breaks
+- Limit line length
+- Use indenting to group code 
+    - Ctrl/Cmd - I to auto-correct indent in RStudio
+
+
 ## Comments are messages to your future self
 
-- Explain the reason & functionality of the code
+- Explain the reason and functionality of the code
 - Any useful messages
 
 ```{r}
 #| echo: true
 #| eval: false
 
-# Linear mixed model
+# Fit a hierarchical linear model
 # Random effects: Sample nested in Population and Year
 tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
                  (1 | Population / Sample_ID) + 
                  (1 | Year),
                data = tvdat)
 
-# Summary output of the model
+# Summarize output of the model
 summary(tvtest)
 
 # Plot tv vs. dd5_tot colored by Region
@@ -266,24 +279,23 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 ```
 
 
-## Markdown-based analyses
+## Examples
 
-- More than just comments
-- Add context to your analysis
-- Narrative, figures, tables, etc. all in one document
-    - Your micropublication project
+[Hard to understand](https://github.com/Middleton-Lab/EDMA/blob/main/Ch_4_pt1.R)
+
+[Easier to understand](https://github.com/Middleton-Lab/binning/blob/master/R/bin.running.R)
 
 
 # Questions {background-color="#f8c471"}
 
 
-# Random Samples and Science {background-color="#40666e"}
+# Sampling to learn about the world {background-color="#40666e"}
 
 
-## Randomness and Sampling
+## Randomness and sampling
 
-- Inherent to (almost) all processes
-    - Almost nothing is deterministic in the natural world
+- Randomness is inherent to repeatable processes
+    - Almost nothing is deterministic in the biological world
 - *Sampling* lets us learn *information* about the world despite the *uncertainty*
 
 
@@ -340,11 +352,18 @@ Simulation is how we know that statistical tests "work" and are not biased (cons
 ```{r}
 #| echo: true
 
+# Set the seed for the RNG to make the simulation reproducible
 set.seed(234626)
-(x <- rbinom(n = 10, size = 1, prob = 0.5))
+
+# Generate 10 trials from a binomial (Bernoulli) distribution
+# Probability = 0.5
+x <- rbinom(n = 10, size = 1, prob = 0.5)
+x
 ```
 
 . . .
+
+Calculate the mean of the 10 trials
 
 ```{r}
 #| echo: true
@@ -363,9 +382,17 @@ mean(x)
 #| echo: true
 
 set.seed(32463)
-(x <- rbinom(n = 10, size = 10, prob = 0.5))
+x <- rbinom(n = 10, size = 10, prob = 0.5)
+x
 ```
 
+. . .
+
+Calculate the mean of the 10 trials.
+
+:::{.alert}
+What is your prediction for the mean?
+:::
 
 . . .
 
@@ -378,7 +405,7 @@ mean(x / 10)
 
 ## Many trials
 
-- 10 samples of 10 "trials", where the probability is 0.5
+10,000 trials of 10 samples...
 
 ```{r}
 #| echo: true
@@ -411,7 +438,7 @@ x_tab
 ```
 
 
-## Many trials
+## Summarizing counts with a histogram
 
 ```{r}
 ggplot(data = tibble(Count = as.numeric(x_tab),
@@ -423,7 +450,9 @@ ggplot(data = tibble(Count = as.numeric(x_tab),
 ```
 
 
-## Summarizing global sampling
+## Summarizing sampling from the globe
+
+![](images/earth.jpg){fig-align="center"}
 
 
 ## Normal distribution
@@ -446,6 +475,8 @@ Schilling et al. [-@Schilling2002-mm]
 
 ## Heights for 6,465 individuals
 
+- Assigned male at birth
+
 ```{r}
 NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |> 
   filter(Sex == "Male") |> 
@@ -463,8 +494,7 @@ ggplot(NHANES, aes(x = Age, y = Height)) +
              position = position_jitter(width = 0.25, seed = 3847293),
              color = "firebrick4") +
   scale_x_continuous(breaks = seq(0, 80, by = 5)) +
-  labs(x = "Age (y)", y = "Height (cm)") +
-  theme_classic()
+  labs(x = "Age (y)", y = "Height (cm)")
 ```
 
 
@@ -477,7 +507,7 @@ ggplot(NHANES_20, aes(Height)) +
   geom_histogram(bins = 30, show.legend = FALSE,
                  fill = "firebrick4") +
   labs(x = "Height (cm)", y = "Count") +
-  theme_classic()
+  scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -515,10 +545,9 @@ ggplot(NHANES_20, aes(Height)) +
     y = dnorm(Height, mean = mean(NHANES_20$Height),
               sd = sd(NHANES_20$Height))),
     aes(Height, y), linewidth = 1.5, color = "#2D5DA1") +
-  theme_classic() +
   theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank())
-
+        axis.text.y = element_blank()) +
+  scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
