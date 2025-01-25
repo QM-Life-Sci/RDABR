@@ -452,7 +452,9 @@ ggplot(data = tibble(Count = as.numeric(x_tab),
 
 ## Summarizing sampling from the globe
 
-![](images/earth.jpg){fig-align="center"}
+- What is your prediction for the percentage of water?
+- What are plausible values?
+- What are implausible values?
 
 
 ## Normal distribution
