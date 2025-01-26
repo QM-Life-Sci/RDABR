@@ -8,13 +8,18 @@ LW <- read_excel("../data/Earth_Land_Water.xlsx") |>
   mutate(C_Land = cumsum(Land),
          C_Water = cumsum(Water),
          `Percent Water` = C_Water / (C_Water + C_Land),
-         Sample = 1:n())
+         Sample = 1:n()) |> 
+  relocate(Sample)
 
 LW
 
 ggplot(LW, aes(x = Sample, y = `Percent Water`)) +
   geom_line(color = "firebrick4", linewidth = 2) +
   scale_y_continuous(limits = c(0, 1))
+
+BinomCI(9, 10,
+        conf.level = 0.95,
+        method = "clopper-pearson")
 
 ################################################################
 
@@ -36,10 +41,6 @@ ggplot(LW, aes(x = Sample, y = `Percent Water`)) +
   scale_y_continuous(limits = c(0, 1))
 
 ################################################################
-
-BinomCI(9, 10,
-        conf.level = 0.95,
-        method = "clopper-pearson")
 
 BinomCI(81, 100,
         conf.level = 0.95,
