@@ -46,8 +46,8 @@ theme_set(theme_classic(base_size = 20))
 ## Common R objects
 
 1. Vectors
-1. Matrices
 1. `data.frame`s and `tibble`s
+1. Matrices
 1. Functions
 
 
@@ -135,34 +135,6 @@ y2_sd
 ```
 
 
-## Matrices
-
-Rectangular object of *one data type*
-
-- Indexed by [Rows, Columns]
-- Default is to fill by column (`byrow = TRUE` for row-wise)
-
-```{r}
-#| echo: true
-
-M <- matrix(1:9, nrow = 3, ncol = 3)
-M
-M[2, 2]
-```
-
-
-## Matrices
-
-```{r}
-#| echo: true
-
-M[1, ]
-M[, 1]
-```
-
-![](https://i.imgur.com/1yKQBJZ.png){fig-align="center"}
-
-
 ## `data.frame()`: a basic unit of storage
 
 Mixed data types per column
@@ -229,6 +201,24 @@ MM
 ```
 
 1. Creation of a column can refer back to previously created columns
+
+
+## Matrices
+
+Rectangular object of *one data type*
+
+- Indexed by [Rows, Columns]
+- Default is to fill by column (`byrow = TRUE` for row-wise)
+
+```{r}
+#| echo: true
+
+M <- matrix(1:9, nrow = 3, ncol = 3)
+M
+M[2, 2]
+```
+
+- We won't use matrices very often
 
 
 ## Functions
