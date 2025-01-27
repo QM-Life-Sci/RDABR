@@ -21,7 +21,28 @@ csl: evolution.csl
 ```
 
 
+# Exploring Variation {background-color="#40666e"}
+
+
+# Normal distribution
+
+
+## Data viz
+
+
 # Univariate Summaries {background-color="#40666e"}
+
+
+# Sampling from Distributions {background-color="#40666e"}
+
+
+## Programming Loops
+
+
+# Moving Data {background-color="#40666e"}
+
+
+## Import / export
 
 
 # Questions {background-color="#f8c471"}

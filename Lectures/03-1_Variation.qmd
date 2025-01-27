@@ -25,10 +25,21 @@ csl: evolution.csl
 # Variation {background-color="#40666e"}
 
 
+# Normal distribution
+
+
 ## Most biological variables are normally distributed
 
 What are your ideas?
 
+
+# Randomization {background-color="#40666e"}
+
+
+# Intro to Data Viz {background-color="#40666e"}
+
+
+## Accessibility and Reproducibility
 
 
 # Questions {background-color="#f8c471"}
