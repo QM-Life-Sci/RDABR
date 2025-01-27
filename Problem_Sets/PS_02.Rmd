@@ -14,7 +14,6 @@ output:
 #| message: false
 #| warning: false
 
-library(tidyverse)
 ```
 
 > "...the descriptive and analytical power of an adequate programming language amply repays the considerable effort required for its mastery." Ken Iverson^[Iverson, K. E. 1962. A Programming Language. John Wiley & Sons Inc.]
@@ -112,17 +111,8 @@ Look at the help for `seq()` and `rep()` to help you with 5 through 9 (and maybe
 Choose names for each of these vectors. Add your code to the block below.
 
 ```{r}
-# FIXME
-v1 <- c(1, 6, 10, 14.75)
-v2 <- c(TRUE, TRUE, FALSE)
-v3 <- c("a", "aa", "aaa")
-v4_1 <- 5:100               # Using the : operator
-v4_2 <- seq(5, 100, by = 1) # This also works
-v5 <- seq(5, 100, by = 5)
-v6 <- seq(5, 100, length = 60)
-v7 <- rep(17, times = 10)
-v8 <- rep(c(1, 2, 3), each = 10)
-v9 <- rep(c(1, 2, 3), length = 3 * 10)
+
+
 ```
 
 
@@ -157,36 +147,9 @@ The numbers (1-9) in the list below correspond to those in the list above.
 8. Which values equal 1?
 9. Which values do not equal 1?
 
-> The following will just return a TRUE/FALSE vector:
-
 ```{r}
-# FIXME
-# 1
-v1 > 5
 
-# 2
-v2 == FALSE
 
-# 3
-"a" %in% v3
-
-# 4
-v4_1 <= 10
-
-# 5
-v5 >= 10
-
-# 6
-sum(v6 < 50)
-
-# 7
-sum(v7 == 17)
-
-#7
-v8 == 1
-
-# 8
-v9 != 1
 ```
 
 
@@ -206,11 +169,7 @@ all.equal(a * a, 2)
 
 Line by line, explain what the statements above are doing and the R output of each. Look at the help for `all.equal()` if you need to. Enter your explanation after the `>` below.
 
-> 1. Assign the square root of 2 to `a`
-> 2. Print `a`
-> 3. Print `a` * `a`. 2 here. 
-> 4. Test whether `a` * `a` equals 2. FALSE. So R is storing a internally with some number of digits. So that when `a` is squared, it doesn't exactly equal 2. Because of #3, R must be rounding when it prints. Try `print(a * a, digits = 20)`.
-> 5. The `all.equal()` function compares two values and tests where they are equal to a certain level of certainty, called the `tolerance`. By default this value is $10^{-8}$.
+> 
 
 
 ## `data.frame()`s and `tibble()`s
@@ -229,29 +188,14 @@ Create a `data.frame` or `tibble` with the following columns:
 If you use a `tibble()`, you will need to load the `tidyverse` package: `library(tidyverse)`. Typically, packages are loaded at the beginning of a script (e.g., the first `setup` chunk).
 
 ```{r}
-# FIXME
-D <- data.frame(
-  Tx_Group = rep(c("control", "high"), each  = 10),
-  Replicate = rep(c(1, 2, 1, 2), each = 5),
-  Productivity = c(rnorm(10, 5, 2), rnorm(10, 7, 2)),
-  stringsAsFactors = FALSE
-)
 
-# This also works with c(5, 7) inside rnorm, but it's
-# less clear.
-D <- data.frame(
-  Tx_Group = rep(c("control", "high"), each  = 10),
-  Replicate = rep(c(1, 2, 1, 2), each = 5),
-  Productivity = rnorm(10, c(5, 7), 2),
-  stringsAsFactors = FALSE
-)
 ```
 
 Use the `str()` function to get information about the data.frame. This will allow you to verify that `Tx_Group` has the type character. Note that even though `Replicate` only contains the integers 1 and 2, R treats it as a numeric.
 
 ```{r}
-# FIXME
-str(D)
+
+
 ```
 
 
@@ -273,22 +217,8 @@ Use your data.frame (or tibble) from the question above. Extract the following s
 5. Rows 1-10 of only the Productivity column
 
 ```{r}
-# FIXME
-# 1
-D[, "Productivity"]
 
-# 2
-D$Productivity
 
-# 3
-D[, 2]
-
-# 4
-D[1:10, ]
-
-# 5
-D[1:10, "Productivity"]
-D$Productivity[1:10] # Get column with $, then subset
 ```
 
 We will do more complex filtering next week (e.g., only rows from replicate 1 where productivity is less than 5).
@@ -317,11 +247,8 @@ These functions take a vector or matrix and return a single value or a new matri
 Try functions operating on the matrix you created above.
 
 ```{r}
-# FIXME
-mean(x)
-sd(x)
-median(x)
-t(x)
+
+
 ```
 
 
@@ -336,12 +263,8 @@ Take the following code chunk and make the code more readable by adding spaces a
 
 ```{r}
 # FIXME
-M1 <- data.frame(x = 11:20,
-                 y = c(20:11),
-                 l = letters[1:10])
-M2 <- tibble(ID = seq(1, 100, by = 1),
-             x = rnorm(n = 100, mean = 10, sd = 5),
-             y = 8.4 * x + rnorm(n = 100, mean = 0, sd = 1))
+M1 <- data.frame(x=11:20,y=c(20:11),l=letters[1:10])
+M2 <- tibble(ID=seq(1, 100, 1),x=rnorm(100,10,5),y=8.4*x+rnorm(100,0,1))
 ```
 
 What is `letters`?

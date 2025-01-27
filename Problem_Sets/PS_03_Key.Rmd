@@ -1,0 +1,41 @@
+---
+title: 'Problem Set 03'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+```
+
+## Simulating data
+
+
+## Visualizing distributions with histograms
+
+
+## Considerations with histograms
+
+
+## Density plots
+
+
+## Univariate summaries
+
+
+## Importing data
+
+
+## Summarizing via sampling
+
+
+## Importing data
