@@ -22,6 +22,9 @@ csl: evolution.csl
 ```
 
 
+# Intro to Data Viz {background-color="#40666e"}
+
+
 # Variation {background-color="#40666e"}
 
 
@@ -33,10 +36,7 @@ csl: evolution.csl
 What are your ideas?
 
 
-# Randomization {background-color="#40666e"}
-
-
-# Intro to Data Viz {background-color="#40666e"}
+# Randomization / Simulation {background-color="#40666e"}
 
 
 ## Accessibility and Reproducibility

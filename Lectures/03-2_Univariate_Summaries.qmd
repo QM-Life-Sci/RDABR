@@ -26,6 +26,9 @@ csl: evolution.csl
 
 # Normal distribution
 
+- 1 sd, 2 sd
+- Role of sample size
+
 
 ## Data viz
 
@@ -34,6 +37,9 @@ csl: evolution.csl
 
 
 # Sampling from Distributions {background-color="#40666e"}
+
+
+# UBC website
 
 
 ## Programming Loops

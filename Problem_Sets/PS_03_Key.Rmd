@@ -35,7 +35,8 @@ library(tidyverse)
 ## Importing data
 
 
+## Intuition for distributions / summaries
+
+
 ## Summarizing via sampling
 
-
-## Importing data
