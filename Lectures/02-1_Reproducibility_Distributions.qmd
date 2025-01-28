@@ -185,7 +185,7 @@ Prigent et al. [-@Prigent2022-iq]
 
 ## Analysis workflow
 
-![](../images/Workflow.drawio.png){fig-align="center" width="80%"}
+![](images/Workflow.drawio.png){fig-align="center" width="80%"}
 
 
 # Clean coding practices {background-color="#40666e"}
