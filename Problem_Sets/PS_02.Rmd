@@ -82,7 +82,8 @@ sd(4:10)
 
 Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">" is the Markdown syntax for a block quote, which will make finding your answers easier.)
 
-> The first line creates and object called `sd` that contains the standard deviation of the number 1, 2, 3, 4, 5, 6. The second line prints that value. The third line prints the standard deviation of the numbers 4 through 10. R must be somehow keeping our variable `sd` separate from its internal function `sd()`. If you were able to overwrite the `sd()` function, then the last line would not work correctly. Although R is good about not overwriting variables (in almost all cases), it is best practice to not use R function names for variables.
+> 
+
 
 Now add comments to the code chunk above briefly annotating your answer above. 
 
@@ -269,8 +270,8 @@ M2 <- tibble(ID=seq(1, 100, 1),x=rnorm(100,10,5),y=8.4*x+rnorm(100,0,1))
 
 What is `letters`?
 
-> A string vector containing the letters a-z.
+> 
 
 Explain how `y` is constructed in `M2`.
 
-> The values from `x` that are produced are passed on to the next like to create `y`. This an important difference with data.frame(). tibble() allows you to use a variable any time after it has been created. data.frame() does not.
+> 
