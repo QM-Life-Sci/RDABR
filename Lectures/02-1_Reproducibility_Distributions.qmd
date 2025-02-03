@@ -492,7 +492,7 @@ ggplot(data = tibble(Count = as.numeric(x_tab),
 
 ## Normal distribution
 
-![](images/Heights.png)
+![](images/Heights.png){fig-align="center"}
 
 
 :::{.right}
