@@ -26,6 +26,30 @@ theme_set(theme_classic(base_size = 20))
 ```
 
 
+# Housekeeping {background-color="#40666e"}
+
+## Problem set
+
+- Turn in when you are ready
+
+
+## Week three check in
+
+
+
+## Hellbender
+
+- Connection problems
+- Tidyverse won't load
+
+:::{.alert}
+How do you feel about local installation?
+:::
+
+- 1-2 GB free space
+- Simplifies your workflow
+
+
 # Introduction to Data Visualization {background-color="#40666e"}
 
 
@@ -559,11 +583,11 @@ Genome-wide Association Studies (GWAS)
 
 ## Simulating heights
 
-What is the binomial equation for genes contributing to height?
+What is the binomial equation for SNPs contributing to height?
 
 . . .
 
-$$\binom{Genes}{Active} = \frac{Active!}{Active!~(Genes - Active)!}$$
+$$\binom{SNPs}{Taller} = \frac{Taller!}{Taller!~(SNPs - Taller)!}$$
 
 . . .
 
@@ -572,35 +596,58 @@ $$\binom{3290}{0 \dots 3290} = \frac{(0 \dots 3290)!}{(0 \dots 3290)!~((3290) - 
 
 ## Simulating heights
 
-How can we simulate the effects of many genes with `rbinom()`?
+How can we simulate the effects of many SNPs with `rbinom()`?
 
 . . .
 
 ```{r}
 #| echo: true
 
-set.seed(34723487)
+# Set the number of SNPs
+SNPs <- 3290
 
-Genes <- 3290
-Active_Genes <- 0:Genes
+# Set the seed for reproducibility
+set.seed(32487)
+```
 
-x <- rbinom(n = Genes, size = Active_Genes, prob = 0.5)
-x[1:100]
+. . .
+
+- 10,000 Individuals
+- All individuals inherit 3290 SNPs
+- Each SNP can be "Taller" (1) or "Average" (0)
+
+```{r}
+#| echo: true
+
+x <- rbinom(n = 10000, size = SNPs, prob = 0.5)
 ```
 
 
-## Distribution of gene effects
+## Distribution of "Taller" SNPs 
+
+```{r}
+x[1:100]
+```
+
+. . .
 
 ```{r}
 #| echo: true
 #| output-location: slide
 
-ggplot(data = tibble(Active = Active_Genes[-1],
-                     Effect = x),
-       aes(x = Active, y = Effect)) +
-  geom_bar(stat = "identity", fill = "skyblue")
-
+ggplot(data = tibble(x),
+       aes(x)) +
+  geom_histogram(bins = 30, fill = "skyblue") +
+  labs(x = "Number of Taller SNPs",
+       y = "Count")
 ```
+
+
+## Assumptions of the model
+
+
+## Exact probabilities
+
 
 
 # Questions {background-color="#f8c471"}
