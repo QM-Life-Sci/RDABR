@@ -18,7 +18,18 @@ csl: evolution.csl
 ```{r}
 #| label: setup
 #| echo: false
+
+library(tidyverse)
+
+theme_set(theme_classic(base_size = 20))
 ```
+
+
+# Three-week check in
+
+## Details
+
+FIXME
 
 
 # Exploring Variation {background-color="#40666e"}
@@ -40,6 +51,9 @@ csl: evolution.csl
 
 
 # UBC website
+
+
+# Randomization / Simulation {background-color="#40666e"}
 
 
 ## Programming Loops
