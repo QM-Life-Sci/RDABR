@@ -34,9 +34,6 @@ library(readxl)
 ## Univariate summaries
 
 
-## Importing data
-
-
 ## Intuition for distributions / summaries
 
 
@@ -52,8 +49,9 @@ The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to t
 
 ### Activity
 
-Load the data in the file `Silver_fir.xlsx` (you will need to use `read_excel()` from the `readxl` package). Determine how missing data were coded in the file and pass the appropriate argument for NAs. 
+Load the data in the file `Silver_fir.xlsx` (you will need to use `read_excel()` from the `readxl` package). 
 
+- Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_excel()`).
 - The columns `family` and `block` are numeric, but should be converted to factors.
 - Only `select()` the columns: `family`, `block`, `population`, and `ht97mm` (height in 1997 in mm)
 

@@ -362,7 +362,8 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ```
 
 - Add an interesting color palette
-- [Paletteer gallery](https://pmassicotte.github.io/paletteer_gallery/)
+- [Paletteer gallery](https://pmassicotte.github.io/paletteer_gallery/){target="_blank"}
+- [R colors](https://derekogle.com/NCGraphing/resources/colors){target="_blank"}
 
 
 ## Building plots: Custom color palette
@@ -389,15 +390,15 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ::: {.column width="50%"}
 R Packages
 
-- [colorBlindness](https://cran.r-project.org/web/packages/colorBlindness/vignettes/colorBlindness.html)
-- [colorblindr](https://github.com/clauswilke/colorblindr)
+- [colorBlindness](https://cran.r-project.org/web/packages/colorBlindness/vignettes/colorBlindness.html){target="_blank"}
+- [colorblindr](https://github.com/clauswilke/colorblindr){target="_blank"}
 :::
 
 ::: {.column width="50%"}
 Accessible palettes
 
-- [RColorbrewer](https://colorbrewer2.org/)
-- [Okabe-Ito](https://siegal.bio.nyu.edu/color-palette/)
+- [RColorbrewer](https://colorbrewer2.org/){target="_blank"}
+- [Okabe-Ito](https://siegal.bio.nyu.edu/color-palette/){target="_blank"}
 :::
 
 ::::

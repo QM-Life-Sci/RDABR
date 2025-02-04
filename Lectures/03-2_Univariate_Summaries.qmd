@@ -47,11 +47,12 @@ theme_set(theme_classic(base_size = 20))
 
 1. Frequency distribution
     - Shows the number of times each measurement occurs in a sample (possibly "binned")
+    - Counts of Heads, Water, Taller SNPs, etc.
 1. Probability distribution:
     - A probability distribution shows the probability that measurement occurs in a sample.
 
 
-## What is a (probability) distribution?
+## Probability distributions
 
 Mathematical function for *probabilities* of *possible outcomes*
 
@@ -94,11 +95,11 @@ dnorm(x = 1, mean = 0, sd = 1)
 
 ## Normal distribution
 
-Calculate the probability across the range $-2$ to $2$ for $\mu = 0$ and $\sigma = 1$:
+Calculate the probability across the range $-3$ to $3$ for $\mu = 0$ and $\sigma = 1$:
 
 ```{r}
 #| echo: true
-Std_Normal <- tibble(x = seq(-2, 2, length.out = 100),
+Std_Normal <- tibble(x = seq(-3, 3, length.out = 100),
                      Probability = dnorm(x, mean = 0, sd = 1))
 ```
 
@@ -106,7 +107,7 @@ Plot the probability as a line:
 
 ```{r}
 #| echo: true
-#| output-location: slide
+#| eval: false
 
 ggplot() +
   geom_line(data = Std_Normal,
@@ -116,13 +117,40 @@ ggplot() +
   geom_point(aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
              size = 4,
              color = "salmon") +
-  scale_y_continuous(breaks = seq(0, 0.5, by = 0.05))
+  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
 
-- Area under the curve = 1 integrating $-\infty < x < \infty$
+
+## Normal distribution
+
+```{r}
+#| echo: false
+
+ggplot() +
+  geom_line(data = Std_Normal,
+            aes(x, Probability),
+            color = "darkgreen",
+            linewidth = 1.5) +
+  geom_point(aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
+             size = 5,
+             color = "salmon") +
+  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+```
+
+Area under the curve = 1 integrating $Pr[x]$ for $-\infty < x < \infty$
 
 
-## Other distributions
+## Try `dnorm()`
+
+- Pick a value for $x$
+- Choose `mean` and `sd`
+
+See what probabilities you find.
+
+
+## Many distributions
 
 ![](images/distributions.png){fig-align="center" width="80%"}
 
@@ -134,23 +162,127 @@ Normal distribution
 :::
 
 
-# Normal distribution
+## Describing a normal distribution
 
-- 1 sd, 2 sd
-- Role of sample size
+Central tendency
 
-# mean and median
+- Mean
+- Median
+- Mode (most common value)
 
-# Univariate Summaries {background-color="#40666e"}
+Spread
+
+- Standard deviation
+- Interquartile range
+
+
+## Sample (arithmetic) mean
+
+$$\bar{x} = \frac{\sum^n_{i=1}x_i}{n}$$
+
+. . .
+
+- "From $i = 1$ to $i = n$, sum ($\Sigma$) each observation ($x_i$), where $n$ is the count of observations."
+- "Mean" is preferred to "average".
+    - Most of the time they are synonymous. 
+
+
+## Median
+
+- The central observations of a sample
+- The 50th percentile
+- The 0.50 quantile).
+- If $n$ is even, then the median is the mean of the two middle observations.
+
+```{r}
+#| echo: true
+
+1:10
+median(1:10)
+quantile(1:10, prob = 0.5)
+```
+
+
+## Mean vs. Median
+
+Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus aculeatus*) with three different *Ectodysplasin* genotypes (*mm*, *Mm*, and *MM*).
+
+![](https://i.imgur.com/Xr68AKa.jpg){fig-align="center"}
+
+
+## Mean vs. Median
+
+```{r}
+SticklebackPlates <- read_csv("../data/Stickleback_Plates.csv",
+                              show_col_types = FALSE)
+```
+
+```{r}
+#| echo: true
+
+glimpse(SticklebackPlates)
+```
+
+
+## Mean vs. Median
+
+```{r}
+ggplot(SticklebackPlates, aes(x = plates)) +
+  geom_histogram(bins = 30, fill = "gray75") +
+  facet_grid(genotype ~ .) +
+  labs(x = "Number of Lateral Body Plates", y = "Count") +
+  theme(strip.text = element_text(face = "italic"))
+```
+
+
+## Mean vs. Median
+
+```{r}
+#| echo: true
+
+SticklebackPlates |> 
+  summarize(mean_plate = mean(plates),
+            median_plate = median(plates),
+            .by = genotype)
+```
+
+
+## Mean is sensitive to extreme values
+
+```{r}
+M <- SticklebackPlates |> 
+  group_by(genotype) |> 
+  summarize(Mean = mean(plates),
+            Median = median(plates),
+            .groups = "drop") |> 
+  gather(Value, x, -genotype)
+
+ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
+  geom_histogram(bins = 30, fill = "gray75") +
+  geom_vline(data = M, aes(xintercept = x, color = Value),
+             linewidth = 2) +
+  scale_color_manual(values = c("firebrick4", "navyblue")) +
+  facet_grid(genotype ~ .) +
+  labs(x = "Number of Lateral Body Plates", y = "Count") +
+  theme(strip.text = element_text(face = "italic"))
+```
+
+
+# Questions {background-color="#f8c471"}
 
 
 # Sampling from Distributions {background-color="#40666e"}
 
+[Kingfisher fish-sampling demo](https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm){target="_blank"}
 
-# UBC website
 
+## Means of samples
 
-# Randomization / Simulation {background-color="#40666e"}
+Law of Large Numbers
+
+- The mean of repeated samples from a population will converge on the true value
+- Long-run means are very predictable
+- Water/land sampling from inflatable globes
 
 
 ## Programming Loops
