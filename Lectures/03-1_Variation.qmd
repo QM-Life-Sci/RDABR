@@ -58,6 +58,7 @@ theme_set(theme_classic(base_size = 20))
 
 - Connection problems
 - Tidyverse won't load
+- RCSS won't answer my emails
 
 :::{.alert}
 How do you feel about local installation on your laptop?
@@ -65,6 +66,7 @@ How do you feel about local installation on your laptop?
 
 - 1-2 GB free space
 - Simplifies your workflow
+    - All files local
 
 
 # Introduction to Data Visualization {background-color="#40666e"}
@@ -126,8 +128,9 @@ set.seed(38479238)
 DD <- tibble(weight = c(rnorm(50, 5, 1),
                         rnorm(40, 5.5, 1), 
                         rnorm(10,15,2)),
-             group = rep(c("ctrl","treatment"), each = 50),
-             year = rep(paste0("year", c(1,2,3,5,4)),each = 10, times = 2))
+             group = rep(c("Control","Treatment"), each = 50),
+             year = rep(c(1,2,3,5,4),each = 10, times = 2)) |> 
+  mutate(year = factor(year))
 ```
 
 ```{r}
@@ -139,11 +142,7 @@ glimpse(DD)
 . . .
 
 ```{r}
-#| echo: true
-
-DD |> 
-  group_by(group) |>
-  summarize(mean = mean(weight))
+DD |> knitr::kable(digits = 2)
 ```
 
 
@@ -151,9 +150,19 @@ DD |>
 
 ```{r}
 #| echo: true
+DD |> count(group)
+
+DD |> 
+  group_by(group) |>
+  summarize(mean = mean(weight))
+```
+
+. . .
+
+```{r}
+#| echo: true
 
 t.test(weight ~ group, data = DD)
-
 ```
 
 
@@ -165,10 +174,12 @@ t.test(weight ~ group, data = DD)
 DD |>
   ggplot(aes(group, weight)) +
   geom_point(position = position_jitter(width = 0.2), size = 3,
-             alpha = 1/2) +
+             alpha = 0.75) +
   stat_summary(fun = mean, geom = "point", size = 5, color = "steelblue") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "steelblue", linewidth = 1.5) 
+               color = "steelblue", linewidth = 1) +
+  labs(x = "Group",
+       y = "Weight (g)")
 ```
 
 
@@ -180,10 +191,13 @@ DD |>
 DD |>
   ggplot(aes(group, weight, color = year)) +
   geom_point(position = position_jitter(width = 0.2), size = 3,
-             alpha = 1/2) +
+             alpha = 0.75) +
   stat_summary(fun = mean, geom = "point", size = 5, color = "black") +
   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "black", linewidth = 1.5) 
+               color = "black", linewidth = 1)  +
+  scale_color_brewer(type = "qual", name = "Year", palette = "Set1") +
+  labs(x = "Group",
+       y = "Weight (g)")
 
 ```
 
@@ -287,7 +301,7 @@ ggplot(iris, aes(x = Petal.Length)) +
   geom_histogram() 
 ```
 
-- Adding `geom_histogram()`
+- Using `geom_histogram()` instead of `geom_point()`
 
 
 ## Building plots: Point color
@@ -409,7 +423,7 @@ ggplot(iris, aes(x = Petal.Length,
        caption = "Anderson (1935)")
 ```
 
-- Add a title and better axis labels
+- Add a main title and better axis titles
 
 
 ## Building plots: Axis scales
@@ -430,7 +444,7 @@ ggplot(iris, aes(x = Petal.Length,
        caption = "Anderson (1935)")
 ```
 
-- `scale_x_continuous()` controls the axis ticks and labels
+- `scale_x_continuous()` controls the axis ticks and tick labels
 
 
 # Questions {background-color="#f8c471"}

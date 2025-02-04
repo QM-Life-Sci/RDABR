@@ -25,14 +25,113 @@ theme_set(theme_classic(base_size = 20))
 ```
 
 
-# Three-week check in
+# Housekeeping {background-color="#40666e"}
 
-## Details
+- Three-week check in (link on Canvas)
+- PS 2 due sometime soon
+- Start PS 3 today
+- Any other questions?
 
-FIXME
+
+# Distributions {background-color="#40666e"}
+
+
+## Distributions
+
+- All observations can be thought of as coming from a population that can be represented as a distribution
+- Flip a coin 6 times and get HHTTHT: one observation in a distribution of possible outcomes (THTHTH, HHHTTT, etc.)
+- Catch a rodent in my swimming pool and test its endurance: that data point is one value in the larger distribution of all endurance measures for all rodents
+
+
+## Distributions most commonly encountered
+
+1. Frequency distribution
+    - Shows the number of times each measurement occurs in a sample (possibly "binned")
+1. Probability distribution:
+    - A probability distribution shows the probability that measurement occurs in a sample.
+
+
+## What is a (probability) distribution?
+
+Mathematical function for *probabilities* of *possible outcomes*
+
+- *Probabilities*: between 0 and 1
+- *Possible outcomes*: real number, integer, binomial (0/1), etc.
+
+Normal distribution ($x$, $\mu$, $\sigma$):
+
+$$
+Pr\left[x\right] = \frac{1}{\sqrt{2\pi\sigma^{2}}}e^{\frac{-\left(x-\mu\right)^{2}}{2\sigma^{2}}}
+$$
+
+
+## Normal distribution
+
+$$
+Pr\left[x\right] = \frac{1}{\sqrt{2\pi\sigma^{2}}}e^{\frac{-\left(x-\mu\right)^{2}}{2\sigma^{2}}}
+$$
+
+```{r}
+#| echo: true
+
+Normal <- function(x, mu, sigma) {
+  (1 / (sqrt(2 * pi * sigma^2))) * exp((-1 * (x - mu)^2) / (2 * sigma^2))
+}
+
+Normal(x = 1, mu = 0, sigma = 1)
+```
+
+. . .
+
+R has built-in functions for probability distributions ("densities"):
+
+```{r}
+#| echo: true
+
+dnorm(x = 1, mean = 0, sd = 1)
+```
+
+
+## Normal distribution
+
+Calculate the probability across the range $-2$ to $2$ for $\mu = 0$ and $\sigma = 1$:
+
+```{r}
+#| echo: true
+Std_Normal <- tibble(x = seq(-2, 2, length.out = 100),
+                     Probability = dnorm(x, mean = 0, sd = 1))
+```
+
+Plot the probability as a line:
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+ggplot() +
+  geom_line(data = Std_Normal,
+            aes(x, Probability),
+            color = "darkgreen",
+            linewidth = 1.5) +
+  geom_point(aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
+             size = 4,
+             color = "salmon") +
+  scale_y_continuous(breaks = seq(0, 0.5, by = 0.05))
+```
+
+- Area under the curve = 1 integrating $-\infty < x < \infty$
+
+
+## Other distributions
+
+![](images/distributions.png){fig-align="center" width="80%"}
 
 
 # Exploring Variation {background-color="#40666e"}
+
+:::{.center}
+Normal distribution
+:::
 
 
 # Normal distribution
@@ -40,9 +139,7 @@ FIXME
 - 1 sd, 2 sd
 - Role of sample size
 
-
-## Data viz
-
+# mean and median
 
 # Univariate Summaries {background-color="#40666e"}
 

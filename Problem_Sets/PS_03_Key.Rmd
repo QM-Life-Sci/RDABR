@@ -15,7 +15,9 @@ output:
 #| warning: false
 
 library(tidyverse)
+library(readxl)
 ```
+
 
 ## Simulating data
 
@@ -40,3 +42,89 @@ library(tidyverse)
 
 ## Summarizing via sampling
 
+
+## Adaptation to drought stress in Silver Fir
+
+The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to the mountainous regions of Europe. Csillery and colleagues carried out a very large (n > 8,000 measurements) greenhouse experiment to study the genetic adaptations to drought tolerance in *Abies*. We are going to work with a part of this data set to explore the mean and median.
+
+![](https://www.cirrusimage.com/Trees/Fir/silver_fir_12.jpg){fig-align="center"}
+
+
+### Activity
+
+Load the data in the file `Silver_fir.xlsx` (you will need to use `read_excel()` from the `readxl` package). Determine how missing data were coded in the file and pass the appropriate argument for NAs. 
+
+- The columns `family` and `block` are numeric, but should be converted to factors.
+- Only `select()` the columns: `family`, `block`, `population`, and `ht97mm` (height in 1997 in mm)
+
+Examine the resulting file with `str()` or `glimpse()`. You should have only 4 columns.
+
+```{r}
+# FIXME
+SF <- read_excel("../data/Silver_fir.xlsx", na = "NA") |> 
+  mutate(family = factor(family),
+         block = factor(block)) |> 
+  select(family, block, population, ht97mm)
+
+glimpse(SF)
+```
+
+These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`. 
+
+Tally up (`count()`) by `population`, `family`, and `block` to determine number of observations in each subgroup. Calculate the mean number of observations per group. See lecture 3-1 for an example of counting and summarizing.
+
+```{r}
+# FIXME
+SF |> 
+  count(population, family, block)
+
+SF |> 
+  count(population, family, block) |> 
+  summarize(mean_n = mean(n))
+```
+
+About how many seedlings are at the smallest replicate `block` level of the data?
+
+> 4 or 5 it seems. 4.54 to be exact
+
+We want to look at the distributions of heights (`ht97mm`), but first we need to drop all NA values.
+
+Use `drop_na()` to drop all NA values from the data:
+
+```{r}
+# FIXME
+
+SF <- SF |> 
+  drop_na()
+```
+
+898 rows should remain. 
+
+Plot the density of the distribution of maximum height, colored by population. Use `facet_wrap()` to plot each population in a separate panel. If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
+
+```{r}
+# FIXME
+ggplot(SF, aes(ht97mm, fill = population)) +
+  geom_density() +
+  facet_wrap("population") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+Now summarize height by population by calculating the mean, standard deviation, and median. Put these values into a tibble and use `knitr::kable()` to print out the table.
+
+```{r}
+# FIXME
+
+SF_summary <- SF |> 
+  group_by(population) |> 
+  summarize(mean_height = mean(ht97mm),
+            sd_height = sd(ht97mm),
+            median_ht = median(ht97mm),
+            .groups = "drop")
+
+knitr::kable(SF_summary)
+```
+
+Compare the mean and the median across the populations. In this sample is the mean a good estimate of the central tendency?
+
+> Some of the values match really well (VTX, ENT), but sometimes the mean is higher because of the observations with large height (left skew).
