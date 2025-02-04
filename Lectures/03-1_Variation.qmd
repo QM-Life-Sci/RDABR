@@ -31,10 +31,27 @@ theme_set(theme_classic(base_size = 20))
 ## Problem set
 
 - Turn in when you are ready
+- "Official" due date is Thursday
+- Do you want a week to complete problem sets?
 
 
 ## Week three check in
 
+- Qualtrics survey that will be linked from Canvas (no assignment)
+- Optional, but I hope you will complete it
+- I will not see your individual responses -- only a summary (Dr. King)
+
+
+## Questions
+
+1. How have you found the pace of the class? Too slow, Just right, Too fast. Feel free to elaborate.
+2. How you have found the level of difficulty? Too easy, Just right, Too complex. Feel free to elaborate.
+3. What have you found most challenging?
+4. What are you confident you understand?
+5. Do you feel comfortable asking questions during class? Why or why not?
+6. Do you feel supported in this class? If not, what would help?
+7. What’s one thing I could do to improve your learning experience?
+8. What’s something you’ve learned that has surprised you?
 
 
 ## Hellbender
@@ -43,7 +60,7 @@ theme_set(theme_classic(base_size = 20))
 - Tidyverse won't load
 
 :::{.alert}
-How do you feel about local installation?
+How do you feel about local installation on your laptop?
 :::
 
 - 1-2 GB free space
@@ -91,8 +108,8 @@ ggplot(ds, aes(x = x1, y = x2)) +
   scale_x_continuous(limits = c(0, 100)) +
   scale_y_continuous(limits = c(0, 100)) +
   coord_fixed() +
-  labs(title = expression(paste("Alberto Cairo's ", 
-                                italic("Datasaurus"))))
+  labs(caption = expression(paste("Alberto Cairo's ", 
+                                  italic("Datasaurus"))))
 ```
 
 
@@ -217,7 +234,7 @@ ggplot(data = iris,
 
 - `ggplot()` sets up the plot using `iris` data.
 - **Aesthetic**: `aes()` sets `x` and `y` variables
-- **Add**: `+ geom_point()` adds `(x, y)` points corresponding to `Petal.Length` and `Petal.Width`
+- **Add** (think "and"): `+ geom_point()` adds `(x, y)` points corresponding to `Petal.Length` and `Petal.Width`
 
 
 ## Logic of ggplot
@@ -225,23 +242,33 @@ ggplot(data = iris,
 - Building plots up by layers
     - Start simple
 - Layers can be:
-    - data
+    - data (`geom_`etries)
     - labels
-    - colors
+    - axis formatting
     - regression lines, etc.
-- Change the theme (shading, colors, line widths, etc.)
+    - theme elements (colors, line widths, etc.)
 
 
 ## Logic of ggplot
 
 ```{r}
 #| echo: true
-#| eval: true
-#| output-location: slide
+#| eval: false
 
 library(tidyverse)
 theme_set(theme_classic(base_size = 20)) # Preferred ggplot theme
 
+ggplot(data = iris,
+       aes(x = Petal.Length, y = Petal.Width)) +
+  geom_point() 
+```
+
+- `data =` is optional and often omitted if the data is the first argument to the function
+
+
+## What patterns do you observe?
+
+```{r}
 ggplot(data = iris,
        aes(x = Petal.Length, y = Petal.Width)) +
   geom_point() 
@@ -274,7 +301,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
   geom_point(size = 3)
 ```
 
-- `color = Species` colors points by the _Species_ column (a factor)
+- `color = Species` colors points by the `Species` column (a factor)
 
 
 ## Building plots: Point shape
@@ -385,28 +412,7 @@ ggplot(iris, aes(x = Petal.Length,
 - Add a title and better axis labels
 
 
-## Building plots: Regression lines
-
-```{r}
-#| echo: true
-#| output-location: slide
-
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
-  geom_point(size = 3) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,) +
-  scale_color_viridis(discrete = TRUE, option = "viridis") +
-  labs(x = "Petal Length (cm)",
-       y = "Petal Width (cm)",
-       title = "Irises",
-       caption = "Anderson (1935)")
-```
-
-- `geom_line()` add a "smooth" line (but in this case linear [`lm`])
-
-
-## Adding lines
-
-What if you add a color aesthetic?
+## Building plots: Axis scales
 
 ```{r}
 #| echo: true
@@ -415,15 +421,16 @@ What if you add a color aesthetic?
 ggplot(iris, aes(x = Petal.Length,
                  y = Petal.Width,
                  color = Species)) + 
-  geom_point(size = 3, alpha = 0.5) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
-              linewidth = 2) +
+  geom_point(size = 3) +
   scale_color_viridis(discrete = TRUE, option = "viridis") +
+  scale_x_continuous(breaks = seq(1, 7, by = 0.5)) +
   labs(x = "Petal Length (cm)",
        y = "Petal Width (cm)",
        title = "Irises",
        caption = "Anderson (1935)")
 ```
+
+- `scale_x_continuous()` controls the axis ticks and labels
 
 
 # Questions {background-color="#f8c471"}
@@ -484,7 +491,7 @@ ggplot(NHANES_40, aes(Height)) +
 ![](images/Heights.png){fig-align="center"}
 
 :::{.center}
-What are your ideas?
+What are your ideas why?
 :::
 
 :::{.right}
@@ -542,19 +549,25 @@ Each R, Y, or S contributes a 0 or 1
 
 ## Binomial Coefficient
 
-$$\frac{Flips!}{Heads!~(Flips - Heads)!}$$
+Number of ways to get $k$ heads from $n$ flips:
+
+$$\binom{Flips}{Heads} = \frac{Flips!}{Heads!~(Flips - Heads)!}$$
 
 ```{r}
 #| echo: true
 
+choose(n = 10, k = 5)
+
 choose(n = 10, k = 0:10)
 ```
+
+. . .
 
 Empirical sampling (10000 samples standardized to 1024):
 
 ```{r}
 #| echo: true
-as.numeric(x_tab / (10000/1024))
+as.numeric(x_tab / (10000/1024)) |> round(digits = 2)
 ```
 
 
@@ -564,7 +577,7 @@ as.numeric(x_tab / (10000/1024))
 - Card games
 - Casino games
 
-Probabilities all derived from the binomial coefficient:
+Probabilities all derived from the binomial coefficient ($n$ choose $k$):
 
 $$\binom{n}{k} = \frac{n!}{k!~(n - k)!}$$
 
@@ -578,12 +591,12 @@ Genome-wide Association Studies (GWAS)
 
 - How are variations in alleles related to quantitative traits (e.g., height)?
 - 2010: ~700 genes explain ~16% of the variation [@Lango_Allen2010-iu]
-- 2018: 3,290 SNPs that collectively explain about 25% of the variation [@Yengo2018-gk]
+- 2018: 3,290 single nucleotide polymorphisms (SNPs) that collectively explain about 25% of the variation [@Yengo2018-gk]
 
 
 ## Simulating heights
 
-What is the binomial equation for SNPs contributing to height?
+What is the binomial equation for SNPs contributing to height ("Taller" SNPs)?
 
 . . .
 
@@ -592,6 +605,8 @@ $$\binom{SNPs}{Taller} = \frac{Taller!}{Taller!~(SNPs - Taller)!}$$
 . . .
 
 $$\binom{3290}{0 \dots 3290} = \frac{(0 \dots 3290)!}{(0 \dots 3290)!~((3290) - (0 \dots 3290))!}$$
+
+`3290!` is a very large number ($\sim 8 \times 10^{10145}$)
 
 
 ## Simulating heights
@@ -607,7 +622,7 @@ How can we simulate the effects of many SNPs with `rbinom()`?
 SNPs <- 3290
 
 # Set the seed for reproducibility
-set.seed(32487)
+set.seed(845934)
 ```
 
 . . .
@@ -623,13 +638,18 @@ x <- rbinom(n = 10000, size = SNPs, prob = 0.5)
 ```
 
 
-## Distribution of "Taller" SNPs 
+## Counts of "Taller" SNPs 
 
 ```{r}
 x[1:100]
 ```
 
-. . .
+:::{.alert}
+What do these numbers represent?
+:::
+
+
+## Distribution of "Taller" SNPs 
 
 ```{r}
 #| echo: true
@@ -643,11 +663,62 @@ ggplot(data = tibble(x),
 ```
 
 
-## Assumptions of the model
+## Assumptions and limitations of the model
+
+What are your ideas?
+
+. . .
+
+- Each SNP must have a very (very) small effect
+- All SNPs are independent
+- Each SNP has the same magnitude of effect (+1)
+- All SNPs are at 50% frequency (`prob = 0.5`)
+- Others
 
 
 ## Exact probabilities
 
+```{r}
+exact_prob <- tibble(x = 0:SNPs,
+                     y = dbinom(x, SNPs, prob = 0.5))
+
+ggplot(exact_prob,
+       aes(x, y)) +
+  geom_bar(stat = "identity", color = "navy") +
+  scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
+  labs(x = "Number of Taller SNPs",
+       y = "Probability")
+```
+
+
+## Exact probabilities
+
+```{r}
+exact_prob <- tibble(x = 0:SNPs,
+                     y = dbinom(x, SNPs, prob = 0.5))
+
+ggplot(exact_prob,
+       aes(x, y)) +
+  geom_bar(stat = "identity", color = "navy") +
+  scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
+  labs(x = "Number of Taller SNPs",
+       y = "Probability")
+```
+
+
+## Exact probabilities
+
+```{r}
+exact_prob <- tibble(x = 1550:1750,
+                     y = dbinom(x, SNPs, prob = 0.5))
+
+ggplot(exact_prob,
+       aes(x, y)) +
+  geom_bar(stat = "identity", color = "navy") +
+  scale_x_continuous(breaks = seq(1550, 1750, by = 50)) +
+  labs(x = "Number of Taller SNPs",
+       y = "Probability")
+```
 
 
 # Questions {background-color="#f8c471"}
