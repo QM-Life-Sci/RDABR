@@ -75,7 +75,7 @@ How do you feel about local installation on your laptop?
 ## Why visualize data? {.scrollable}
 
 ```{r}
-ds <- read_csv("../data/Datasaurus_data.csv",
+ds <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Datasaurus_data.csv",
                col_names = c("x1","x2"),
                show_col_types = FALSE)
 knitr::kable(ds)
@@ -127,9 +127,9 @@ set.seed(38479238)
 
 DD <- tibble(weight = c(rnorm(50, 5, 1),
                         rnorm(40, 5.5, 1), 
-                        rnorm(10,15,2)),
-             group = rep(c("Control","Treatment"), each = 50),
-             year = rep(c(1,2,3,5,4),each = 10, times = 2)) |> 
+                        rnorm(10, 15, 2)),
+             group = rep(c("Control", "Treatment"), each = 50),
+             year = rep(c(1, 2, 3, 5, 4),each = 10, times = 2)) |> 
   mutate(year = factor(year))
 ```
 
@@ -457,7 +457,8 @@ ggplot(iris, aes(x = Petal.Length,
 ## Variation in height for 6,465 individuals
 
 ```{r}
-NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |> 
+NHANES <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/NHANES.csv",
+                   show_col_types = FALSE) |> 
   filter(Sex == "Male") |> 
   select(-Sex) |> 
   arrange(Height)
@@ -615,7 +616,7 @@ What is the binomial equation for SNPs contributing to height ("Taller" SNPs)?
 
 . . .
 
-$$\binom{SNPs}{Taller} = \frac{Taller!}{Taller!~(SNPs - Taller)!}$$
+$$\binom{SNPs}{Taller} = \frac{SNPs!}{Taller!~(SNPs - Taller)!}$$
 
 . . .
 
