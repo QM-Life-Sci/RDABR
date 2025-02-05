@@ -84,7 +84,9 @@ Normal(x = 1, mu = 0, sigma = 1)
 
 . . .
 
-R has built-in functions for probability distributions ("densities"):
+R has built-in functions for probability distributions ("densities").
+
+`dnorm()` is the normal distribution probability density:
 
 ```{r}
 #| echo: true
@@ -112,11 +114,11 @@ Plot the probability as a line:
 ggplot() +
   geom_line(data = Std_Normal,
             aes(x, Probability),
-            color = "darkgreen",
+            color = "salmon",
             linewidth = 1.5) +
   geom_point(aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
              size = 4,
-             color = "salmon") +
+             color = "darkgreen") +
   scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
   scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
@@ -130,11 +132,11 @@ ggplot() +
 ggplot() +
   geom_line(data = Std_Normal,
             aes(x, Probability),
-            color = "darkgreen",
+            color = "salmon",
             linewidth = 1.5) +
   geom_point(aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
              size = 5,
-             color = "salmon") +
+             color = "darkgreen") +
   scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
   scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
@@ -148,6 +150,16 @@ Area under the curve = 1 integrating $Pr[x]$ for $-\infty < x < \infty$
 - Choose `mean` and `sd`
 
 See what probabilities you find.
+
+What answer should you get?
+
+```{r}
+#| echo: true
+#| eval: false
+
+x <- seq(-100, 100)
+sum(dnorm(x, mean = 0, sd = 1))
+```
 
 
 ## Many distributions
@@ -182,10 +194,11 @@ $$\bar{x} = \frac{\sum^n_{i=1}x_i}{n}$$
 
 . . .
 
-- "From $i = 1$ to $i = n$, sum ($\Sigma$) each observation ($x_i$), where $n$ is the count of observations."
-- "Mean" is preferred to "average".
-    - Most of the time they are synonymous. 
+"From $i = 1$ to $i = n$, sum ($\Sigma$) each observation ($x_i$) and divide the sum by $n$, where $n$ is the count of observations."
 
+:::{.callout-note}
+"Mean" is preferred to "average". Most of the time they are synonymous. 
+:::
 
 ## Median
 
@@ -213,14 +226,12 @@ Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus acul
 ## Mean vs. Median
 
 ```{r}
-SticklebackPlates <- read_csv("../data/Stickleback_Plates.csv",
+SticklebackPlates <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
                               show_col_types = FALSE)
 ```
 
 ```{r}
-#| echo: true
-
-glimpse(SticklebackPlates)
+knitr::kable(SticklebackPlates)
 ```
 
 
@@ -237,6 +248,8 @@ ggplot(SticklebackPlates, aes(x = plates)) +
 
 ## Mean vs. Median
 
+`.by = genotype` is the same is `group_by(genotype)`
+
 ```{r}
 #| echo: true
 
@@ -245,6 +258,8 @@ SticklebackPlates |>
             median_plate = median(plates),
             .by = genotype)
 ```
+
+How do the mean and median compare?
 
 
 ## Mean is sensitive to extreme values
@@ -270,6 +285,77 @@ ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
 
 # Questions {background-color="#f8c471"}
 
+# Measures of Spread {background-color="#40666e"}
+
+1. Standard deviation (and variance)
+2. Interquartile range
+
+
+## Standard deviation
+
+$$\sigma = \sqrt{\frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}}$$
+
+- What is $\bar{x}$?
+- What does $\left( x_i - \bar{x} \right)^2$ represent?
+- What is the function of the square root in the equation?
+
+
+## Standard deviation: Rules of thumb
+
+- ~68% of points between -1 sd and +1 sd ($\pm 1$ sd)
+- ~95% of points between -2 sd and +2 sd ($\pm 2$ sd)
+- ~99.7% of points between -3 sd and +3 sd ($\pm 3$ sd)
+
+```{r}
+#| fig-pos: center
+
+ggplot() +
+  geom_line(data = Std_Normal,
+            aes(x, Probability),
+            color = "gray50",
+            linewidth = 1) +
+  geom_segment(aes(x = c(-1, 1),
+                   xend = c(-1, 1),
+                   y = 0,
+                   yend = dnorm(x = c(-1, 1))),
+               color = "navy", linewidth = 1.5) +
+  geom_segment(aes(x = c(-2, 2),
+                   xend = c(-2, 2),
+                   y = 0,
+                   yend = dnorm(x = c(-2, 2))),
+               color = "darkgreen", linewidth = 1.5) +
+  geom_segment(aes(x = c(-3, 3),
+                   xend = c(-3, 3),
+                   y = 0,
+                   yend = dnorm(x = c(-3, 3))),
+               color = "red", linewidth = 1.5) +
+  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+```
+
+
+## Variance
+
+$$\sigma^2 = \frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}$$
+
+- Some equations (normal distribution) will use the variance
+
+
+## Interquartile range (IQR)
+
+- Remember that the median is the 0.5 quantile (and 50th percentile)
+- IQR is the range between the 0.25 and 0.75 quantiles ("quartiles")
+
+```{r}
+#| echo: true
+
+quantile(iris$Sepal.Length, probs = 0.75) - quantile(iris$Sepal.Length, probs = 0.25)
+
+IQR(iris$Sepal.Length)
+
+summary(iris$Sepal.Length)
+```
+
 
 # Sampling from Distributions {background-color="#40666e"}
 
@@ -286,12 +372,6 @@ Law of Large Numbers
 
 
 ## Programming Loops
-
-
-# Moving Data {background-color="#40666e"}
-
-
-## Import / export
 
 
 # Questions {background-color="#f8c471"}
