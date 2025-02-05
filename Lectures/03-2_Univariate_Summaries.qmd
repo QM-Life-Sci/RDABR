@@ -150,7 +150,13 @@ Area under the curve = 1 integrating $Pr[x]$ for $-\infty < x < \infty$
 - Pick a value for $x$
 - Choose `mean` and `sd` (not 0 and 1)
 
-See what probabilities you find. See if the means and standard deviations match.
+```{r}
+#| echo: true
+
+rnorm(10, mean = 2, sd = 5)
+```
+
+See what probabilities you find.
 
 What sum do you predict:
 
@@ -191,7 +197,7 @@ Spread
 
 ## Sample (arithmetic) mean
 
-$$\bar{x} = \frac{\sum^n_{i=1}x_i}{n}$$
+$$\bar{x} = \frac{1}{n}~\sum^n_{i=1}x_i = \frac{\sum^n_{i=1}x_i}{n}$$
 
 . . .
 
@@ -479,10 +485,4 @@ mean(sample_means)
 
 
 # Questions {background-color="#f8c471"}
-
-
-## References
-
-::: {#refs}
-:::
 

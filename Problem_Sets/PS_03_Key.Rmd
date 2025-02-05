@@ -50,9 +50,9 @@ mean(x)
 sd(x)
 ```
 
-How do the mean and sd compare to the values you specified above?
+How do the mean and sd compare to the values you specified above? If they differ, why do you think that might be?
 
-> They are close but not exactly the same.
+> They are close but not exactly the same. Random numbers should be relatively close to the specified mean and sd, but they don't have to be exact. So if we have 100 of them, the mean and sd will be slightly off.
 
 
 ### Considerations with histograms
@@ -63,6 +63,8 @@ Below is the most basic code to plot a histogram:
 - `x` is passed to `aes()`
 - `geom_histogram()` adds a histogram layer
 
+You should delete the first line and replace `x` in the plotting statment to be your vector created above.
+
 ```{r}
 x <- 1:20 # Delete this line and use the vector you assigned above.
 
@@ -71,7 +73,9 @@ ggplot(tibble(x), aes(x)) +
 
 ```
 
-Run the code above. You will get a message: `stat_bin()` using `bins = 30`. Pick better value with `binwidth`. Basically ggplot is saying that it has divided the data into 30 equally sized ranges ("bins") by default.
+Run the code above. You will get a message: "`stat_bin()` using `bins = 30`. Pick better value with `binwidth`".
+
+Basically ggplot is saying that it has divided the data into 30 equally sized ranges ("bins") by default.
 
 In the chunk below, copy the code above. Add the argument `bins = ` to `geom_histogram()`. Start with 5 bins and gradually increase the number of bins: 5, 10, 25, 50, 100.
 
@@ -85,15 +89,123 @@ ggplot(tibble(x), aes(x)) +
 
 How does the shape of the histogram change as you add more bins? 
 
-> The shape changes somewhat. When there are only 5 bins, each one represents a large range of the data. It looks vaguely normal, but it's hard to tell what the distribution really looks like. When the number of bins is very high, 
+> The shape changes somewhat. When there are only 5 bins, each one represents a large range of the data. It looks vaguely normal, but it's hard to tell what the distribution really looks like. When the number of bins is very high, the bins are really narrow, and th eplot looks very sporadic.
+
 
 ### Density plots as an alternative
+
+One alternative to histograms is to use a density estimate which does not require binning in the same way as a histogram. Copy the histogram code from above, and replace `geom_histogram()` with `geom_density()`.
+
+```{r}
+# FIXME
+
+ggplot(tibble(x), aes(x)) +
+  geom_density()
+
+```
+
+What do you observe about the density plot compared to the histogram?
+
+> They look very similar, but the density plot has a smooth surface compared to the histogram. We no longer can identify individual observations in the same way, because there aren't counts.
 
 
 ### Counting and quantiles
 
+In lecture we looked at the interquartile range (distance between the 0.25 and 0.75 quantiles) as a way to describe the spread of data. In this exercise we will explore how to use quantiles to summarize distributions.
 
-# Univariate summaries
+Start be generating 10000 random normal values (call it `x` for convenience). It is best to use a mean of 0 and sd of 1 (the defaults for `rnorm()`).
+
+```{r}
+# FIXME
+
+set.seed(732646)
+x <- rnorm(10000, mean = 0, sd = 1)
+```
+
+Calculate the mean and standard deviation. Confirm that they are very close to 0 and 1, respectively.
+
+```{r}
+# FIXME
+
+mean(x)
+sd(x)
+```
+
+Recall that we can use inequalities to generate vectors of `TRUE` and `FALSE` values.
+
+```{r}
+z <- 1:10
+z <= 5
+```
+
+And if we sum those values, `TRUE` is 1, and FALSE` is 0.
+
+```{r}
+sum(z <= 5)
+```
+
+We can use this behavior to verify some of our rules of thumb for a normal distribution:
+
+- ~68% of points between -1 sd and +1 sd (±1 sd)
+- ~95% of points between -2 sd and +2 sd (±2 sd)
+- ~99.7% of points between -3 sd and +3 sd (±3 sd)
+
+Start by generating two vectors:
+
+1. `gt_1` contains all values of `x` greater than  1
+2. `lt_1` contains all values of `x` less than -1
+
+These vectors are TRUE and FALSE values. Print out the first 10 of each to confirm.
+
+```{r}
+# FIXME
+
+gt_1 <- x > 1
+lt_1 <- x < -1
+
+gt_1[1:10]
+lt_1[1:10]
+```
+
+Sum each of the vectors
+
+```{r}
+# FIXME
+
+sum(gt_1)
+sum(lt_1)
+```
+
+Add the two sums together and divide by 10000. Confirm that this value matches the expected percent of observations more than 1 standard deviation from the mean.
+
+```{r}
+# FIXME
+
+(10000 - (sum(gt_1) + sum(lt_1))) / 10000
+```
+
+What do you find?
+
+> (Your exact numbers will vary.) 1628 are greater than 1 and 1620 are less than -1. So 67.5% are within 1 standard deviation.
+
+Repeat the analysis above to confirm that 95% are within 2 sd and 99.7% are within 3 sd. Feel free to combine steps if you wish.
+
+```{r}
+# FIXME
+
+# 2 sd
+(10000 - (sum(x > 2) + sum(x < -2))) / 10000
+
+# 3 sd
+(10000 - (sum(x > 3) + sum(x < -3))) / 10000
+```
+
+How close do they match? If they are off, why might that be?
+
+> They are very close. You might find that the estimate for 3 sd is not as good. Since these values are relatively rare, you might find more variation that that estimate.
+
+
+# Univariate summaries for real data
 
 ## Adaptation to drought stress in Silver Fir
 
@@ -108,27 +220,41 @@ We are going to work with a part of this data set to explore the mean, median, a
 
 ### Importing data into R
 
-- Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_excel()`).
-- The columns `family` and `block` are numeric, but should be converted to factors.
+The data we will work with are in the file `Silver_fir.csv`. We can read this into R using the function `read_csv()`, which is loaded as part of the tidyverse package.
+
+The code below is a minimal example of how to read data in. The first imports directly from a web address. The second (commented code) from a local file, assumed to be in the same directory as the current file.
+
+You can use either. Just comment the other out.
+
+```{r}
+# FIXME
+SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv") |> 
+  mutate(family = factor(family),
+         block = factor(block)) |> 
+  select(family, block, population, ht97mm)
+
+# SF <- read_csv("Silver_fir.csv") |> 
+#   mutate(family = factor(family),
+#          block = factor(block)) |> 
+#   select(family, block, population, ht97mm)
+```
+
+Before we work with the data, we need to do a couple of things.
+
+- Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_csv()`).
+- The columns `family` and `block` are numeric, but should be converted to factors. Add a pipe with `mutate(family = factor(family))` and one for `block` as well. 
 - Only `select()` the columns: `family`, `block`, `population`, and `ht97mm` (height in 1997 in mm)
 
 Examine the resulting file with `str()` or `glimpse()`. You should have only 4 columns.
 
 ```{r}
 # FIXME
-SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv", na = "NA") |> 
-  mutate(family = factor(family),
-         block = factor(block)) |> 
-  select(family, block, population, ht97mm)
-
-# SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv", na = "NA") |> 
-#   mutate(family = factor(family),
-#          block = factor(block)) |> 
-#   select(family, block, population, ht97mm)
-
 
 glimpse(SF)
+
+str(SF)
 ```
+
 
 ### Counting
 
@@ -155,15 +281,60 @@ We want to look at the distributions of heights (`ht97mm`), but first we need to
 Use `drop_na()` to drop all NA values from the data:
 
 ```{r}
-# FIXME
-
 SF <- SF |> 
   drop_na()
 ```
 
-898 rows should remain. 
+898 rows should remain. Verify this:
 
-Plot the density of the distribution of maximum height, colored by population. Use `facet_wrap()` to plot each population in a separate panel. If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
+```{r}
+nrow(SF)
+```
+
+
+### Filtering
+
+The `filter()` function can be used to quickly filter out rows based on a set of one or more conditions. For example
+
+```{r}
+BAY <- SF |> filter(population == "BAY")
+```
+
+creates a new tibble `BAY` resulting from filtering `population == BAY`. Note the double equals `==` for equality.
+
+Create a second tibble `Not_BAY` that is all rows not equal to (`!=`) `BAY`.
+
+```{r}
+# FIXME
+
+Not_BAY <- SF |> filter(population != "BAY")
+```
+
+Confirm that all rows are accounted for. Sum the number of rows (`nrow()`) in each and make sure it matches the number of rows in the original tibble.
+
+```{r}
+# FIXME
+
+nrow(BAY) + nrow(Not_BAY)
+nrow(SF)
+```
+
+You can filter on multiple conditions with and `&` and or `|`:
+
+```{r}
+SF |> filter(ht97mm > 100 & population == "BAY")
+SF |> filter(population == "BAY" | population == "ENT")
+```
+
+Feel free to experiment with other filtering combinations.
+
+
+### Plotting
+
+Plot the density of the distribution of `ht97mm`, colored by population.
+
+- Add `facet_wrap("population")` to plot each population in a separate panel.
+- If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
 
 ```{r}
 # FIXME
@@ -173,7 +344,7 @@ ggplot(SF, aes(ht97mm, fill = population)) +
   theme(axis.text.x = element_text(angle = 90))
 ```
 
-Now summarize height by population by calculating the mean, standard deviation, and median. Put these values into a tibble and use `knitr::kable()` to print out the table.
+Now summarize height by population by calculating the mean, standard deviation, and median. Put these values into a tibble and use `knitr::kable()` to print out the table. This will be similar to the `group_by() |> summarize()` code above.
 
 ```{r}
 # FIXME
@@ -195,18 +366,25 @@ Compare the mean and the median across the populations. In this sample is the me
 
 # Intuition for distributions / summaries
 
-```{r}
-set.seed(423766)
+At the end of lecture 3-2, we used the Law of Large Numbers to show how the mean of a set of samples from a population is a good estimate of the population's mean. That code, condensed into one chuck is:
 
+```{r}
+# Generate 1000 random normal numbers with a mean of 10 and sd of 4
+set.seed(423766)
 x <- rnorm(n = 1000, mean = 10, sd = 4)
 
 set.seed(12366)
 
+# Size of the same for each iteration
 sample_size <- 20
 
+# Number of iterations
 n_means <- 100
+
+# Empty vector to hold means for each sample
 sample_means <- numeric(n_means)
 
+# Iterate through, calculating the mean for each sample
 for (ii in 1:n_means) {
   s <- sample(x, size = sample_size, replace = FALSE)
   sample_means[ii] <- mean(s)
@@ -224,10 +402,58 @@ mean(sample_means)
 
 ## Activity
 
-- What would change with larger sample sizes (> 20)?
-- What would change with more means (> 100)?
+We left off in lecture with two questions:
 
+1. What would change with larger sample sizes (~100) but the same number of iterations (100)?
+2. What would change with more iterations (1000) but the same sample size (20)?
 
-## Summarizing via sampling
+What is your prediction for each question?
 
+> You answer will vary.
+
+Copy the code above to answer each question. For simplicity, use the same set of random values created above.
+
+```{r}
+# FIXME
+
+# What would change with larger sample sizes (~100) but the same number of iterations (100)?
+set.seed(12366)
+sample_size <- 100
+n_means <- 100
+sample_means <- numeric(n_means)
+
+for (ii in 1:n_means) {
+  s <- sample(x, size = sample_size, replace = FALSE)
+  sample_means[ii] <- mean(s)
+}
+
+ggplot(tibble(sample_means), aes(sample_means)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count")
+
+mean(x)
+mean(sample_means)
+
+# What would change with more iterations (1000) but the same sample size (20)?
+set.seed(12366)
+sample_size <- 20
+n_means <- 1000
+sample_means <- numeric(n_means)
+
+for (ii in 1:n_means) {
+  s <- sample(x, size = sample_size, replace = FALSE)
+  sample_means[ii] <- mean(s)
+}
+
+ggplot(tibble(sample_means), aes(sample_means)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count")
+
+mean(x)
+mean(sample_means)
+```
+
+What observations do you make? Pay particular attention to the x-axis scale in the histograms.
+
+> All of the combinations estimate the mean equally well. There is a wide range in the spread of the estimates. The first is ~8-11, then second ~9-10.5, and the third 7-12. Smaller sample sizes (#1 and #3) are less certain about the mean. The larger sample of 100 leads to a more confident estimate of the mean.
 
