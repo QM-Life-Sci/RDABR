@@ -5,7 +5,7 @@ date: 'Last updated: `r Sys.Date()`'
 output:
   html_document:
     toc: true
-    toc_depth: 2
+    toc_depth: 3
     toc_float: true
 ---
 
@@ -16,40 +16,97 @@ output:
 
 library(tidyverse)
 library(readxl)
+
+theme_set(theme_classic())
 ```
 
 
-## Simulating data
+# Simulating data and visualizing distributions with histograms
+
+One of the best ways to understand a data analysis or statistical process is to simulate data. You know the "answer" ahead, and as long as you can recover that answer, you can be certain (to the extent that you can be certain) that the analysis or process works as you expect.
 
 
-## Visualizing distributions with histograms
+## Activity
+
+In the code chunk below, generate 100 values from a normal distribution (`rnorm()`). Choose any mean and standard deviation that you wish. Means can be positive or negative, integers or real numbers. Standard deviations must be positive, but can be integers or real numbers.
+
+Be sure to set the seed for the random number generator, so that your analysis will be reproducible.
+
+```{r}
+# FIXME
+# Your numbers will be different
+
+set.seed(374663)
+x <- rnorm(100, mean = 4.87, sd = 0.43)
+```
 
 
-## Considerations with histograms
+Calculate the mean and standard deviation for your vector of random numbers.
+
+```{r}
+# FIXME
+
+mean(x)
+sd(x)
+```
+
+How do the mean and sd compare to the values you specified above?
+
+> They are close but not exactly the same.
 
 
-## Density plots
+### Considerations with histograms
+
+Below is the most basic code to plot a histogram:
+
+- The vector `x` is converted into a `tibble()`
+- `x` is passed to `aes()`
+- `geom_histogram()` adds a histogram layer
+
+```{r}
+x <- 1:20 # Delete this line and use the vector you assigned above.
+
+ggplot(tibble(x), aes(x)) +
+  geom_histogram()
+
+```
+
+Run the code above. You will get a message: `stat_bin()` using `bins = 30`. Pick better value with `binwidth`. Basically ggplot is saying that it has divided the data into 30 equally sized ranges ("bins") by default.
+
+In the chunk below, copy the code above. Add the argument `bins = ` to `geom_histogram()`. Start with 5 bins and gradually increase the number of bins: 5, 10, 25, 50, 100.
+
+```{r}
+# FIXME
+
+ggplot(tibble(x), aes(x)) +
+  geom_histogram(bins = 100)
+
+```
+
+How does the shape of the histogram change as you add more bins? 
+
+> The shape changes somewhat. When there are only 5 bins, each one represents a large range of the data. It looks vaguely normal, but it's hard to tell what the distribution really looks like. When the number of bins is very high, 
+
+### Density plots as an alternative
 
 
-## Univariate summaries
+### Counting and quantiles
 
 
-## Intuition for distributions / summaries
-
-
-## Summarizing via sampling
-
+# Univariate summaries
 
 ## Adaptation to drought stress in Silver Fir
 
-The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to the mountainous regions of Europe. Csillery and colleagues carried out a very large (n > 8,000 measurements) greenhouse experiment to study the genetic adaptations to drought tolerance in *Abies*. We are going to work with a part of this data set to explore the mean and median.
+The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to the mountainous regions of Europe. Csilléry and colleagues carried out a very large (n > 8,000 measurements) experiment to study the genetic adaptations to drought tolerance in *Abies*^[Csilléry, K., N. Buchmann, and B. Fady. 2020. Adaptation to drought is coupled with slow growth, but independent from phenology in marginal silver fir (*Abies alba* Mill.) populations. *Evol. Appl.* 13:2357–2376.].
+
+We are going to work with a part of this data set to explore the mean, median, and standard deviation.
 
 ![](https://www.cirrusimage.com/Trees/Fir/silver_fir_12.jpg){fig-align="center"}
 
 
-### Activity
+## Activity
 
-# FIXME
+### Importing data into R
 
 - Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_excel()`).
 - The columns `family` and `block` are numeric, but should be converted to factors.
@@ -64,8 +121,16 @@ SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/m
          block = factor(block)) |> 
   select(family, block, population, ht97mm)
 
+# SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv", na = "NA") |> 
+#   mutate(family = factor(family),
+#          block = factor(block)) |> 
+#   select(family, block, population, ht97mm)
+
+
 glimpse(SF)
 ```
+
+### Counting
 
 These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`. 
 
@@ -126,3 +191,43 @@ knitr::kable(SF_summary)
 Compare the mean and the median across the populations. In this sample is the mean a good estimate of the central tendency?
 
 > Some of the values match really well (VTX, ENT), but sometimes the mean is higher because of the observations with large height (left skew).
+
+
+# Intuition for distributions / summaries
+
+```{r}
+set.seed(423766)
+
+x <- rnorm(n = 1000, mean = 10, sd = 4)
+
+set.seed(12366)
+
+sample_size <- 20
+
+n_means <- 100
+sample_means <- numeric(n_means)
+
+for (ii in 1:n_means) {
+  s <- sample(x, size = sample_size, replace = FALSE)
+  sample_means[ii] <- mean(s)
+}
+
+ggplot(tibble(sample_means), aes(sample_means)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count")
+
+mean(x)
+
+mean(sample_means)
+```
+
+
+## Activity
+
+- What would change with larger sample sizes (> 20)?
+- What would change with more means (> 100)?
+
+
+## Summarizing via sampling
+
+
