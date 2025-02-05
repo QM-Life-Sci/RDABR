@@ -49,7 +49,7 @@ The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to t
 
 ### Activity
 
-Load the data in the file `Silver_fir.xlsx` (you will need to use `read_excel()` from the `readxl` package). 
+# FIXME
 
 - Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_excel()`).
 - The columns `family` and `block` are numeric, but should be converted to factors.
@@ -59,7 +59,7 @@ Examine the resulting file with `str()` or `glimpse()`. You should have only 4 c
 
 ```{r}
 # FIXME
-SF <- read_excel("../data/Silver_fir.xlsx", na = "NA") |> 
+SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv", na = "NA") |> 
   mutate(family = factor(family),
          block = factor(block)) |> 
   select(family, block, population, ht97mm)
