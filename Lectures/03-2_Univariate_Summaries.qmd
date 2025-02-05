@@ -29,6 +29,7 @@ theme_set(theme_classic(base_size = 20))
 
 - Three-week check in (link on Canvas)
 - PS 2 due sometime soon
+- Let's look at the slides
 - Start PS 3 today
 - Any other questions?
 
@@ -144,14 +145,14 @@ ggplot() +
 Area under the curve = 1 integrating $Pr[x]$ for $-\infty < x < \infty$
 
 
-## Try `dnorm()`
+## Test out `dnorm()`
 
 - Pick a value for $x$
-- Choose `mean` and `sd`
+- Choose `mean` and `sd` (not 0 and 1)
 
-See what probabilities you find.
+See what probabilities you find. See if the means and standard deviations match.
 
-What answer should you get?
+What sum do you predict:
 
 ```{r}
 #| echo: true
@@ -296,29 +297,30 @@ ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
 $$\sigma = \sqrt{\frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}}$$
 
 - What is $\bar{x}$?
-- What does $\left( x_i - \bar{x} \right)^2$ represent?
+- What does $\left( x_i - \bar{x} \right)^2$ represent? Why squared? What does this imply for standard deviations?
+- What is the function of $n$?
 - What is the function of the square root in the equation?
 
 
 ## Standard deviation: Rules of thumb
 
-- ~68% of points between -1 sd and +1 sd ($\pm 1$ sd)
-- ~95% of points between -2 sd and +2 sd ($\pm 2$ sd)
-- ~99.7% of points between -3 sd and +3 sd ($\pm 3$ sd)
+- ~68% of points between -1 sd and +1 sd (±1 sd)
+- ~95% of points between -2 sd and +2 sd (±2 sd)
+- ~99.7% of points between -3 sd and +3 sd (±3 sd)
 
 ```{r}
-#| fig-pos: center
+#| fig-align: center
 
 ggplot() +
   geom_line(data = Std_Normal,
             aes(x, Probability),
-            color = "gray50",
+            color = "gray75",
             linewidth = 1) +
   geom_segment(aes(x = c(-1, 1),
                    xend = c(-1, 1),
                    y = 0,
                    yend = dnorm(x = c(-1, 1))),
-               color = "navy", linewidth = 1.5) +
+               color = "orange", linewidth = 1.5) +
   geom_segment(aes(x = c(-2, 2),
                    xend = c(-2, 2),
                    y = 0,
@@ -328,7 +330,7 @@ ggplot() +
                    xend = c(-3, 3),
                    y = 0,
                    yend = dnorm(x = c(-3, 3))),
-               color = "red", linewidth = 1.5) +
+               color = "navy", linewidth = 1.5) +
   scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
   scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
@@ -338,7 +340,9 @@ ggplot() +
 
 $$\sigma^2 = \frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}$$
 
-- Some equations (normal distribution) will use the variance
+- Some equations will use the variance (e.g., normal distribution probability density)
+- Most people think in standard deviations
+    - Same units as $x$
 
 
 ## Interquartile range (IQR)
@@ -352,6 +356,12 @@ $$\sigma^2 = \frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}$$
 quantile(iris$Sepal.Length, probs = 0.75) - quantile(iris$Sepal.Length, probs = 0.25)
 
 IQR(iris$Sepal.Length)
+```
+
+Call `summary()` on a vector:
+
+```{r}
+#| echo: true
 
 summary(iris$Sepal.Length)
 ```
@@ -372,6 +382,100 @@ Law of Large Numbers
 
 
 ## Programming Loops
+
+- R is a (moderately) general purpose programming language
+- "Flow control" syntax
+
+```{r}
+#| echo: true
+
+# for loops
+n <- 100 # <1>
+squares <- numeric(length = 100) # <2>
+
+for (ii in 1:n){  # <3>
+  squares[ii] <- ii^2  # <4>
+}
+
+squares
+```
+1. Set the number of iterations `n`.
+2. Create an empty numeric vector to hold the `squares`.
+3. Set up the for loop. The variable `ii` is created here. Iterate from 1 to n.
+4. Assign the square of `ii` to the `ii`th element of the vector `squares`.
+
+
+## Means of samples
+
+```{r}
+#| echo: true
+#| fig-align: center
+
+set.seed(423766)
+
+x <- rnorm(n = 1000, mean = 10, sd = 4)
+mean(x)
+
+ggplot(tibble(x), aes(x)) +
+  geom_histogram(bins = 30, fill = "coral") +
+  labs(y = "Count")
+```
+
+
+## Resampling to estimate a mean
+
+```{r}
+#| echo: true
+
+set.seed(12366)
+
+sample_size <- 20
+
+n_means <- 100
+sample_means <- numeric(n_means)
+
+for (ii in 1:n_means) {
+  s <- sample(x, size = sample_size, replace = FALSE)
+  sample_means[ii] <- mean(s)
+}
+```
+
+. . .
+
+```{r}
+#| echo: true
+
+sample_means[1:10]
+```
+
+What will the distribution of sample *means* look like? What will the range be?
+
+
+## Sample means
+
+```{r}
+#| echo: true
+#| fig-align: center
+#| output-location: slide
+
+ggplot(tibble(sample_means), aes(sample_means)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count")
+```
+
+
+## Mean of means
+
+```{r}
+#| echo: true
+
+mean(x)
+
+mean(sample_means)
+```
+
+- What would change with larger sample sizes (> 20)?
+- What would change with more means (> 100)?
 
 
 # Questions {background-color="#f8c471"}
