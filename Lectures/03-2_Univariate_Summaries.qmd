@@ -441,10 +441,11 @@ n_means <- 100
 sample_means <- numeric(n_means)
 
 for (ii in 1:n_means) {
-  s <- sample(x, size = sample_size, replace = FALSE)
+  s <- sample(x, size = sample_size, replace = FALSE)  # <1>
   sample_means[ii] <- mean(s)
 }
 ```
+1. Randomly sample from x, being sure to not sample the same value twice (`replace = FALSE`).
 
 . . .
 
