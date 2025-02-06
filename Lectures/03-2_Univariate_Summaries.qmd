@@ -211,7 +211,7 @@ $$\bar{x} = \frac{1}{n}~\sum^n_{i=1}x_i = \frac{\sum^n_{i=1}x_i}{n}$$
 
 - The central observations of a sample
 - The 50th percentile
-- The 0.50 quantile).
+- The 0.50 quantile.
 - If $n$ is even, then the median is the mean of the two middle observations.
 
 ```{r}
