@@ -28,7 +28,7 @@ theme_set(theme_classic(base_size = 20))
 # Housekeeping {background-color="#40666e"}
 
 - Three-week check in (link on Canvas)
-- PS 2 due sometime soon
+- PS 2 due sometime soon (Rmd and HTML if you can)
 - Let's look at the slides
 - Start PS 3 today
 - Any other questions?
@@ -255,15 +255,13 @@ ggplot(SticklebackPlates, aes(x = plates)) +
 
 ## Mean vs. Median
 
-`.by = genotype` is the same is `group_by(genotype)`
-
 ```{r}
 #| echo: true
 
 SticklebackPlates |> 
+  group_by(genotype) |> 
   summarize(mean_plate = mean(plates),
-            median_plate = median(plates),
-            .by = genotype)
+            median_plate = median(plates))
 ```
 
 How do the mean and median compare?
@@ -359,7 +357,8 @@ $$\sigma^2 = \frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}$$
 ```{r}
 #| echo: true
 
-quantile(iris$Sepal.Length, probs = 0.75) - quantile(iris$Sepal.Length, probs = 0.25)
+quantile(iris$Sepal.Length, probs = 0.75) - 
+  quantile(iris$Sepal.Length, probs = 0.25)
 
 IQR(iris$Sepal.Length)
 ```
@@ -371,6 +370,16 @@ Call `summary()` on a vector:
 
 summary(iris$Sepal.Length)
 ```
+
+
+## Why does all this matter?
+
+- Your confidence in an estimate depends on the spread of the observed data
+- Coming soon:
+    - Relationships between variables
+    - Differences in means between groups
+
+All depend on the means and spread of the data
 
 
 # Sampling from Distributions {background-color="#40666e"}
