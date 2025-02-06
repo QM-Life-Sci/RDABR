@@ -68,7 +68,7 @@ Below is the most basic code to plot a histogram:
 - `x` is passed to `aes()`
 - `geom_histogram()` adds a histogram layer
 
-You should delete the first line and replace `x` in the plotting statment to be your vector created above.
+You should delete the first line and replace `x` in the plotting statement to be your vector created above.
 
 ```{r}
 x <- 1:20 # Delete this line and use the vector you assigned above.
