@@ -10,8 +10,8 @@ html-math-method:
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 format:
   clean-revealjs:
-    self-contained: false
-    chalkboard: true
+    self-contained: true
+    chalkboard: false
     standalone: true
     slide-number: true
     show-slide-number: print
