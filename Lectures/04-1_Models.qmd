@@ -1,5 +1,6 @@
 ---
 title: "Unit 4: Scientific Questions and Statistical Models"
+subtitle: "Correlation"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -21,6 +22,8 @@ csl: evolution.csl
 
 library(tidyverse)
 library(ggtext)
+library(patchwork)
+library(ggExtra)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -44,11 +47,11 @@ theme_set(theme_classic(base_size = 20))
 
 ## Scientific questions
 
-- Is there an effect?
+- Is there an effect (e.g., mean differences)?
 - How large is the effect?
 - (How large) is the association?
-- (How well) can I predict?
-- Others
+- (How well) can I predict a quantity, group, or classification of interest?
+- Many others
 
 
 ## Remember the Goal of Statistics
@@ -60,26 +63,6 @@ theme_set(theme_classic(base_size = 20))
     - Model where there is *no* effect ("Null")
     - Model where there is an effect ("Alternative(s)")
 - Uncertainty is always present
-
-
-## Example: Genetics of corn oil content
-
-> Which set of loci best predicts oil content in corn kernels?
-
-:::: {.columns}
-
-::: {.column width="40%"}
-![](https://i.imgur.com/w6z5m2e.jpg){fig-align="center"}
-:::
-
-::: {.column width="60%"}
-- Heritability of corn oil content is 0
-- Different possible combinations of SNPs
-- All additive
-- Epistasis
-:::
-
-::::
 
 
 ## Example: Species richness in Missouri lakes
@@ -96,6 +79,26 @@ theme_set(theme_classic(base_size = 20))
 - There is no relationship between species richness and agricultural intensity
 - There is a positive relationship
 - There is a negative relationship
+:::
+
+::::
+
+
+## Example: Genetics of corn oil content
+
+> Which set of loci best predicts oil content in corn kernels?
+
+:::: {.columns}
+
+::: {.column width="40%"}
+![](https://i.imgur.com/w6z5m2e.jpg){fig-align="center"}
+:::
+
+::: {.column width="60%"}
+- Heritability of corn oil content is 0
+- Different possible combinations of SNPs
+- All additive
+- Gene-gene interactions
 :::
 
 ::::
@@ -207,7 +210,6 @@ glimpse(CD)
 CD |>
   group_by(Wing_Morph) |>
   summarise(mean = mean(CO2_resid))
-  
 ```
 
 
@@ -241,9 +243,9 @@ print(P)
 
 ## How large a difference do you get from sampling error?
 
-1. Assume Long Wing and Short Wing crickets share a distribution
+1. Assume long-winged and short-winged crickets share a distribution
 2. Put all values from both morphs in one group
-3. Randomly assign Long Wing and Short Wing labels to values
+3. Randomly assign Long Wing and Short Wing labels to observed values of `CO2_resid`
 4. Repeat over and over
 
 
@@ -312,8 +314,8 @@ print(P)
 ## What do we expect to see when there is a meaningful difference between wing morphs? 
 
 1. Assume corrected metabolic rate is normally distributed
-2. Pull random values for long wings from a normal distribution with a higher mean
-3. Pull random values for short wings from a normal distribution with a lower mean
+2. Draw random values for long wings from a normal distribution with a *higher* mean
+3. Draw random values for short wings from a normal distribution with a *lower* mean
 4. Repeat over and over
 
 
@@ -372,6 +374,170 @@ SS |>
   stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4")  +
   labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
   theme(axis.title = element_markdown())
+```
+
+
+# Models {background-color="#40666e"}
+
+
+## Models and Inference
+
+> All models are wrong, but some are useful.
+
+:::{.right}
+George Box (1976; attributed)
+:::
+
+- If we knew the process exactly we would not need a model (e.g., points exactly on a line).
+
+$$y = mx + b$$
+
+- Often not a single unequivocably correct model.
+- Some very wrong and some less wrong.
+- Your role is to choose and defend a model, given your questions and the assumptions of the model.
+
+
+## Types of data
+
+*Continuous*
+
+- Real number line (rounding okay)
+- Bone lengths, age, oil content of corn
+- Counts of species
+
+*Categorical*
+
+- Binomial: 0/1, land/water, etc.
+- Treatment or observation groups (Ag/Non-Ag land use)
+- Genotypes (Sticklebacks: *MM*, *Mm*, *mm*)
+
+
+# Strength of Association {background-color="#40666e"}
+
+Pairs of continuous variables
+
+
+## Coloration of lion noses
+
+:::: {.columns}
+
+::: {.column width="30%"}
+![](images/lion_nose.png)
+:::
+
+::: {.column width="70%"}
+```{r}
+#| fig-height: 8
+
+LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
+  rename(Age = age,
+         `Proportion Black` = proportion.black)
+
+ggplot(LA, aes(Age, `Proportion Black`)) +
+  geom_point(size = 6, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14) +
+  theme_classic(base_size = 30)
+```
+:::
+
+::::
+
+
+## Coloration of lion noses
+
+```{r}
+p1 <- ggplot(LA, aes(x = Age, y = `Proportion Black`)) +
+  geom_point(size = 4, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14) +
+  theme_classic(base_size = 20)
+
+p2 <- ggplot(LA, aes(y = Age, x = `Proportion Black`)) +
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14) +
+  theme_classic(base_size = 20)
+p1 + p2
+```
+
+:::{.center}
+Which plot is better?
+:::
+
+
+## (Pearson's) Correlation ($r$)
+
+Strength of association between two variables
+
+- No directionality. Equally true:
+    - How does $x$ change as $y$ changes?
+    - How does $y$ change as $x$ changes?
+- Range: $-1 \leq r \leq 1$
+- Null hypothesis: $r = 0$
+
+
+## (Pearson's) Correlation ($r$)
+
+Strength of association between two variables:
+
+\begin{align*}
+r &= \frac{{}\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}
+{\sqrt{\sum_{i=1}^{n} (x_i - \bar{x})^2  \sum_{i=1}^{n}(y_i - \bar{y})^2}}\\
+    &= \frac{1}{n - 1} \sum_{i=1}^n \frac{x_i - \bar{x}}{s_x} \frac{y_i - \bar{y}}{s_y}\\
+\end{align*}
+
+where
+
+- $(x_i - \bar{x})$ and $(y_i - \bar{y})$ are deviations from the mean
+- $s_x$ and $s_y$ are standard deviations
+
+
+## Assumptions
+
+- $x$ and $y$ are paired
+- Observations are independent
+- Bivariate normality
+    - Separately, $x$ and $y$ are normally distributed
+
+
+## Bivariate normality
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+set.seed(43237497)
+
+BVN <- tibble(x = rnorm(1e4, mean = 0, sd = 1),
+              y = rnorm(1e4, mean = 0, sd = 1))
+
+P <- ggplot(BVN, aes(x, y)) +
+  geom_point(alpha = 0.25, color = "firebrick") +
+  coord_equal()
+
+ggMarginal(P, type = "histogram", fill = "firebrick")
+```
+
+
+## Correlation in R: `cor()`
+
+Random bivariate normal data:
+
+```{r}
+#| echo: true
+
+cor(BVN$x, BVN$y)
+```
+
+Lion nose coloration:
+
+```{r}
+#| echo: true
+
+cor(LA$Age, LA$`Proportion Black`)
+
+cor(LA$`Proportion Black`, LA$Age)
 ```
 
 
