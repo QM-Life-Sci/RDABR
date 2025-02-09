@@ -5,8 +5,8 @@ html-math-method:
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 format:
   clean-revealjs:
-    self-contained: false
-    chalkboard: true
+    self-contained: true
+    chalkboard: false
     standalone: true
     slide-number: true
     show-slide-number: print
@@ -18,10 +18,40 @@ csl: evolution.csl
 ```{r}
 #| label: setup
 #| echo: false
+
+library(tidyverse)
+
+theme_set(theme_classic(base_size = 20))
 ```
 
 
-# Correlation and Bivariate Regression {background-color="#40666e"}
+# Housekeeping {background-color="#40666e"}
+
+- Review problem set keys
+- Progress Check 1 next week
+    - Tuesday: Questions and review (feel free to submit ahead)
+    - Thursday: In class working time
+
+
+# Previously {background-color="#40666e"}
+
+
+# Comparisons of Continuous Variables {background-color="#40666e"}
+
+
+## Deviations
+
+
+# Strength of Association {background-color="#40666e"}
+
+
+# Assumptions {background-color="#40666e"}
+
+
+# Bivariate regression {background-color="#40666e"}
+
+
+https://openintro-ims.netlify.app/model-slr
 
 
 # Questions {background-color="#f8c471"}
