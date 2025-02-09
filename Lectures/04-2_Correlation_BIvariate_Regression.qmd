@@ -435,12 +435,12 @@ my_model
 ## Model formulas: `Y ~ X`
 
 :::{.center}
-"Y is modeled by X"
+"Y *is modeled by* X"
 :::
 
-- Response variable (Y)
-- Predictor variable (X)
-- Equivalent to: $$Y = \theta_0 + \theta_1 X$$
+- Response (outcome) variable: $Y$
+- Predictor variable: $X$
+- Equivalent to: $Y = \theta_0 + \theta_1 X$
 - Intercept (`1`) is assumed
     - `Y ~ X + 1`
 
