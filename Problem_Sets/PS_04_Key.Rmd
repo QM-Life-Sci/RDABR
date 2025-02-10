@@ -1,8 +1,7 @@
 ---
 title: 'Problem Set 03'
 author: "Your Name Here"
-date: 'Last updated: `r Sys.Date()`'
-output:
+date: 'Last updated: `r Sys.Date()`'output:
   html_document:
     toc: true
     toc_depth: 3
@@ -16,9 +15,100 @@ output:
 
 library(tidyverse)
 library(readxl)
+library(mvtnorm)
+library(ggExtra)
 
 theme_set(theme_classic())
 ```
+
+
+# Simulating correlations
+
+In class we looked at a bivariate normal distribution: two variables separately generated from normal distributions: Normal(0, 1). We observed the correlation between these two variables was ~0.
+
+Two variables can be correlated and still maintain bivariate normality (one of the assumptions of a correlation). The code below generates the same distribution that we looked at in class. It is slightly different though:
+
+- We use the `mvtnorm` package function `rmvnorm()`, which generates multivariate normal distributions. Here we make two variables simultaneously.
+- We specify the correlation `r` of the two variables (the line `r <- 0`), which is included to a matrix `sigma` that specifies the relationships between the simulated values.
+- We assign column names to the matrix `x` (because it has none by default).
+
+Run the code and verify that it works. You might have to install the `mvtnorm` and `ggExtra` packages.
+
+```{r}
+library(mvtnorm)
+library(ggExtra)
+
+set.seed(43237497)
+
+r <- 0
+sigma <- matrix(c(1, r, r, 1), ncol = 2)
+sigma
+
+x <- rmvnorm(n = 1e4, mean = c(0, 0), sigma = sigma)
+colnames(x) <- c("V1", "V2")
+head(x)
+cor(x[, "V1"], x[, "V2"])
+
+P <- ggplot(as_tibble(x), aes(V1, V2)) +
+  geom_point(alpha = 0.25, color = "firebrick") +
+  coord_equal()
+
+ggMarginal(P, type = "histogram", fill = "firebrick")
+```
+
+You should see that the correlation is close to 0 (0.0104) and that the plot looks similar to the one from class.
+
+
+## Activity
+
+Use the code block above to explore the relationship between the correlation and the distributions of the variables.
+
+- Gradually change the correlation `r` to 0.1, 0.2, 0.5, 0.8, 0.9, 0.99. Rerun the code each time. Also try some negative correlations. You only need to change the one line: `r <- 0`.
+
+What happens to the *joint* distribution of V1 and V2 as the correlation moves away from 0 and gets closer to 1 or -1? 
+
+> It gradually goes from looking like a ball of points to a squished ball of points. When r is positive it is from lower left to upper right, when r is negative from upper left to lower right.
+
+
+In the line `x <- rmvnorm(n = 1e4, mean = c(0, 0), sigma = sigma)`, we set the mean of the normal distribution for V1 and V2 (`mean = c(0, 0)`). Change the values for the means and see how the correlation changes.
+
+How does the pattern change when you change the mean(s)?
+
+> The x and/or y axis labels change, but the overall pattern and the resulting correlations do not change.
+
+
+What does this tell you about the correlation between two variables?
+
+> Correlation is independent of the mean. If you look at the second equation I gave you for Pearson's correlation, you see that it includes x and y deviations each divided by the standard deviation. This step has the effect of standardizing each variable to have a standard deviation of 1.
+
+
+# Simulating OLS regression
+
+In lecture, we used a set of simulated data to learn how ordinary least squares regression minimizes the sum of the squared residuals. The code we used was
+
+```{r}
+set.seed(4)
+n <- 30
+
+X <- rnorm(n, mean = 10, sd = 1)
+Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+
+M <- tibble(X, Y)
+
+ggplot(M, aes(X, Y)) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "darkorange") +
+  geom_point(color = "navy")
+
+fm <- lm(Y ~ X + 1, data = M)
+summary(fm)
+```
+
+We have added `geom_smooth()` to add a least squares regression line through the data. Although the slope and intercept of the line is calculated by `ggplot`, it matches the line from `lm()`.
+
+We will use this code block to explore how the functional relationship between a predictor and an outcome variables, as well as the variation in each impacts the inferred relationship between them.
+
+
+# Lion noses
 
 
 # Possums data

@@ -85,6 +85,30 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
 
 # Non-causal correlations {background-color="#40666e"}
 
+Enjoy: [Spurious Correlations](https://www.tylervigen.com/spurious-correlations){target="_blank"}
+
+
+## Non-causal correlations
+
+![](images/vinyl.png){fig-align="center"}
+
+
+## Non-causal correlations
+
+![](images/UFO.png){fig-align="center"}
+
+
+## Spurious correlations
+
+::: {.callout-note}
+## Correlation $\neq$ Causation
+
+What else could be *separately* causing the patterns I observe?
+:::
+
+- Not restricted to correlation
+- Think deeply about the processes you are studying
+- Controlled experiments can help
 
 
 # Bivariate regression {background-color="#40666e"}
