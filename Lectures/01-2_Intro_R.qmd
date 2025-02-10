@@ -6,8 +6,8 @@ html-math-method:
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
 format:
   clean-revealjs:
-    self-contained: false
-    chalkboard: true
+    self-contained: true
+    chalkboard: false
     standalone: true
     slide-number: true
     show-slide-number: print
@@ -222,7 +222,7 @@ You will develop skills for adapting code from a problem you have solved before.
 ## Installing some packages
 
 - Install once, use often
-    - No need to reinstall
+    - No need to re-install
     - Don't include `install.package()` in your files
 - `tidyverse`
 - `cowplot`
