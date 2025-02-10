@@ -83,6 +83,10 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
     - Thursday: In class working time
 
 
+# Non-causal correlations {background-color="#40666e"}
+
+
+
 # Bivariate regression {background-color="#40666e"}
 
 ## Coloration of lion noses
@@ -229,8 +233,6 @@ Few assumptions are made about $X$
 
 ```{r, fig.height = 5, fig.width = 5}
 
-#| echo: false
-#| eval: true
 set.seed(86)
 cc <- tibble("Concentration" = seq(from = 10, to = 110, by = 10))
 cc$Absorbance = cc$Concentration * 0.025 + rnorm(nrow(cc), 0, 0.15)
@@ -238,8 +240,7 @@ cc$Absorbance = cc$Concentration * 0.025 + rnorm(nrow(cc), 0, 0.15)
 ggplot(cc, aes(Concentration, Absorbance)) +
   geom_point(size = 3) +
   scale_x_continuous(n.breaks = 10) +
-  theme(text = element_text(size = 20))
-  
+  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, by = 0.5))
 ```
 
 :::
@@ -428,7 +429,7 @@ my_model
 ```
 
 - `+ 1` includes an intercept (default, optional)
-- For weach 1 unit increase in $X$, $Y$ increases $2.39525$
+- For each 1 unit increase in $X$, $Y$ increases $2.39525$
 - $Y = -0.03541$ when $X = 0$
 
 

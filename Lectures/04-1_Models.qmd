@@ -468,9 +468,9 @@ Which plot is better?
 
 ## (Pearson's) Correlation ($r$)
 
-Strength of association between two variables
+Strength and direction of association between two variables
 
-- No directionality. Equally true:
+- Equally true:
     - How does $x$ change as $y$ changes?
     - How does $y$ change as $x$ changes?
 - Range: $-1 \leq r \leq 1$
@@ -507,6 +507,7 @@ where
 #| echo: true
 #| output-location: slide
 
+library(ggExtra)
 set.seed(43237497)
 
 BVN <- tibble(x = rnorm(1e4, mean = 0, sd = 1),
