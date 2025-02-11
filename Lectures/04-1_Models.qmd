@@ -32,6 +32,7 @@ theme_set(theme_classic(base_size = 20))
 # Housekeeping {background-color="#40666e"}
 
 - Three-week Check In: complete before Thursday (if you choose to)
+- PS 2
 - PS 3 due Thursday
     - PS keys available on Canvas
 - Progress Check 1 next week
