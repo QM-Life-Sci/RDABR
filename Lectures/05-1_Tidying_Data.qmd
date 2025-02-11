@@ -22,7 +22,27 @@ csl: evolution.csl
 ```
 
 
+# Housekeeping {background-color="#40666e"}
+
+- Questions about PC 1
+- PC 1 due Thursday
+
+
 # Data Integrity {background-color="#40666e"}
+
+
+# Isolating data from analysis
+
+
+# Tidy vs. Untidy Data
+
+Pivoting and why
+
+
+# Practice with lm() for OLS
+
+
+# Standard errors
 
 
 # Questions {background-color="#f8c471"}

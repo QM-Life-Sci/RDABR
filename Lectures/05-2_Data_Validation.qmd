@@ -23,6 +23,9 @@ csl: evolution.csl
 
 # Data Validation, Verification, Cleaning {background-color="#40666e"}
 
+# Tools for checking data
+
+# Detecting and fixing errors
 
 # Questions {background-color="#f8c471"}
 

@@ -23,10 +23,15 @@ csl: evolution.csl
 
 
 
-# Linear models {background-color="#40666e"}
+# "Linear" models {background-color="#40666e"}
+
+Why is `lm()` called `lm()`?
 
 
 # Assumptions {background-color="#40666e"}
+
+
+# Checking model assumptions
 
 
 # Summarizing data and models {background-color="#40666e"}
