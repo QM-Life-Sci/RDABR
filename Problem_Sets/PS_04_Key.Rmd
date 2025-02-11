@@ -1,7 +1,8 @@
 ---
-title: 'Problem Set 03'
+title: 'Problem Set 04'
 author: "Your Name Here"
-date: 'Last updated: `r Sys.Date()`'output:
+date: 'Last updated: `r Sys.Date()`'
+output:
   html_document:
     toc: true
     toc_depth: 3
@@ -29,7 +30,7 @@ In class we looked at a bivariate normal distribution: two variables separately 
 Two variables can be correlated and still maintain bivariate normality (one of the assumptions of a correlation). The code below generates the same distribution that we looked at in class. It is slightly different though:
 
 - We use the `mvtnorm` package function `rmvnorm()`, which generates multivariate normal distributions. Here we make two variables simultaneously.
-- We specify the correlation `r` of the two variables (the line `r <- 0`), which is included to a matrix `sigma` that specifies the relationships between the simulated values.
+- We specify the correlation `r` of the two variables (the line: r <- 0), which is included to a matrix `sigma` that specifies the relationships between the simulated values.
 - We assign column names to the matrix `x` (because it has none by default).
 
 Run the code and verify that it works. You might have to install the `mvtnorm` and `ggExtra` packages.
@@ -63,7 +64,7 @@ You should see that the correlation is close to 0 (0.0104) and that the plot loo
 
 Use the code block above to explore the relationship between the correlation and the distributions of the variables.
 
-- Gradually change the correlation `r` to 0.1, 0.2, 0.5, 0.8, 0.9, 0.99. Rerun the code each time. Also try some negative correlations. You only need to change the one line: `r <- 0`.
+- Gradually change the correlation `r` to 0.1, 0.2, 0.5, 0.8, 0.9, 0.99. Rerun the code each time. Also try some negative correlations. You only need to change the one line: r <- 0.
 
 What happens to the *joint* distribution of V1 and V2 as the correlation moves away from 0 and gets closer to 1 or -1? 
 
@@ -79,7 +80,7 @@ How does the pattern change when you change the mean(s)?
 
 What does this tell you about the correlation between two variables?
 
-> Correlation is independent of the mean. If you look at the second equation I gave you for Pearson's correlation, you see that it includes x and y deviations each divided by the standard deviation. This step has the effect of standardizing each variable to have a standard deviation of 1.
+> Correlation is independent of the mean. The mean can change but the correlation remains the same.
 
 
 # Simulating OLS regression
@@ -96,8 +97,9 @@ Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
 M <- tibble(X, Y)
 
 ggplot(M, aes(X, Y)) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "darkorange") +
-  geom_point(color = "navy")
+  geom_smooth(formula = y ~ x, method = "lm",
+              se = FALSE, color = "darkorange") +
+  geom_point(color = "navy", size = 3)
 
 fm <- lm(Y ~ X + 1, data = M)
 summary(fm)
@@ -105,7 +107,37 @@ summary(fm)
 
 We have added `geom_smooth()` to add a least squares regression line through the data. Although the slope and intercept of the line is calculated by `ggplot`, it matches the line from `lm()`.
 
+The important part of the summary to look at are these lines:
+
+```
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.03541    2.31743  -0.015    0.988    
+X            2.39525    0.22035  10.870 1.48e-11 ***
+```
+
+The `Estimate` values are the `(Intercept)` (-0.03541) and slope for `X` (2.39525). We will learn about the other values in this table as well as the other parts of the summary in the coming weeks.
+
 We will use this code block to explore how the functional relationship between a predictor and an outcome variables, as well as the variation in each impacts the inferred relationship between them.
+
+
+## Activity
+
+In the code block above, systematically change the following aspects of the simulation (but only change one thing at a time). For each, describe how the shape of the plot changes as well as the values for intercept and slope. Using factors of 10 will usually allow you to see the patterns.
+
+The slope of the line, by changing 2.3 to larger or smaller values.
+
+> When the slope is small (0.1), there is no relationship, and the values fall far from the line. When the slope is large (20), the points fall very close to the line. Nonetheless, the slope estimate reported in the summary matches pretty well. The intercept doesn't change much.
+
+
+The range of X, by changing its standard deviation
+
+> When X has a larger range (sd = 10), the points fall right on the line. When X has a small range (sd = 0.1), the points fall far from the line and the slope goes closer to 0. The intercept doesn't change very much.
+
+
+The random noise parameter (`rnorm(n, mean = 1, sd = 1)`) by altering its mean and standard deviation.
+
+> Adding more noise via a higher mean changes the scale of the y axis, but the slope remains the same (and accurate). Adding more noise via a larger standard deviation (sd = 10) moves the points away from the line and changes the slope and intercept. Reducing the noise (sd = 0.1), reduces the spread around the line and results in a slope near 2.3. 
 
 
 # Lion noses
