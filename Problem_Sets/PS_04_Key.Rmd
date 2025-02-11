@@ -78,7 +78,7 @@ How does the pattern change when you change the mean(s)?
 > The x and/or y axis labels change, but the overall pattern and the resulting correlations do not change.
 
 
-What does this tell you about the correlation between two variables?
+What does this result tell you about the correlation between two variables?
 
 > Correlation is independent of the mean. The mean can change but the correlation remains the same.
 
@@ -214,13 +214,15 @@ How would the interpretation differ if you regressed proportion black on age?
 
 # Possum head size
 
-Possums are Australian marsupial (pouched) mammals (not to be confused with North American opossums [also marsupial mammals]). Lindenmayer and colleages^[Lindenmayer, D. B., K. L. Viggers, R. B. Cunningham, and C. F. Donnelly. 1995. Morphological variation among populations of the mountain brushtail possum, *Trichosurus caninus* Ogilby (Phalangeridae, Marsupialia). *Aust. J. Zool.* 43:449.] measured body and head size for 102 animals in two different locations.
+Possums are Australian marsupial (pouched) mammals (not to be confused with North American opossums [also marsupial mammals]). Lindenmayer and colleagues^[Lindenmayer, DB, KL Viggers, RB Cunningham, and CF Donnelly. 1995. Morphological variation among populations of the mountain brushtail possum, *Trichosurus caninus* Ogilby (Phalangeridae, Marsupialia). *Aust. J. Zool.* 43:449.] measured body and head size for 102 animals trapped in the wild in two different areas
 
 Here is a photograph:
 
 ![](https://collections.museumsvictoria.com.au/content/media/4/360404-small.jpg)
 
 ## Activity
+
+Load the `possum.csv` data set.
 
 ```{r}
 # FIXME
@@ -230,7 +232,16 @@ MBP <- read_csv("../data/possum.csv", show_col_types = FALSE)
 glimpse(MBP)
 ```
 
+What columns does the data contain? See if you can decipher from the column names what they represent. What types are they?
 
+> `site`: A number representing the site the animal was trapped at; `pop`: Character representing the trapping location (Vic or other); `sex`: Character sec of the animal; `age`: Numeric age of the animal; `skull_l`, `skull_w`: Numeric measures of skull length and width; `total_l`: Numeric total length of the possum; `tail_l`: Numeric length of the tail
+
+Make two plots, with points colored by sex in each:
+
+1. Skull length plotted against age
+2. Skull width plotted against age
+
+Feel free to add axis labels, etc. Length and width measurements are in millimeters.
 
 ```{r}
 # FIXME
@@ -238,30 +249,70 @@ glimpse(MBP)
 library(ggsci)
 
 ggplot(MBP, aes(age, skull_l, color = sex)) +
-  geom_point() +
+  geom_point(size = 3) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
-  scale_color_aaas()
+  scale_color_aaas() +
+  labs(x = "Age (y)", y = "Skull Length (mm)")
 
 ggplot(MBP, aes(age, skull_w, color = sex)) +
-  geom_point() +
+  geom_point(size = 3) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
-  scale_color_aaas()
+  scale_color_aaas() +
+  labs(x = "Age (y)", y = "Skull Width (mm)")
 ```
 
+You will get a couple of warning messages from ggplot:
+
+```
+Warning messages:
+1: Removed 2 rows containing non-finite outside the scale range
+(`stat_smooth()`). 
+2: Removed 2 rows containing missing values or values outside the scale range
+(`geom_point()`). 
+```
+
+See if you can determine what these messages mean.
+
+> There are missing data.
+
+What patterns do you observe in the plot of **skull length vs. age** with respect to age and sex?
+
+> As the animals get older, skull length increases. Males appear to grow faster than females.
+
+What patterns do you observe in the plot of **skull width vs. age** with respect to age and sex?
+
+> As males age, skull width increases. But for females, skull width appears to be roughly constant.
 
 
-See lecture 3-1, where we filtered the NHANES data for an example.
+Split the data into two separate tibbles one for females and one for males, by filtering on sex. For an example, see lecture 3-1, where we filtered the NHANES data.
 
 ```{r}
 # FIXME
 
-MBP_m <- MBP |> filter(sex == "m")
 MBP_f <- MBP |> filter(sex == "f")
-
-lm(skull_l ~ age, data = MBP_m) |> summary()
-lm(skull_l ~ age, data = MBP_f) |> summary()
-
-lm(skull_w ~ age, data = MBP_m) |> summary()
-lm(skull_w ~ age, data = MBP_f) |> summary()
+MBP_m <- MBP |> filter(sex == "m")
 ```
 
+For each sex:
+
+1. Regress skull length on age
+2. Regress skull width on age
+
+You will have 4 regressions. You can either assign the regression to an object or simply pipe (`>|`) the `lm()` to `summary()`.
+
+```{r}
+lm(skull_l ~ age, data = MBP_f) |> summary()
+lm(skull_l ~ age, data = MBP_m) |> summary()
+
+lm(skull_w ~ age, data = MBP_f) |> summary()
+lm(skull_w ~ age, data = MBP_m) |> summary()
+```
+
+How do the slopes compare between females and males for **skull length**? Does this agree with the plot you made above?
+
+> The slope for females is 0.368 and for males is 0.791. Both slopes are positive, and the slope for males is larger. This is the pattern in the plot.
+
+
+How do the slopes compare between females and males for **skull width**? Does this agree with the plot you made above?
+
+> The slope for females is 0.082 and for males is 0.773. The slope for females is near zero, which is what it appears to be in the plot. The slope for males is positive and much larger. So again this agrees with the plot.
