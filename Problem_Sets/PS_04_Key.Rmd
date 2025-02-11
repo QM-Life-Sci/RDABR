@@ -137,10 +137,131 @@ The range of X, by changing its standard deviation
 
 The random noise parameter (`rnorm(n, mean = 1, sd = 1)`) by altering its mean and standard deviation.
 
-> Adding more noise via a higher mean changes the scale of the y axis, but the slope remains the same (and accurate). Adding more noise via a larger standard deviation (sd = 10) moves the points away from the line and changes the slope and intercept. Reducing the noise (sd = 0.1), reduces the spread around the line and results in a slope near 2.3. 
+> Adding more noise via a higher mean changes the scale of the y axis, but the slope remains the same (and as expected at 2.3). Adding more noise via a larger standard deviation (sd = 10) moves the points away from the line and changes the slope and intercept. Reducing the noise (sd = 0.1), reduces the spread around the line and results in a slope near 2.3. 
 
 
 # Lion noses
 
+In class we looked at the correlation between lion age and the proportion of black pigmentation in their nose (or, equally, the proportion of black pigmentation and age). We also used this as motivation for ordinary least squares regression. We will complete that analysis now.
 
-# Possums data
+## Activity
+
+The file `LionAges.csv` contains the data. Read the data into an R object. It has two columns:
+
+- `age`: Age of the lion
+- `proportion.black`: Proportion of the nose that is black (between 0 and 1).
+
+```{r}
+# FIXME
+
+LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
+
+LA
+```
+
+Make two scatter plots:
+
+1. Proportion black plotted against age
+2. Age plotted against proportion black
+
+Feel free to color the points, add axis titles, etc., as you wish.
+
+```{r}
+# FIXME
+
+ggplot(LA, aes(x = age, y = proportion.black)) +
+  geom_point(size = 4, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14)
+
+ggplot(LA, aes(y = age, x = proportion.black)) +
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14)
+```
+
+Use the `lm()` function to fit a regression where age is predicted by proportion black. Assign the model to a variable. Then generate the `summary()`
+
+```{r}
+# FIXME
+
+fm <- lm(age ~ proportion.black,
+         data = LA)
+summary(fm)
+```
+
+What are the slope and the intercept for the best fit line?
+
+> The slope is 10.6 and the intercept is 0.879.
+
+
+What is you interpretation of the slope of the regression in mathematical terms?
+
+> For a 1 unit increase in proportion black, age increases by 10.6 years.
+
+Why is the slope so large?
+
+> Age is restricted to the range 0 to 1, so the slope of age must be large to accommodate a change from 1-13 years in 1 unit.
+
+When we regress age on proportion black, what we are saying is that we know the proportion and want to predict age. Does that make sense in this situation?
+
+> It might be useful to predict age from a photo, so this seems to make sense.
+
+How would the interpretation differ if you regressed proportion black on age?
+
+> In this case, we would be trying to predict the peoportion from the age. That is to say we would already know the age and be trying to determine the proportion. Depending on the scientific question that might make sense. Or maybe not.
+
+
+# Possum head size
+
+Possums are Australian marsupial (pouched) mammals (not to be confused with North American opossums [also marsupial mammals]). Lindenmayer and colleages^[Lindenmayer, D. B., K. L. Viggers, R. B. Cunningham, and C. F. Donnelly. 1995. Morphological variation among populations of the mountain brushtail possum, *Trichosurus caninus* Ogilby (Phalangeridae, Marsupialia). *Aust. J. Zool.* 43:449.] measured body and head size for 102 animals in two different locations.
+
+Here is a photograph:
+
+![](https://collections.museumsvictoria.com.au/content/media/4/360404-small.jpg)
+
+## Activity
+
+```{r}
+# FIXME
+
+MBP <- read_csv("../data/possum.csv", show_col_types = FALSE)
+
+glimpse(MBP)
+```
+
+
+
+```{r}
+# FIXME
+
+library(ggsci)
+
+ggplot(MBP, aes(age, skull_l, color = sex)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  scale_color_aaas()
+
+ggplot(MBP, aes(age, skull_w, color = sex)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  scale_color_aaas()
+```
+
+
+
+See lecture 3-1, where we filtered the NHANES data for an example.
+
+```{r}
+# FIXME
+
+MBP_m <- MBP |> filter(sex == "m")
+MBP_f <- MBP |> filter(sex == "f")
+
+lm(skull_l ~ age, data = MBP_m) |> summary()
+lm(skull_l ~ age, data = MBP_f) |> summary()
+
+lm(skull_w ~ age, data = MBP_m) |> summary()
+lm(skull_w ~ age, data = MBP_f) |> summary()
+```
+
