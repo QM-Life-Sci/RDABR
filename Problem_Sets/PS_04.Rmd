@@ -30,7 +30,7 @@ In class we looked at a bivariate normal distribution: two variables separately 
 Two variables can be correlated and still maintain bivariate normality (one of the assumptions of a correlation). The code below generates the same distribution that we looked at in class. It is slightly different though:
 
 - We use the `mvtnorm` package function `rmvnorm()`, which generates multivariate normal distributions. Here we make two variables simultaneously.
-- We specify the correlation `r` of the two variables (the line: r <- 0), which is included to a matrix `sigma` that specifies the relationships between the simulated values.
+- We specify the correlation `r` of the two variables (the line: r <- 0), which is included in the matrix `sigma` that specifies the relationships between the simulated values.
 - We assign column names to the matrix `x` (because it has none by default).
 
 Run the code and verify that it works. You might have to install the `mvtnorm` and `ggExtra` packages.
