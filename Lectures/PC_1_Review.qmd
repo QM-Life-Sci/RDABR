@@ -1,0 +1,37 @@
+---
+title: "PC 1 Review"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- 3 week check in discussion
+- 
+
+
+# Title {background-color="#40666e"}
+
+
+
+# Questions {background-color="#f8c471"}
+
