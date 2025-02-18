@@ -33,7 +33,7 @@ library(tidyverse)
 # Micropublications {background-color="#40666e"}
 
 
-## [Micropublications](https://www.micropublication.org/)
+## Micropublications [https://www.micropublication.org/](https://www.micropublication.org/)
 
 > "brief, novel findings, negative and/or reproduced results, and results which may lack a broader scientific narrative."
 
@@ -203,7 +203,7 @@ isTRUE(all.equal(v1, v2))
 > Is there a way to ask R to "pull out" data from an automatically generated set of information (for example, the summary of the least squares regression function lm)? I could see it being useful to automatically pull out data and assign it to a variable for further processing.
 
 
-## Let's simulate some data
+## Simulate data
 
 ```{r}
 #| echo: true
@@ -212,9 +212,16 @@ isTRUE(all.equal(v1, v2))
 ```
 
 
-## Examining object structures
+## Look at an `lm()` summary
 
-`str()`
+```{r}
+#| echo: true
+
+
+```
+
+
+## Examining object structures with `str()`
 
 ```{r}
 #| echo: true
