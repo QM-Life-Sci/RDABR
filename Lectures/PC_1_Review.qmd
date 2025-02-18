@@ -26,12 +26,223 @@ library(tidyverse)
 # Housekeeping {background-color="#40666e"}
 
 - 3 week check in discussion
-- 
+- Micropublication
+- Review / questions
 
 
-# Title {background-color="#40666e"}
+# Micropublications {background-color="#40666e"}
 
+
+## [Micropublications](https://www.micropublication.org/)
+
+> "brief, novel findings, negative and/or reproduced results, and results which may lack a broader scientific narrative."
+
+- New finding - novel discoveries, new reagents and/or methods
+- Null/negative result
+- Replication - successful (including being scooped)
+- Replication - unsuccessful
+- Materials and Reagents
+- Methodology
+- Data updates
+
+:::{.alert}
+Not every publication needs to be expansive.
+:::
+
+
+## Project
+
+Produce a *reproducible* micropublication-style report (3-5 pages)
+
+- Scientific question / Background
+- Use your own data or data from the literature
+    - I will help you
+- Methods and analysis
+    - Describing analyses and writing about results
+- A figure (can be multi-panel, can have images, must be reproducible)
+- A table (if needed)
+- References
+
+
+## Skills
+
+- Determining appropriate analyses to answer questions
+- Writing about statistics
+- Making publication-ready figures (colors, font size, etc.)
+- Making tables
+- Writing figure captions and table headers
+- Extracting information from R during rendering
+- Including references
+- HTML or PDF (I will provide templates)
+- Presenting
+
+
+## Key dates
+
+- 4/15: Plan due
+    - Question
+    - Dataset
+    - Figure plan
+    - Analysis ideas
+- 5/8 and 5/12: Presentations (2 slides)
+- 5/16: Project due
 
 
 # Questions {background-color="#f8c471"}
+
+
+## When to separate vs. combine operations
+
+> Can we combine multiple logical operations in a single line? For example, when we did PS_2 and were trying to figure out how much data was outside one standard deviation of the mean, we isolated the data points less than -1 and greater than 1 in separate lines. Could this be condensed by asking for data that is either less than -1 or larger than 1 in only one logical test?
+
+Being concise at the expense of clarity
+
+
+## When to separate vs. combine operations
+
+```{r}
+#| echo: true
+
+set.seed(732646)
+x <- rnorm(10000, mean = 0, sd = 1)
+```
+
+
+## What to put where in `ggplot()`
+
+> Is there a rule of thumb for understanding if the code for a plot should go inside the parentheses of ggplot, be added on with +, or be added using the pipe?
+
+
+## Let's make a plot
+
+```{r}
+
+```
+
+
+## When to separate vs. combine operations
+
+```{r}
+#| echo: true
+
+gt_1 <- x > 1  # T/F vectors
+lt_1 <- x < -1
+
+sum(gt_1)
+sum(lt_1)
+```
+
+. . .
+
+```{r}
+#| echo: true
+(sum(gt_1) + sum(lt_1)) / 10000
+(10000 - (sum(gt_1) + sum(lt_1))) / 10000
+```
+
+
+## When to separate vs. combine operations
+
+```{r}
+#| echo: true
+
+set.seed(732646)
+x <- rnorm(10000, mean = 0, sd = 1)
+
+mean(x < -1 | x > 1)
+mean(x > -1 & x < 1)
+```
+
+. . .
+
+Combining logical operations: `&` (and); `|` (or)
+
+> "`all.equal(x, y)` is a utility to compare R objects x and y testing 'near equality'."
+
+- `tolerance = 1e-3`
+- `isTRUE(all.equal(x, y))`
+
+
+## Combining logical operations
+
+```{r}
+#| echo: true
+
+v1 <- c(TRUE, TRUE, TRUE)
+v2 <- c(TRUE, FALSE, TRUE)
+
+v1 & v2
+v1 | v2
+
+all.equal(v1, v2)
+isTRUE(all.equal(v1, v2))
+```
+
+
+## Explicit vs. Concise
+
+:::: {.columns}
+
+::: {.column width="30%"}
+![](images/Roff1.png)
+:::
+
+::: {.column width="70%"}
+![](images/Roff2.png)
+:::
+
+::::
+
+. . .
+
+`P <- mean(F.replicate >= F.replicate[1])`
+
+
+## Extracting data from analyses
+
+> Is there a way to ask R to "pull out" data from an automatically generated set of information (for example, the summary of the least squares regression function lm)? I could see it being useful to automatically pull out data and assign it to a variable for further processing.
+
+
+## Let's simulate some data
+
+```{r}
+#| echo: true
+
+
+```
+
+
+## Examining object structures
+
+`str()`
+
+```{r}
+#| echo: true
+
+
+```
+
+
+## Using the tidyverse: `broom`
+
+- `broom::tidy()`
+- `broom::glance()`
+- `broom::augment()`
+
+```{r}
+#| echo: true
+
+
+```
+
+
+## Inline code in Rmd/qmd files
+
+```{r}
+#| echo: true
+
+x <- rnorm(100, mean = 10, sd = 1)
+```
+
+The mean of x is `r mean(x)`.
 

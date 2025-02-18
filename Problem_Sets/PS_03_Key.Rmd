@@ -185,6 +185,7 @@ Add the two sums together and divide by 10000. Confirm that this value matches (
 ```{r}
 # FIXME
 
+(sum(gt_1) + sum(lt_1)) / 10000
 (10000 - (sum(gt_1) + sum(lt_1))) / 10000
 ```
 
