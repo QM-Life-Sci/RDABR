@@ -1,6 +1,6 @@
 ---
-title: "Unit 6: Transformations"
-subtitle: "Making summary tables and writing about analyses"
+title: "Unit 6: Assumptions"
+subtitle: "Summarizing data and models"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -22,10 +22,22 @@ csl: evolution.csl
 ```
 
 
-# Transformations {background-color="#40666e"}
+
+# "Linear" models {background-color="#40666e"}
+
+Why is `lm()` called `lm()`?
 
 
-# Making summary tables and writing about analyses {background-color="#40666e"}
+# Assumptions {background-color="#40666e"}
+
+
+# Checking model assumptions
+
+
+# Transformations
+
+
+# Summarizing data and models {background-color="#40666e"}
 
 
 # Questions {background-color="#f8c471"}

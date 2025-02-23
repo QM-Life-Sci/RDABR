@@ -1,0 +1,697 @@
+---
+title: "Unit 5: Comparison of Means"
+subtitle: "Intervals and Standard Errors"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(patchwork)
+library(ggExtra)
+library(latex2exp)
+library(wesanderson)
+
+theme_set(theme_classic(base_size = 20))
+
+source("ssPlot.R")
+
+shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
+  require(tidyverse, quietly = TRUE)
+  require(cowplot)
+  crit <- qnorm(p, mean, sd)
+  
+  M <- tibble(x = seq(-4, 4, length = 200),
+              y = dnorm(x))
+  PP <- ggplot(M, aes(x, y)) +
+    geom_line() +
+    labs(x = "Value", y = "Relative Likelihood")
+  lower <- geom_ribbon(data = subset(M, x < crit),
+                       aes(ymax = y), ymin = 0,
+                       fill = "firebrick4", alpha = 0.5)
+  upper <- geom_ribbon(data = subset(M, x > abs(crit)),
+                       aes(ymax = y), ymin = 0,
+                       fill = "firebrick4", alpha = 0.5)
+  if (tail == "both") PP <- PP + lower + upper
+  if (tail == "lower") PP <- PP + lower
+  if (tail == "upper") PP <- PP + upper
+  return(PP)
+}
+
+
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- Progress Check 1 due Thursday
+    - If you need more time, let me know.
+- Be thinking about / looking for a dataset
+    - Let me know if you want to discuss
+- Change to lecture topic order
+- Change in lecture structure
+
+
+## Plan for this week
+
+- Standard errors: How confident are we in an estimate?
+- Intervals around estimates
+- Comparison of means
+- (Almost) all models are linear models
+
+
+# Standard errors {background-color="#40666e"}
+
+
+## Resampling to estimate a mean
+
+```{r}
+#| echo: true
+
+set.seed(423766)
+
+x <- rnorm(n = 2000, mean = 10, sd = 4)
+
+resample_means <- function(x, sample_size, n_means) {
+  sample_means <- numeric(n_means)
+  for (ii in 1:n_means) {
+    s <- sample(x, size = sample_size, replace = FALSE)  # <1>
+    sample_means[ii] <- mean(s)
+  }
+  return(sample_means)
+}
+
+sm1 <- resample_means(x, sample_size = 20, n_means = 100)
+```
+1. Randomly sample from x, being sure to not sample the same value twice (`replace = FALSE`).
+
+. . .
+
+```{r}
+#| echo: true
+
+sm1[1:10]
+```
+
+What will the distribution of sample *means* look like? What will the range be?
+
+
+## Mean of means: mean = 10, sd = 4
+
+```{r}
+#| echo: false
+#| warning: false
+
+ggplot(tibble(sm1), aes(sm1)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count",
+       title = "sample size = 20; n means = 100") +
+  scale_x_continuous(limits = c(6, 14), breaks = 6:14)
+```
+
+
+## Mean of means: mean = 10, sd = 4
+
+```{r}
+#| warning: false
+
+ggplot(tibble(x = resample_means(x, sample_size = 20, n_means = 1000)),
+       aes(x)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count",
+       title = "sample size = 20; n means = 1000") +
+  scale_x_continuous(limits = c(6, 14), breaks = 6:14)
+```
+
+
+## Mean of means: mean = 10, sd = 4
+
+```{r}
+#| warning: false
+
+ggplot(tibble(x = resample_means(x, sample_size = 20, n_means = 10000)),
+       aes(x)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count",
+       title = "sample size = 20; n means = 10000") +
+  scale_x_continuous(limits = c(6, 14), breaks = 6:14)
+```
+
+
+## Mean of means: mean = 10, sd = 4
+
+```{r}
+#| warning: false
+
+ggplot(tibble(x = resample_means(x, sample_size = 200, n_means = 100)),
+       aes(x)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count",
+       title = "sample size = 200; n means = 100") +
+  scale_x_continuous(limits = c(6, 14), breaks = 6:14)
+```
+
+
+## Mean of means: mean = 10, sd = 4
+
+```{r}
+#| warning: false
+
+ggplot(tibble(x = resample_means(x, sample_size = 2000, n_means = 100)),
+       aes(x)) +
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count",
+       title = "sample size = 2000; n means = 100") +
+  scale_x_continuous(limits = c(6, 14), breaks = 6:14)
+```
+
+
+## Standard errors
+
+- Empirically, we see that the estimate is more precise if the samples is larger.
+- How can we quantify the level of uncertainty?
+
+Adjust the standard deviation by sample size:
+
+$$
+s = \sqrt{\frac{\sum \left(x_i - \bar{x}\right)^2}{n - 1}}
+$$
+
+$$SE_{\bar{x}} = \frac{s}{\sqrt{n}}$$
+
+How does $SE_{\bar{x}}$ change as $n$ increases?
+
+
+## Standard error of the sample mean
+
+```{r}
+SticklebackPlates <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
+                              show_col_types = FALSE)
+```
+
+No built-in function in R, so we write our own:
+
+```{r}
+#| echo: true
+
+SEM <- function(x) {sd(x) / sqrt(length(x))}
+```
+
+Stickleback plate numbers:
+
+```{r}
+#| echo: true
+
+SticklebackPlates |> 
+  group_by(genotype) |> 
+  summarise(Count = length(plates),
+            Mean = mean(plates),
+            SEM_plates = SEM(plates))
+```
+
+Means are very different, but $SE_{\overline{plate}}$ is similar for *MM* and *mm*.
+
+
+## Standard errors appear often
+
+- Sample mean: "SEM"
+- Parameter estimates
+
+```{r}
+set.seed(4)
+n <- 30
+
+X <- rnorm(n, mean = 10, sd = 1)
+Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
+
+M <- tibble(X, Y)
+
+lm(Y ~ X + 1, data = M) |> summary()
+```
+
+
+# What can I do with standard errors? {background-color="#40666e"}
+
+
+## Compare the standard error to the estimate
+
+```{r}
+set.seed(324678)
+n <- 1000
+DD <- tibble(x = c(rnorm(n, 0, 5), rnorm(n, 0, 50)),
+             `SD Group` = rep(c("sd = 5", "sd = 50"), each = n))
+DD |> 
+  group_by(`SD Group`) |> 
+  summarize(Count = length(x),
+            Mean = mean(x),
+            SEM = SEM(x)) |> 
+  knitr::kable(digits = 2)
+```
+
+
+## Plot raw data with summary stats
+
+```{r}
+#| echo: true
+#| output-location: slide 
+
+ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
+  geom_point(position = position_jitter(width = 0.2, seed = 423479),
+             alpha = 0.25, pch = 16) +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "purple") + 
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
+               color = "purple", linewidth = 1) +
+  labs(x = "Genotype", y = "Number of Plates") +
+  theme(axis.text.x = element_text(face = "italic"))
+```
+
+
+## Intervals measure uncertainty in a parameter estimate
+
+In what range of values do I expect to find estimates?
+
+- Repeat the same experiment
+- Same conditions, sample size, etc.
+
+. . .
+
+```{r}
+mu1 <- 24.3
+mu2 <- 32.5
+
+DD1 <- tibble("Treatment" = rep(c("A", "B"),each = 8),
+              "Phenotype" = c(rnorm(8, mu1), rnorm(8, mu2)),
+              "DataSet" = "G1")
+
+DD2 <- tibble("Treatment" = rep(c("A", "B"),each = 8),
+              "Phenotype" = c(rnorm(8, mu1, 6), rnorm(8, mu2, 6)),
+              "DataSet" = "G2")
+
+DD3 <- tibble("Treatment" = rep(c("A", "B"),each = 80),
+              "Phenotype" = c(rnorm(80, mu1), rnorm(80, mu2)),
+              "DataSet" = "G3")
+
+DD4 <- tibble("Treatment" = rep(c("A", "B"),each = 80),
+              "Phenotype" = c(rnorm(80, mu1, 6), rnorm(80, mu2, 6)),
+              "DataSet" = "G4")
+
+DD <- bind_rows(DD1, DD2, DD3, DD4)
+
+
+DD |>
+  ggplot(aes(Treatment, Phenotype)) +
+  geom_point(position = position_jitter(width = 0.2, seed = 423479),
+             alpha = 0.25, pch = 16,
+             size = 2) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "darkred") + 
+  facet_wrap("DataSet", nrow = 2)
+```
+
+
+## Confidence interval for a mean
+
+- Approximate calculation
+    - $n = 30$ to $n = 100$
+
+$$95\%~CI = \bar{x} \pm 2 \times SEM$$
+
+- Exact calculation using a critical *t*-value and appropriate degrees of freedom
+    - $t$-distribution coming later
+    - Approximate for now...
+  
+
+## Confidence intervals
+
+> A confidence interval is a range that we expect, with some level of conﬁdence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
+
+Our calculation is based on our expectation from sampling the true population distribution *repeatedly.*
+
+
+## Estimating confidence intervals
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+#| fig-height: 10
+shade_normal(p = 0.025) +
+    theme(text = element_text(size = 24))
+
+```
+
+:::
+
+::: {.column width="50%"}
+
+- $2$ in $\pm 2 \times SEM$ is an approximation
+- True value is ~1.96 for a standard normal distribution (assuming infinite sample size)
+- Exact confidence intervals rely on the *t*-distribution
+    - Increase width of CI for smaller sample size
+
+:::
+
+::::
+
+
+## Plotting Confidence Intervals
+
+```{r}
+DD |>
+  ggplot(aes(Treatment, Phenotype)) +
+  geom_point(position = position_jitter(width = 0.2, seed = 423479),
+             alpha = 0.25, pch = 16) +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "firebrick4") + 
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1,
+               color = "firebrick4", linewidth = 1) +
+  facet_wrap(vars(DataSet), nrow=2)
+
+```
+
+
+## What Exactly does a confidence interval represent about a sample?
+
+> A confidence interval is a range that we expect, with some level of conﬁdence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
+
+Our calculation is based on our expectation from sampling the true population distribution repeatedly.
+
+
+## Example CI calculation
+
+Mean undulation rate for *n = 8* [gliding snakes](http://www.flyingsnake.org/):
+
+![](http://www.lazerhorse.org/wp-content/uploads/2015/01/Flying-Snake-Chrysopelea.jpg){fig-align="center" width="60%"}
+
+What is the mean undulation rate and ~95% CI for this sample of flying snakes?
+
+
+## Example CI calculation
+
+```{r}
+#| echo: true
+
+undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
+
+undulation_mean <- mean(undulation_rate)
+undulation_SEM <- SEM(undulation_rate)
+
+lower <- undulation_mean - 2 * undulation_SEM
+upper <- undulation_mean + 2 * undulation_SEM
+
+c(lower, undulation_mean, upper)
+
+```
+
+
+## Compare the estimate to its 95% CI
+
+```{r}
+lm(Y ~ X + 1, data = M) |> summary()
+```
+
+
+# Comparison of two means {background-color="#40666e"}
+
+
+## Comparison of two means
+
+- One categorical predictor (factor) with two levels
+    - Internally re-coded as 0 and 1
+- One level is the *reference* level
+    - Default is alphabetically first factor
+    - Be careful with factors coded with integers
+
+> "How much does the outcome variable change (positive or negative) for each 1 unit increase in the predictor?"
+
+:::{.alert}
+"1 unit" is $0 \rightarrow 1$ "difference" between groups
+:::
+
+
+## Horned lizard predation
+
+
+![](https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg){fig-align="center" width=90%}
+
+<center>
+*Phrynosoma cornutum*
+</center>
+
+
+## Loggerhead shrike
+
+![](https://i.imgur.com/Q1ee6FQ.png){fig-align="center" width=90%}
+
+
+## Are longer horns protective against predation?
+
+![](https://i.imgur.com/asOgPnC.jpg){fig-align="center" width=80%}
+
+
+## Are longer horns protective against predation?
+
+::: {.incremental}
+
+- Is mean horn length in live horned lizards *different* than in dead horned lizards?
+    - Is the mean horn length larger?
+- How does natural variation in horn length impact the observed mean value?
+    - What difference(s) do we expect from random sampling of horned lizards?
+:::
+
+. . .
+
+:::{.alert}
+What is the null hypothesis?
+:::
+
+
+## Horned lizard predation
+
+Simulate data with ~10% difference in horn length:
+
+- Alive: n = 150, mean horn length = 24.5 mm, sd = 2.6
+- Dead: n = 30, mean horn length = 22.0 mm, sd = 2.7
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+set.seed(3575575)
+
+Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
+Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
+Group <- c(rep("Alive", 150),
+           rep("Dead", 30))
+
+HL <- tibble(Horn_Length = c(Alive, Dead),
+             Group = factor(Group))
+knitr::kable(HL)
+```
+
+
+## Horned lizard predation
+
+```{r}
+HL |> 
+  ggplot(aes(Horn_Length)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  facet_grid(Group ~ .) +
+  labs(x = "Horn Length (mm)", y = "Count")
+```
+
+
+## Summarize
+
+```{r}
+#| echo: true
+
+HL |>
+  group_by(Group) |> 
+  summarize(n = length(Horn_Length),
+            Horn_mean = mean(Horn_Length),
+            Horn_sd = sd(Horn_Length),
+            Horn_SEM = SEM(Horn_Length))
+```
+
+
+## How does the mean change in alive lizards compared to dead?
+
+```{r}
+
+HL$CatNum <- as.numeric(HL$Group) - 1
+HL$CatJitter <- HL$CatNum + rnorm(nrow(HL), 0, 0.1)
+
+HL |>
+  ggplot(aes(CatJitter, Horn_Length)) +
+  geom_point(color = "navy", size = 3) +
+  labs(x = "Group", y = "Horn Length (mm)") +
+  scale_x_continuous(breaks = c(0, 1),
+                     labels = c("Alive", "Dead")) +
+  theme(text = element_text(size = 20))
+
+```
+
+
+## FIXME - What are we showing here?
+
+```{r}
+#| echo: true
+
+Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
+Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
+
+```
+
+
+```{r}
+mu1 <- 24.5
+mu2 <- 22
+yrange <- seq(14, 32, length = 200)
+Distp1 <- tibble(y = yrange,
+                 x = dnorm(yrange,mu1,2.6) + 0.4)
+Distp2 <- tibble(y = yrange,
+                 x = dnorm(yrange,mu2,2.7) + 1.4)
+
+mu3 <- 26
+mu4 <- 26
+Distp3 <- tibble(y = yrange,
+                 x = dnorm(yrange,mu3,2.6) + 0.4)
+Distp4 <- tibble(y = yrange,
+                 x = dnorm(yrange,mu4,2.7) + 1.4)
+
+
+p <- ggplot(HL, aes(CatJitter, Horn_Length)) +
+  geom_segment(x = -0.5, y = mu1, xend = 0.6, yend = mu1, linewidth = 1) +
+  geom_segment(x = 0.7, y = mu2, xend = 1.6, yend = mu2, linewidth = 1) +  
+  geom_point(color = "navy", size = 3) +
+  geom_path(data= Distp1, aes(x, y), linewidth = 1) +
+  geom_path(data= Distp2, aes(x, y), linewidth = 1) +
+  geom_segment(x = -0.5, y = mu3, xend = 0.6, yend = mu3, 
+               color = "firebrick", linewidth = 1) +
+  geom_segment(x = 0.7, y = mu4, xend = 1.6, yend = mu4, 
+               color = "firebrick", linewidth = 1) +  
+  geom_path(data= Distp3, aes(x,y), color = "firebrick", linewidth = 1) +
+  geom_path(data= Distp4, aes(x,y), color = "firebrick", linewidth = 1) +
+  ylim(c(14, 32)) +
+  labs(x = "Group", y = "Horn Length (mm)") +
+  scale_x_continuous(breaks = c(0,1),labels = c("Alive","Dead")) +
+  theme(text = element_text(size = 20))
+
+p
+
+```
+
+
+## Model assumptions
+
+- Observations normally distributed *within* groups
+    - Not *between* groups (e.g., bimodal distribution when all observations are pooled)
+    - e.g., body mass in dimorphic species (gorillas)
+- Within-group variances are (approximately) equal
+
+```{r}
+#| fig-width: 14
+#| fig-align: center
+
+set.seed(21347)
+n <- 400
+
+DD <- tibble(Mass = c(rnorm(n, 181.5, 23), rnorm(n, 90.5, 15)),
+             Sex = rep(c("Male", "Female"), each = n))
+
+ggplot() +
+  geom_density(data = DD, aes(Mass), fill = "gray75") +
+  geom_density(data = DD, aes(Mass, color = Sex), linewidth = 2) +
+  scale_color_manual(values = c("#B66DFF", "#009292")) +
+  labs(y = "Density", x = "Body Mass (kg)")
+
+```
+
+
+## Minimize sums of squares
+
+```{r}
+
+HL$pred <- NA
+mu.a <- mean(HL$Horn_Length[HL$Group == "Alive"])
+mu.d <- mean(HL$Horn_Length[HL$Group == "Dead"])
+HL$pred[HL$Group == "Alive"] <- mu.a
+HL$pred[HL$Group == "Dead"] <- mu.d
+
+HL |>
+  ggplot(aes(CatJitter, Horn_Length)) +
+  geom_segment(data = HL, aes(x = CatJitter, xend = CatJitter,
+                              y = Horn_Length, yend = pred),
+               color = "firebrick", linewidth = 0.75,
+               alpha = 0.75) +
+  geom_point(color = "navy", size = 2.5) +
+  labs(x = "Group", y = "Horn Length (mm)") +
+  geom_segment(x = -0.5, y = mu.a, xend = 0.4, yend = mu.a) +
+  geom_segment(x = 0.6, y = mu.d, xend = 1.5, yend = mu.d) +
+  scale_x_continuous(breaks = c(0,1),labels = c("Alive","Dead"))
+ 
+```
+
+
+## Linear model to compare means
+
+```{r}
+#| echo: true
+
+mod <- lm(Horn_Length ~ Group, data = HL)
+```
+
+- Looks exactly like an OLS linear model
+- `Group` is a factor (or character converted to factor)
+    - Be careful with groups defined by numbers
+- R internally converts to 0 (Alive) and 1 (Dead)
+
+
+## Linear model to compare means
+
+```{r}
+#| echo: true
+
+summary(mod)
+```
+
+- `(Intercept)`: Mean for Alive group
+- `GroupDead`: Mean for Alive group + Difference between Alive and Dead
+
+
+## Group means from a linear model
+
+```{r}
+#| echo: true
+
+coef(mod)
+
+HL |> 
+  group_by(Group) |> 
+  summarize(`Horn Length` = mean(Horn_Length)) |> 
+  as.data.frame()
+```
+
+
+
+# Questions {background-color="#f8c471"}
+
+
+## References
+
+::: {#refs}
+:::
