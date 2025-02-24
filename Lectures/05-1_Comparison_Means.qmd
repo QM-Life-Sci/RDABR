@@ -28,8 +28,6 @@ library(wesanderson)
 
 theme_set(theme_classic(base_size = 20))
 
-source("ssPlot.R")
-
 shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
   require(tidyverse, quietly = TRUE)
   require(cowplot)
@@ -60,7 +58,7 @@ shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
 
 - Progress Check 1 due Thursday
     - If you need more time, let me know.
-- Be thinking about / looking for a dataset
+- Be thinking about / looking for a data set
     - Let me know if you want to discuss
 - Change to lecture topic order
 - Change in lecture structure
@@ -180,9 +178,39 @@ ggplot(tibble(x = resample_means(x, sample_size = 2000, n_means = 100)),
 ```
 
 
+## Scaling of standard deviation with sample size
+
+```{r}
+set.seed(32437)
+SDS <- map(.x = c(10, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500),
+           .f = function(.x) {
+             sds <- numeric(length = 100)
+             for (ii in 1:100) {
+               x <- rnorm(.x, mean = 0, sd = 10)
+               sds[ii] <- sd(x)
+             }
+             return(tibble(n = .x,
+                           SD = sds))
+           }
+) |> 
+  list_rbind()
+
+ggplot(SDS, aes(x = n, y = SD)) +
+  geom_point(position = position_jitter(width = 10, seed = 23553),
+             alpha = 0.25, pch = 16,
+             size = 2) +
+  stat_summary(fun = mean,
+               geom = "point",
+               size = 4, color = "salmon") +
+  labs(x = "Sample Size", y = "Standard Deviation",
+       title = "mean = 0; sd = 10",
+       caption = "100 iterations")
+```
+
+
 ## Standard errors
 
-- Empirically, we see that the estimate is more precise if the samples is larger.
+- Empirically, we see that the estimate is more precise if the number of samples is larger.
 - How can we quantify the level of uncertainty?
 
 Adjust the standard deviation by sample size:
@@ -193,23 +221,39 @@ $$
 
 $$SE_{\bar{x}} = \frac{s}{\sqrt{n}}$$
 
-How does $SE_{\bar{x}}$ change as $n$ increases?
+How will $SE_{\bar{x}}$ change as $n$ increases?
 
 
-## Standard error of the sample mean
+## Stickleback plates
+
+![](https://i.imgur.com/Xr68AKa.jpg){fig-align="center"}
+
+
+## Stickleback plates
 
 ```{r}
 SticklebackPlates <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
                               show_col_types = FALSE)
+
+ggplot(SticklebackPlates, aes(x = plates)) +
+  geom_histogram(bins = 30, fill = "#6695DE") +
+  facet_grid(genotype ~ .) +
+  labs(x = "Number of Lateral Body Plates", y = "Count") +
+  theme(strip.text = element_text(face = "italic"))
 ```
 
-No built-in function in R, so we write our own:
+
+## Standard error of the sample mean
 
 ```{r}
 #| echo: true
 
 SEM <- function(x) {sd(x) / sqrt(length(x))}
 ```
+
+where `x` is a vector of values.
+
+. . .
 
 Stickleback plate numbers:
 
@@ -228,8 +272,9 @@ Means are very different, but $SE_{\overline{plate}}$ is similar for *MM* and *m
 
 ## Standard errors appear often
 
-- Sample mean: "SEM"
-- Parameter estimates
+- Any time you have a parameter estimate and want to know how confident you are
+- Sample mean: $SE_{\bar{x}}$ or "SEM"
+- SEs for parameter estimates in linear models
 
 ```{r}
 set.seed(4)
@@ -244,23 +289,16 @@ lm(Y ~ X + 1, data = M) |> summary()
 ```
 
 
-# What can I do with standard errors? {background-color="#40666e"}
+# What can you do with standard errors? {background-color="#40666e"}
 
 
 ## Compare the standard error to the estimate
 
 ```{r}
-set.seed(324678)
-n <- 1000
-DD <- tibble(x = c(rnorm(n, 0, 5), rnorm(n, 0, 50)),
-             `SD Group` = rep(c("sd = 5", "sd = 50"), each = n))
-DD |> 
-  group_by(`SD Group`) |> 
-  summarize(Count = length(x),
-            Mean = mean(x),
-            SEM = SEM(x)) |> 
-  knitr::kable(digits = 2)
+lm(Y ~ X + 1, data = M) |> summary()
 ```
+
+If the standard error is many times the estimate, then the estimate is not very confident
 
 
 ## Plot raw data with summary stats
@@ -272,17 +310,27 @@ DD |>
 ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
   geom_point(position = position_jitter(width = 0.2, seed = 423479),
              alpha = 0.25, pch = 16) +
-  stat_summary(fun = mean, geom = "point", size = 3, color = "purple") + 
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "purple", linewidth = 1) +
+  stat_summary(fun = mean, # <1>
+               geom = "point", # <1>
+               size = 3, color = "purple") + 
+  stat_summary(fun.data = mean_se, # <2>
+               geom = "errorbar", # <3>
+               width = 0.1,
+               linewidth = 1,
+               color = "purple") +
   labs(x = "Genotype", y = "Number of Plates") +
-  theme(axis.text.x = element_text(face = "italic"))
+  theme(axis.text.x = element_text(face = "italic")) # <4>
 ```
+1. Add a point with the mean
+2. Calculate the standard error of the sample mean.
+3. Add error bars around the SEM.
+4. Italicize the x-axis labels.
 
 
-## Intervals measure uncertainty in a parameter estimate
+# From standard errors to intervals {background-color="#40666e"}
 
-In what range of values do I expect to find estimates?
+
+## Intervals describe uncertainty
 
 - Repeat the same experiment
 - Same conditions, sample size, etc.
@@ -324,14 +372,15 @@ DD |>
 
 ## Confidence interval for a mean
 
-- Approximate calculation
+- Approximate calculation:
     - $n = 30$ to $n = 100$
+    - $2$ is an approximation
 
 $$95\%~CI = \bar{x} \pm 2 \times SEM$$
 
-- Exact calculation using a critical *t*-value and appropriate degrees of freedom
-    - $t$-distribution coming later
-    - Approximate for now...
+- Exact calculation: 
+    - Requires a critical $t$-value and appropriate degrees of freedom for the $t$-distribution
+    - Coming soon. Approximate for now...
   
 
 ## Confidence intervals
@@ -340,54 +389,35 @@ $$95\%~CI = \bar{x} \pm 2 \times SEM$$
 
 Our calculation is based on our expectation from sampling the true population distribution *repeatedly.*
 
-
-## Estimating confidence intervals
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-```{r}
-#| fig-height: 10
-shade_normal(p = 0.025) +
-    theme(text = element_text(size = 24))
-
-```
-
-:::
-
-::: {.column width="50%"}
-
-- $2$ in $\pm 2 \times SEM$ is an approximation
-- True value is ~1.96 for a standard normal distribution (assuming infinite sample size)
-- Exact confidence intervals rely on the *t*-distribution
-    - Increase width of CI for smaller sample size
-
-:::
-
-::::
+- Same sample size, same experimental conditions
+- Same procedures, same analysis
 
 
-## Plotting Confidence Intervals
+## Plotting confidence intervals
 
 ```{r}
+#| echo: true
+#| output-location: slide
+
 DD |>
   ggplot(aes(Treatment, Phenotype)) +
   geom_point(position = position_jitter(width = 0.2, seed = 423479),
              alpha = 0.25, pch = 16) +
-  stat_summary(fun = mean, geom = "point", size = 3, color = "firebrick4") + 
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1,
-               color = "firebrick4", linewidth = 1) +
-  facet_wrap(vars(DataSet), nrow=2)
+  stat_summary(fun = mean, # <1>
+               geom = "point",# <1>
+               size = 3, color = "firebrick4") + 
+  stat_summary(fun.data = mean_cl_normal, # <2>
+               geom = "errorbar", # <3>
+               width = 0.1,
+               linewidth = 1,
+               color = "firebrick4") +
+  facet_wrap("DataSet", nrow = 2) # <4>
 
 ```
-
-
-## What Exactly does a confidence interval represent about a sample?
-
-> A confidence interval is a range that we expect, with some level of conﬁdence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
-
-Our calculation is based on our expectation from sampling the true population distribution repeatedly.
+1. Add a point with the mean
+2. Calculate the confidence interval assuming a normal distribution
+3. Add error bars around the SEM.
+4. Create a panel for each level of "Dataset" and plot in 2 rows.
 
 
 ## Example CI calculation
@@ -417,7 +447,7 @@ c(lower, undulation_mean, upper)
 ```
 
 
-## Compare the estimate to its 95% CI
+## Approximate CI for regression parameter estimates
 
 ```{r}
 lm(Y ~ X + 1, data = M) |> summary()
@@ -468,6 +498,7 @@ lm(Y ~ X + 1, data = M) |> summary()
 
 - Is mean horn length in live horned lizards *different* than in dead horned lizards?
     - Is the mean horn length larger?
+    - Is the mean horn length smaller?
 - How does natural variation in horn length impact the observed mean value?
     - What difference(s) do we expect from random sampling of horned lizards?
 :::
@@ -499,7 +530,8 @@ Group <- c(rep("Alive", 150),
 
 HL <- tibble(Horn_Length = c(Alive, Dead),
              Group = factor(Group))
-knitr::kable(HL)
+str(HL)
+print(HL)
 ```
 
 
@@ -528,10 +560,9 @@ HL |>
 ```
 
 
-## How does the mean change in alive lizards compared to dead?
+## (How) is the mean different in alive lizards compared to dead lizards?
 
 ```{r}
-
 HL$CatNum <- as.numeric(HL$Group) - 1
 HL$CatJitter <- HL$CatNum + rnorm(nrow(HL), 0, 0.1)
 
@@ -542,66 +573,42 @@ HL |>
   scale_x_continuous(breaks = c(0, 1),
                      labels = c("Alive", "Dead")) +
   theme(text = element_text(size = 20))
-
-```
-
-
-## FIXME - What are we showing here?
-
-```{r}
-#| echo: true
-
-Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
-Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
-
-```
-
-
-```{r}
-mu1 <- 24.5
-mu2 <- 22
-yrange <- seq(14, 32, length = 200)
-Distp1 <- tibble(y = yrange,
-                 x = dnorm(yrange,mu1,2.6) + 0.4)
-Distp2 <- tibble(y = yrange,
-                 x = dnorm(yrange,mu2,2.7) + 1.4)
-
-mu3 <- 26
-mu4 <- 26
-Distp3 <- tibble(y = yrange,
-                 x = dnorm(yrange,mu3,2.6) + 0.4)
-Distp4 <- tibble(y = yrange,
-                 x = dnorm(yrange,mu4,2.7) + 1.4)
-
-
-p <- ggplot(HL, aes(CatJitter, Horn_Length)) +
-  geom_segment(x = -0.5, y = mu1, xend = 0.6, yend = mu1, linewidth = 1) +
-  geom_segment(x = 0.7, y = mu2, xend = 1.6, yend = mu2, linewidth = 1) +  
-  geom_point(color = "navy", size = 3) +
-  geom_path(data= Distp1, aes(x, y), linewidth = 1) +
-  geom_path(data= Distp2, aes(x, y), linewidth = 1) +
-  geom_segment(x = -0.5, y = mu3, xend = 0.6, yend = mu3, 
-               color = "firebrick", linewidth = 1) +
-  geom_segment(x = 0.7, y = mu4, xend = 1.6, yend = mu4, 
-               color = "firebrick", linewidth = 1) +  
-  geom_path(data= Distp3, aes(x,y), color = "firebrick", linewidth = 1) +
-  geom_path(data= Distp4, aes(x,y), color = "firebrick", linewidth = 1) +
-  ylim(c(14, 32)) +
-  labs(x = "Group", y = "Horn Length (mm)") +
-  scale_x_continuous(breaks = c(0,1),labels = c("Alive","Dead")) +
-  theme(text = element_text(size = 20))
-
-p
-
 ```
 
 
 ## Model assumptions
 
-- Observations normally distributed *within* groups
-    - Not *between* groups (e.g., bimodal distribution when all observations are pooled)
-    - e.g., body mass in dimorphic species (gorillas)
-- Within-group variances are (approximately) equal
+1. Observations normally distributed *within* groups
+    - Not *between* groups
+    - e.g., bimodal distribution when all observations are plotted together
+2. Within-group variances are (approximately) equal
+
+:::{.alert}
+IID: Independent and identically distributed
+:::
+
+
+## Body mass in Lowland Gorillas
+
+```{r}
+#| fig-width: 14
+#| fig-align: center
+
+set.seed(21347)
+n <- 4000
+
+DD <- tibble(Mass = c(rnorm(n, 181.5, 23),
+                      rnorm(n, 90.5, 15)),
+             Sex = rep(c("Male", "Female"), each = n))
+
+ggplot() +
+  geom_density(data = DD, aes(Mass), fill = "gray75") +
+  labs(y = "Density", x = "Body Mass (kg)")
+
+```
+
+
+## Body mass in Lowland Gorillas
 
 ```{r}
 #| fig-width: 14
