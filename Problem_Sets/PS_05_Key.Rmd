@@ -44,7 +44,7 @@ stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |>
 glimpse(stalk)
 ```
 
-Visualize the dataset in two different ways by making two different plots:
+Visualize the data set in two different ways by making two different plots:
 
 1. Make a boxplot showing each food type on the x-axis using `geom_boxplot()`. We haven't gone over boxplots, but here is a website with a good overview: [https://www.atlassian.com/data/charts/box-plot-complete-guide](https://www.atlassian.com/data/charts/box-plot-complete-guide){target="_blank"}. See if you can set up the boxplot so that the food source is on the x-axis and eye span on the y-axis.
 2. Plot the raw data (points) for the two groups.
@@ -226,6 +226,6 @@ What values do you find for `(Intercept)` and `food01`? Compare these values to 
 > The values are all exactly the same.
 
 
-The conversion from factors to 0 and 1 is carried out when you use `lm()` with factors. Internally, the variable is converted to 0 and 1. Additionally, a column of all 1s is created for the intercept. Later in the course we will see how R uses 0 and 1 to encode factors with more than 2 levels.
+The conversion from factors to 0 and 1 is carried out automatically when you use `lm()` with factors. Internally, the variable is converted to 0 and 1. Additionally, a column of all 1s is created for the intercept. Later in the course we will see how R uses 0 and 1 to encode factors with more than 2 levels.
 
-The idea of adding the effects either contin
+The idea of adding *linear* combinations of either continuous or categorical variables is where the name "linear model" comes from. Later we will see how this idea can be extended to include any combination of any number of continuous and categorical predictors.
