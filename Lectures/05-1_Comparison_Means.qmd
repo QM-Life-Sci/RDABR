@@ -630,7 +630,7 @@ summary(mod)
 ```
 
 - `(Intercept)`: Mean for Alive group
-- `GroupDead`: Mean for Alive group + Difference between Alive and Dead
+- `GroupDead`: Difference in mean between Alive and Dead groups
 
 
 ## Group means from a linear model
