@@ -213,6 +213,8 @@ ggplot(SDS, aes(x = n, y = SD)) +
 - Empirically, we see that the estimate is more precise if the number of samples is larger.
 - How can we quantify the level of uncertainty?
 
+. . .
+
 Adjust the standard deviation by sample size:
 
 $$
@@ -273,8 +275,11 @@ Means are very different, but $SE_{\overline{plate}}$ is similar for *MM* and *m
 ## Standard errors appear often
 
 - Any time you have a parameter estimate and want to know how confident you are
+    - Doesn't tell you about the data
 - Sample mean: $SE_{\bar{x}}$ or "SEM"
 - SEs for parameter estimates in linear models
+
+. . .
 
 ```{r}
 set.seed(4)
@@ -540,7 +545,7 @@ print(HL)
 ```{r}
 HL |> 
   ggplot(aes(Horn_Length)) +
-  geom_histogram(bins = 30, fill = "gray50") +
+  geom_histogram(bins = 30, fill = "#6695DE") +
   facet_grid(Group ~ .) +
   labs(x = "Horn Length (mm)", y = "Count")
 ```
@@ -573,59 +578,6 @@ HL |>
   scale_x_continuous(breaks = c(0, 1),
                      labels = c("Alive", "Dead")) +
   theme(text = element_text(size = 20))
-```
-
-
-## Model assumptions
-
-1. Observations normally distributed *within* groups
-    - Not *between* groups
-    - e.g., bimodal distribution when all observations are plotted together
-2. Within-group variances are (approximately) equal
-
-:::{.alert}
-IID: Independent and identically distributed
-:::
-
-
-## Body mass in Lowland Gorillas
-
-```{r}
-#| fig-width: 14
-#| fig-align: center
-
-set.seed(21347)
-n <- 4000
-
-DD <- tibble(Mass = c(rnorm(n, 181.5, 23),
-                      rnorm(n, 90.5, 15)),
-             Sex = rep(c("Male", "Female"), each = n))
-
-ggplot() +
-  geom_density(data = DD, aes(Mass), fill = "gray75") +
-  labs(y = "Density", x = "Body Mass (kg)")
-
-```
-
-
-## Body mass in Lowland Gorillas
-
-```{r}
-#| fig-width: 14
-#| fig-align: center
-
-set.seed(21347)
-n <- 400
-
-DD <- tibble(Mass = c(rnorm(n, 181.5, 23), rnorm(n, 90.5, 15)),
-             Sex = rep(c("Male", "Female"), each = n))
-
-ggplot() +
-  geom_density(data = DD, aes(Mass), fill = "gray75") +
-  geom_density(data = DD, aes(Mass, color = Sex), linewidth = 2) +
-  scale_color_manual(values = c("#B66DFF", "#009292")) +
-  labs(y = "Density", x = "Body Mass (kg)")
-
 ```
 
 
@@ -689,10 +641,71 @@ coef(mod)
 
 HL |> 
   group_by(Group) |> 
-  summarize(`Horn Length` = mean(Horn_Length)) |> 
+  summarize(`Horn Length` = mean(Horn_Length),
+            `SEM Horn Length` = SEM(Horn_Length),
+            Lower = `Horn Length` - 2 * `SEM Horn Length`,
+            Upper = `Horn Length` + 2 * `SEM Horn Length`) |> 
   as.data.frame()
 ```
 
+. . .
+
+What do you think it means that the 95% CIs do not overlap?
+
+
+## Model assumptions
+
+1. Observations normally distributed *within* groups
+    - Not *between* groups
+    - e.g., bimodal distribution when all observations are plotted together
+2. Within-group variances are (approximately) equal
+
+:::{.alert}
+IID: Independent and identically distributed
+:::
+
+
+## Body mass in Lowland Gorillas
+
+```{r}
+#| fig-width: 14
+#| fig-align: center
+
+set.seed(21347)
+n <- 4000
+
+DD <- tibble(Mass = c(rnorm(n, 181.5, 23),
+                      rnorm(n, 90.5, 15)),
+             Sex = rep(c("Male", "Female"), each = n))
+
+ggplot() +
+  geom_density(data = DD, aes(Mass), fill = "gray75") +
+  labs(y = "Density", x = "Body Mass (kg)")
+
+```
+
+
+## Body mass in Lowland Gorillas
+
+- Within-group distributions are IID
+
+```{r}
+#| fig-width: 14
+#| fig-align: center
+
+set.seed(21347)
+n <- 4000
+
+DD <- tibble(Mass = c(rnorm(n, 181.5, 23), rnorm(n, 90.5, 15)),
+             Sex = rep(c("Male", "Female"), each = n))
+
+ggplot() +
+  geom_density(data = DD, aes(Mass), fill = "gray75") +
+  geom_density(data = DD, aes(Mass, color = Sex), linewidth = 2) +
+  scale_color_manual(values = c("#B66DFF", "#009292")) +
+  labs(y = "Density", x = "Body Mass (kg)")
+
+```
 
 
 # Questions {background-color="#f8c471"}
