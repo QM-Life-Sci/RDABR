@@ -58,6 +58,7 @@ shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
 
 - Progress Check 1 due Thursday
     - If you need more time, let me know.
+    - Submit Rmd and HTML
 - Be thinking about / looking for a data set
     - Let me know if you want to discuss
 - Change to lecture topic order
