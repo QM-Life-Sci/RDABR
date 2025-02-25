@@ -5,7 +5,7 @@ date: 'Last updated: `r Sys.Date()`'
 output:
   html_document:
     toc: true
-    toc_depth: 3
+    toc_depth: 4
     toc_float: true
 ---
 
@@ -189,7 +189,7 @@ What is the base level? Relate this to the summary table you created above.
 
 The function `ifelse()` (and it's tidyverse counterpart `if_else()`, which are largely interchangeable) is useful for doing conditional assignment to a variable. It takes the general form: `ifelse(test, yes, no)`.
 
-The `test` parameter is an equality or inequality (==, <, >, etc.) which returns a `TRUE` or `FALSE`. For each element, if the result is TRUE, the value at `yes` is returned. If the result is FALSE, the value at `no` is returned. Study the following examples.
+The `test` parameter is an equality or inequality (==, <, >, etc.) which returns a `TRUE` or `FALSE`. For each element, if the result is TRUE, the value at `yes` is returned. If the result is FALSE, the value at `no` is returned. Study the following examples, and try out some other `iflese`s.
 
 ```{r}
 x <- 1:10
@@ -207,7 +207,25 @@ Next we want to create a new column in the stalk-eyed flies data that has 0 wher
 # FIXME
 
 stalk <- stalk |> 
-  mutate(food01 = ifelse(food_source == "Corn", 0, 1))
+  mutate(food01 = ifelse(food_source == "Corn", 0, 1),
+         Intercept = rep(1, times = n()))
 stalk |> print(n = 50)
 ```
 
+Fit a linear model where `eye_span` is predicted by `food01`. Remember that an intercept is assumed by default (equivalent to `+ 1`). Assign the model to an object and print out the summary.
+
+```{r}
+# FIXME
+
+fm01 <- lm(eye_span ~ food01, data = stalk)
+summary(fm01)
+```
+
+What values do you find for `(Intercept)` and `food01`? Compare these values to the parameter estimates in your original linear model with `food_source` as a categorical variable. Also compare the other values in the summary (standard errors, etc.).
+
+> The values are all exactly the same.
+
+
+The conversion from factors to 0 and 1 is carried out when you use `lm()` with factors. Internally, the variable is converted to 0 and 1. Additionally, a column of all 1s is created for the intercept. Later in the course we will see how R uses 0 and 1 to encode factors with more than 2 levels.
+
+The idea of adding the effects either contin
