@@ -26,5 +26,7 @@ theme_set(theme_classic())
 
 # Tests of means
 
+Sticklebacks
+
 # “Linear” Models
 
