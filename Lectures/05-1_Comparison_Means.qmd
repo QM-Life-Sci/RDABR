@@ -428,7 +428,7 @@ DD |>
 
 ## Example CI calculation
 
-Mean undulation rate for *n = 8* [gliding snakes](http://www.flyingsnake.org/):
+Mean undulation rate for *n = 8* [gliding snakes](http://www.flyingsnake.org/){target="_blank"}:
 
 ![](http://www.lazerhorse.org/wp-content/uploads/2015/01/Flying-Snake-Chrysopelea.jpg){fig-align="center" width="60%"}
 
