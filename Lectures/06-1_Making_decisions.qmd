@@ -1,0 +1,89 @@
+---
+title: "Unit 6: Making Decisions"
+subtitle: "Tail probabilities, hypothesis testing, and null models"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(patchwork)
+library(ggExtra)
+library(latex2exp)
+library(wesanderson)
+
+theme_set(theme_classic(base_size = 20))
+
+shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
+  require(tidyverse, quietly = TRUE)
+  require(cowplot)
+  crit <- qnorm(p, mean, sd)
+  
+  M <- tibble(x = seq(-4, 4, length = 200),
+              y = dnorm(x))
+  PP <- ggplot(M, aes(x, y)) +
+    geom_line() +
+    labs(x = "Value", y = "Relative Likelihood")
+  lower <- geom_ribbon(data = subset(M, x < crit),
+                       aes(ymax = y), ymin = 0,
+                       fill = "firebrick4", alpha = 0.5)
+  upper <- geom_ribbon(data = subset(M, x > abs(crit)),
+                       aes(ymax = y), ymin = 0,
+                       fill = "firebrick4", alpha = 0.5)
+  if (tail == "both") PP <- PP + lower + upper
+  if (tail == "lower") PP <- PP + lower
+  if (tail == "upper") PP <- PP + upper
+  return(PP)
+}
+
+
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- Be thinking about / looking for a data set
+    - Let me know if you want to discuss
+
+
+# Making decisions: a framework {background-color="#40666e"}
+
+
+# Tail probabilities {background-color="#40666e"}
+
+
+# $t$ Distribution {background-color="#40666e"}
+
+
+# Exact confidence intervals {background-color="#40666e"}
+
+CI simulation from UBC
+
+
+# Null models {background-color="#40666e"}
+
+
+# Hypothesis testing {background-color="#40666e"}
+
+
+# Questions {background-color="#f8c471"}
+
+
+## References
+
+::: {#refs}
+:::
