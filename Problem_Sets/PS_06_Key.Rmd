@@ -20,10 +20,13 @@ theme_set(theme_classic())
 ```
 
 
-## Possums
+## Exact CIs vs. approximate CIs
 
 
-## Stalk-eyed flies
+## PS 4 Possums
+
+
+## PS 5 Stalk-eyed flies
 
 Stalk-eyed flies are a group of flies whose eyes are at the ends of long projections ("stalks") on either side of their head. Shortly after emerging from the pupa, these flies ingest air through their mouth and pump it into these stalks to elongate them ([watch this amazing process here](https://www.youtube.com/watch?v=ZGdfIX5x8XM){target="_blank"}). 
 
@@ -168,67 +171,3 @@ Study the printed output of `t.test()`. Do you find the means for the Corn and C
 
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). A *t*-test is just a special kind of linear model (1 categorical predictor with 2 levels), so we can also fit the same model using `lm()`. There are a few different kinds of *t*-test that you can do with `t.test()`, but all of them are just specific kinds of linear models.
 
-
-#### “Linear” Models
-
-When we learned about OLS regression, the interpretation of the slope was "how much does the outcome variable (y) change for a 1 unit increase in the predictor (x)". We used `lm()` to fit those OLS models, and we just used `lm()` to fit a model comparing means (and showed how that it also equivalent to a *t*-test).
-
-How can we use the same function to do these two different tasks? In this exercise, we'll look under the hood a bit to see what is happening internally when you ask R to fit a linear model with a categorical variable (factor).
-
-Start by examining the different values for `food_source` with `levels()`. This function prints the values for a factor. Run `levels()` on the variable `food_source`. It's easiest to use the `$` notation, for example `levels(stalk$food_source)` (where `stalk` is the name of the tibble holding the values).
-
-```{r}
-# FIXME
-
-levels(stalk$food_source)
-```
-
-The order in which the levels are printed is the default order for determining what is the base level (i.e., Intercept) for the comparison.
-
-What is the base level? Relate this to the summary table you created above.
-
-> Corn is the base level. The table has a line for the Itercept, which represents the mean for Corn. The other line is the difference for cotton.
-
-
-The function `ifelse()` (and it's tidyverse counterpart `if_else()`, which are largely interchangeable) is useful for doing conditional assignment to a variable. It takes the general form: `ifelse(test, yes, no)`.
-
-The `test` parameter is an equality or inequality (==, <, >, etc.) which returns a `TRUE` or `FALSE`. For each element, if the result is TRUE, the value at `yes` is returned. If the result is FALSE, the value at `no` is returned. Study the following examples, and try out some other `iflese`s.
-
-```{r}
-x <- 1:10
-x <- ifelse(x <= 5, 1, 10)
-x
-
-y <- 1:10
-y <- ifelse(y <= 5, y + 3, y^2)
-y
-```
-
-Next we want to create a new column in the stalk-eyed flies data that has 0 where `food_source == "Corn"` and 1 if it is not. Use `mutate()` to create this column. Call the column `food01`. Verify that the column was created correctly (Corn should be 0 and Cotton 1).
-
-```{r}
-# FIXME
-
-stalk <- stalk |> 
-  mutate(food01 = ifelse(food_source == "Corn", 0, 1),
-         Intercept = rep(1, times = n()))
-stalk |> print(n = 50)
-```
-
-Fit a linear model where `eye_span` is predicted by `food01`. Remember that an intercept is assumed by default (equivalent to `+ 1`). Assign the model to an object and print out the summary.
-
-```{r}
-# FIXME
-
-fm01 <- lm(eye_span ~ food01, data = stalk)
-summary(fm01)
-```
-
-What values do you find for `(Intercept)` and `food01`? Compare these values to the parameter estimates in your original linear model with `food_source` as a categorical variable. Also compare the other values in the summary (standard errors, etc.).
-
-> The values are all exactly the same.
-
-
-The conversion from factors to 0 and 1 is carried out automatically when you use `lm()` with factors. Internally, the variable is converted to 0 and 1. Additionally, a column of all 1s is created for the intercept. Later in the course we will see how R uses 0 and 1 to encode factors with more than 2 levels.
-
-The idea of adding *linear* combinations of either continuous or categorical variables is where the name "linear model" comes from. Later we will see how this idea can be extended to include any combination of any number of continuous and categorical predictors.
