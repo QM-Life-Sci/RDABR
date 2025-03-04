@@ -41,11 +41,17 @@ source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lec
 
 # Housekeeping {background-color="#40666e"}
 
+- Problem sets: Try to answer all the questions
+- Progress check: Grading in progress
 - Be thinking about / looking for a data set
     - Let me know if you want to discuss
 
 
+# What is the process for making decisions through science? {background-color="#40666e"}
+
+
 # Distributions and tail probabilities {background-color="#40666e"}
+
 
 ## Random normal values
 
@@ -61,7 +67,7 @@ sd5 <- tibble(y = rnorm(100000, 5, 5))
 ```
 
 
-## HIstograms of random normal values
+## Histograms of random normal values
 
 ```{r echo=FALSE}
 p1 <- sd1 |> ggplot(aes(y)) +
