@@ -576,9 +576,14 @@ HL |>
 - "Raw" effect size = 2.22 mm
     - Specific to this analysis (original scale)
 - Standardize for comparing analyses
-    - Pearson's correlation (*r*), Cohen's *d*, etc. (Unit 11)
+    - Pearson's correlation (*r*), Cohen's *d*, etc. (more on planning experiments later this semester)
 
-$$d = \frac{\bar{x}_1 - \bar{x}_2}{s}$$
+$$d = \frac{\bar{x}_1 - \bar{x}_2}{s_{pooled}}$$
+
+
+## Standardized effect size
+
+Calculate Cohen's $d$ using the `effectsize` package:
 
 ```{r}
 #| echo: true
@@ -586,6 +591,8 @@ $$d = \frac{\bar{x}_1 - \bar{x}_2}{s}$$
 library(effectsize)
 cohens_d(Horn_Length ~ Group, data = HL)
 ```
+
+- Uses "pooled" standard deviation: sd weighted by the sample size
 
 
 ## How is the mean different in alive lizards compared to dead? 
@@ -832,7 +839,7 @@ Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1) - r
 
 ## Making Decisions {.smaller}
 
-> What is the probability of observing a difference as big or bigger than my observed difference from sampling error alone? 
+> What is the probability of observing a difference **as big or bigger** than the observed difference *from sampling error alone*? 
 
 The answer to this question is called a *P*-value: *P* = 4/100000 = 0.00004
 
