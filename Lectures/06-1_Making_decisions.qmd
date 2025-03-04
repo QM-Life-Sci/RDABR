@@ -911,40 +911,6 @@ Data will always be on one side of H~0~ or the other.
 - Multiply the one-sided *P* by 2.
 
 
-## Closed-form *P*-value
-
-- Calculate test statistic
-- Determine *P*-value:area under tail(s)
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-```{r}
-#| fig-height: 7
-
-shade_t(p = 0.15, df = 10, tail = "both") +
-  ggtitle("P = 0.3") +
-  theme(text = element_text(size = 30))
-```
-
-:::
-
-::: {.column width="50%"}
-
-```{r}
-#| fig-height: 7
-
-shade_t(p = 0.005, 10, tail = "both") +
-  ggtitle("P = 0.01") +
-  theme(text = element_text(size = 30))
-```
-
-:::
-
-::::
-
-
 ## Testing different hypotheses
 
 $$t = \frac{\theta - \theta_{null}}{\mbox{SE}_{\theta}}$$
@@ -1174,9 +1140,7 @@ nhst.plot
 Preregistration of experimental design and planned analysis
 
 1. Report parameter estimates, confidence intervals, and effect sizes 
-1. Model selection
-
-All could be done in a frequentist/likelihood or Bayesian framework
+1. Model selection (later this semester)
 
 
 # Questions {background-color="#f8c471"}
