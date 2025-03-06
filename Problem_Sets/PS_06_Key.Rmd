@@ -20,76 +20,192 @@ theme_set(theme_classic())
 ```
 
 
-## Exact CIs vs. approximate CIs
+## Hypothesis tests
 
+Remember that the definition of a *P*-value is:
 
-## PS 4 Possums
+> How probable is the observed test statistic (e.g., *t*-statistic) or a test statistic more extreme by chance alone?
 
+When we are considering *t*-statistics (equivalently *t*-values, like what we see in linear model summaries), in practice you calculate *t* for a parameter estimate (e.g., a slope or an intercept) using the equation:
 
-## PS 5 Stalk-eyed flies
+$$t = \frac{\theta - \theta_{null}}{\mbox{SE}_{\theta}}$$
 
-Stalk-eyed flies are a group of flies whose eyes are at the ends of long projections ("stalks") on either side of their head. Shortly after emerging from the pupa, these flies ingest air through their mouth and pump it into these stalks to elongate them ([watch this amazing process here](https://www.youtube.com/watch?v=ZGdfIX5x8XM){target="_blank"}). 
+Remember that, almost always, $\theta_{null}$ is 0 (the default for linear model summary tables in R), so the calculation is just the parameter estimate ($\theta$) divided by its standard error. These are the first two columns in the `Coefficients` tables in a `summary()`. The *t*-value with the degrees of freedom is used with `pt()` to calculate the *P*-value.
 
-Females prefer males with wider eye spans. See the photo below:
-
-![](https://i.imgur.com/7KxZKQF.jpg){fig-align="center"}
-
-The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies (*Cyrtodiopsis dalmanni*) were reared on different food sources (`food_source`: corn and cotton). The distance between the eyes in millimeters is recorded as `eye_span`.^[David, P., T. Bjorksten, K. Fowler, and A. Pomiankowski. 2000. Condition-dependent signalling of genetic variation in stalk-eyed flies. *Nature* 406: 186-188.]
-
-The hypothesis is that food type affects eye span. In this exercise, you will try to answer this question.
 
 ### Activity
 
-Load the `Stalkies.csv` file and explicitly mutate `food_source` into a factor. Examine the columns of data it contains.
+We want to first do a simulation to better understand what the *P*-value is a summary represents. Keep in mind that, for science that we do typically, we do not have the ability to do this kind of simulation where we know the answer ahead of time. 
+
+We can use simulations to explore how statistical models behave under controlled conditions. When simulations give us the answer that we know is there (because we set up the simulation to begin with), it gives us confidence that the same process will work in the real world with real data where we don't know the answer.
+
+Start by generating two sets of n = 20 random numbers drawn from normal distributions. Set the means to 5 in one set and 6 in the other. Both of the standard deviations are 0.9. Call these vectors `x1` and `x2`. There will be 40 total observations between the two sets.
+
+I have set the seed for you, so that our answers will match.
+
+```{r}
+# FIXME
+
+set.seed(4578)
+
+x1 <- rnorm(20, mean = 5, sd = 0.9)
+x2 <- rnorm(20, mean = 6, sd = 0.9)
+```
+
+Calculate the mean of each group and the difference in the means (`x1_mean - x2_mean`). Assign the difference to a variable `d_obs`.
+
+```{r}
+# FIXME
+
+(x1_mean <- mean(x1))
+(x2_mean <- mean(x2))
+
+(d_obs <- x1_mean - x2_mean)
+```
+
+What are the means and observed difference in the means between `x1` and `x2`?
+
+> The mean of x1 is 4.67 and of x2 5.90. The difference is -1.22.
+
+The code block below carries out a randomization to generate a distribution of differences when x1 and x2 are randomly assigned. Read through the code and the comments, and be sure you understand what each step is doing.
+
+Change `eval: false` to `eval: true`, and run the code. If you have named the variables `x1`, `x2`, and `d_obs`, then it should run without modification.
+
+```{r}
+#| eval: true
+
+# Combine x1 and x2 into 1 vector
+x <- c(x1, x2)
+
+# Set the number of iterations for the simulation
+iters <- 10000
+
+# Create an empty numeric vector to hold the differences
+d <- numeric(iters)
+
+# Assign the observed difference to position 1
+# This satisfies the "observed test statistic" part of the hypothesis definition.
+d[1] <- d_obs
+
+# Run the randomization
+for (ii in 2:iters) {                      # Iterate from 2 to iters
+  x_shuffled <- sample(x, replace = FALSE) # Shuffle all the elements of x
+  x1s <- x_shuffled[1:20]                  # Assign 1-20 to x1s
+  x2s <- x_shuffled[21:40]                 # Assign 11-40 to x2s
+  d[ii] <- mean(x1s) - mean(x2s)           # Assign the difference of means to the iith position of d
+}
+```
+
+Now we have a vector of 10,000 differences. The first position holds the observed difference in the groups.
+
+Make a histogram of the differences.
+
+```{r}
+# FIXME
+
+ggplot(tibble(d), aes(d)) +
+  geom_histogram(bins = 30)
+```
+
+From just looking at the plot, what is the approximate mean value for the differences? 
+
+> The distribution is centered on 0. So the mean is probably near 0.
+
+To the plot above, add two vertical lines, one at the value of the observed difference and one at the same value but with the opposite sign. You can copy the code to make the histogram from the chunk above.
+
+There are a few examples in the slides for Unit 6 that show you how to add a vertical line. Search for "geom_vline".
+
+```{r}
+# FIXME
+
+ggplot(tibble(d), aes(d)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = c(d_obs, abs(d_obs)), color = "hotpink", linewidth = 2)
+
+```
+
+Just from looking at the plot, take a guess about how many times the randomized data returned a difference greater than the observed difference (i.e., more extreme). Remember to consider both tails.
+
+> Not many. Just a few points are outside of the vertical lines.
+
+Add up the number of times that the random difference is less than or equal to the observed difference *or* greater than or equal to the opposite sign of the observed difference. I.e., you are summing up the counts in the tails of the distribution.
+
+```{r}
+# FIXME
+
+sum(d <= d_obs | d >= abs(d_obs))
+```
+
+Finally calculate the *P*-value for the test of equality of the two means. You can either divide the sum above by `iters` or use `mean()` instead of summing the inequalities.
+
+```{r}
+# FIXME
+
+sum(d <= d_obs | d >= abs(d_obs)) / iters
+
+mean(d <= d_obs | d >= abs(d_obs))
+```
+
+What is the *P*-value? This represents the probability that we would observe the difference of -1.22 or anything greater by chance alone.
+
+> P = 0.0003.
+
+
+How likely is it that you would observe a difference like this by chance?
+
+> Very unlikely. Only 3 times in 10000 (2 plus the one we observed).
+
+
+So far we have determined the *P*-value for the difference by simulation. Notice that we did not calculate a *t*-statistic at all -- only the difference in the means between the two groups.
+
+We want to fit a linear model to these data and compare. To do that, we first need to join the observations together into a single tibble along with a grouping variable.
+
+Create a tibble with the combined observations `x1` and `x2` as one variable just called `x`. Also create a grouping variable, e.g., a variable called "Grp" with values "x1" and "x2", which is repeated 20 times each. Look at the help for `rep()` for suggestions. Check that your tibble is correct.
+
+```{r}
+# FIXME
+
+DD <- tibble(x, 
+             Grp = rep(c("x1", "x2"), each = 20))
+DD
+```
+
+Finally, fit a linear model where `x` is predicted by the new grouping variable. Print the summary of the linear model.
+
+```{r}
+# FIXME
+
+fm <- lm(x ~ Grp, data = DD)
+summary(fm)
+```
+
+This is the same linear model that we used in PS 5.
+
+Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grpx2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
+
+> They are very close but not exact. For the linear model the *P*-value is 0.000126, and for the randomization it was 0.0003. For that, we only used 10000 iterations. Maybe more iterations would be more exact. Also we didn't do exactly the same test, so it's not realistic to find an exact match. If we chose another seed, we would get slightly different results, but still very close to the linear model.
+
+
+## Stalk-eyed flies
+
+In Problem Set 5 we analyzed a data set where the eye span of stalk-eyed flies was measured in two different diet treatments: corn and cotton. We'll complete this analysis now by looking at hypothesis tests for the linear model.
+
+### Activity
+
+Import the `Stalkies.csv` as in PS 5. Feel free to copy your code or the code from the key.
 
 ```{r}
 # FIXME
 
 stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |> 
   mutate(food_source = factor(food_source))
-glimpse(stalk)
 ```
 
-Visualize the data set in two different ways by making two different plots:
+#### Exact CIs vs. approximate CIs
 
-1. Make a boxplot showing each food type on the x-axis using `geom_boxplot()`. We haven't gone over boxplots, but here is a website with a good overview: [https://www.atlassian.com/data/charts/box-plot-complete-guide](https://www.atlassian.com/data/charts/box-plot-complete-guide){target="_blank"}. See if you can set up the boxplot so that the food source is on the x-axis and eye span on the y-axis.
-2. Plot the raw data (points) for the two groups.
-    - For the points, include jitter and transparency.
-    - Include a point for the means and error bars standard errors of the mean plotted in a different color (the code in Lecture 05-1 "Plot raw data with summary stats" will help you).
-    - Try a few different values for each of these elements (jitter, color, transparency) to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate.
-    - Change the axis labels to what you would expect to find on a publication ready figure.
+Calculate the approximate and exact 95% confidence intervals for the means of the corn and cotton groups. Again, you can copy your code for the approximate CI or use the code from the key.
 
-```{r}
-# FIXME
-
-ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_boxplot() +
-  labs(x = "Food Source", y = "Eye Span (mm)")
-
-ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_point(position = position_jitter(width = 0.2, seed = 423479),
-             alpha = 0.25, pch = 16) +
-  stat_summary(fun = mean,
-               geom = "point",
-               size = 3, color = "purple") + 
-  stat_summary(fun.data = mean_se,
-               geom = "errorbar",
-               width = 0.1,
-               linewidth = 1,
-               color = "purple") +
-  labs(x = "Food Source", y = "Eye Span (mm)")
-```
-
-Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show? How does the information provided by the boxplot differ from the information conveyed by the second plot.
-
-> The mean eye span is higher for flies reared on corn than on cotton. The variation also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups. The boxplot hides all the data. There is no way to tell the sample sizes. One benefit is that it is easier to compare the spread of the data with a box. Hiding the data is the main reason that I prefer dots, means, and error bars to boxplots.
-
-
-#### Summary statistics
-
-For each food source calculate: the number of observations, mean, standard deviation, variance, and standard error of the mean.
-
-Use `group_by()` and `summarize()` as we have seen in the lecture slides. Remember that there is no SEM function built-in with R. Copy the function from the lecture slides and use it here.
+For the exact confidence interval, you will need to calculate the appropriate *t*-statistic, using the right degrees of freedom for each group separately (consider these as separate confidence intervals). Be sure to use a positive value for *t*, or your CI limits will be reversed.
 
 ```{r}
 # FIXME
@@ -98,46 +214,34 @@ SEM <- function(x) {sd(x) / sqrt(length(x))}
 
 stalk |> 
   group_by(food_source) |> 
-  summarise(n = length(eye_span),
-            mean_eye_span = mean(eye_span),
-            sd_eye_span = sd(eye_span),
-            var_eye_span = var(eye_span),
-            SEM_eye_span = SEM(eye_span))
+  summarize(mean_ES = mean(eye_span),
+            SEM_ES = SEM(eye_span),
+            Approx_Lower = mean_ES - 2 * SEM_ES,
+            Approx_Upper = mean_ES + 2 * SEM_ES,
+            df = length(eye_span) - 1,
+            t_crit = abs(qt(p = 0.025, df = df)),
+            Exact_Lower = mean_ES - t_crit * SEM_ES,
+            Exact_Upper = mean_ES + t_crit * SEM_ES)
 ```
 
-How do the number of observations, mean, standard deviation, variance, and SEM compare? Do they match your intuition above?
+How do the exact and approximate CIs compare for this dataset?
 
-> The number of observations is pretty similar (21 vs. 24). Mean eyespan is about 0.5 mm higher in corn-fed flies. Standard deviation is about 4x higher in cotton, and variance is 14x higher. SEM is about 3.5x higher.
+> They are pretty close to 2 digits. Only one of the four bounds differs.
 
 
-#### Intervals
+For the example we looked at in class, undulation rate in flying snakes, the difference in the two CIs was quite large. How do you explain the close similarity here?
 
-Calculate approximate 95% confidence intervals for the mean eye span for each group. You can either do the calculations step-by-step as we did for the gliding snakes example or using `group_by()` and `summarize()` like we did for the horned lizard example.
-
-```{r}
-# FIXME
-
-stalk |> 
-  group_by(food_source) |> 
-  summarize(mean_eye_span = mean(eye_span),
-            SEM_eye_span = SEM(eye_span),
-            Lower = mean_eye_span - 2 * SEM_eye_span,
-            Upper = mean_eye_span + 2 * SEM_eye_span)
-```
-
-What are the approximate 95% confidence intervals for the mean eye span for flies raised on corn and cotton? What is your hypothesis for whether the means differ or not? How confident are you in your hypothesis?
-
-> The interval for corn is 2.01 - 2.08 mm and for cotton in 1.43 - 1.66 mm. The intervals don't overlap and and very separated. So the means are very likely different.
+> The sample sizes are much larger here.
 
 
 #### Tests of means
 
-Finally we can fit the linear model where eye span is modeled by food source.
-
-`lm()` is a general function that fits many many different kinds of linear models. We will use `lm()` almost exclusively in the coming units.
+Return to the linear model you fit for PS 5. Those instructions were:
 
 1. Fit a linear model using `lm()` where `eye_span` is modeled by `food_source` and assign this to an object.
 2. Pass the object that you just created to the function `summary()` to generate the model summary.
+
+Copy the code here and execute it.
 
 ```{r}
 # FIXME
@@ -146,28 +250,84 @@ fm <- lm(eye_span ~ food_source, data = stalk)
 summary(fm)
 ```
 
-Examine the coefficients in the model summary. Try to reconcile the values in the `Estimate` column for the rows: `(Intercept)` and `food_sourceCotton` with the means you calculated above.
+Interpret the *P*-values for the two parameter estimates: `(Intercept)` and `food_sourceCotton`. What hypothesis tests do these values represent? How likely was each parameter estimate to have arisen by chance alone?
 
-> The intercept is identical to the mean for the corn group. The second row in the coefficients `food_sourceCotton` is the same value as the difference between the mean for Corn and the mean for Cotton. So this row represents the mean difference between Corn and Cotton.
+> The *P*-values are both very small: 10^-16 and 7 x 10^-10 for the intercept and the difference between the means of the corn and cotton group. Both *P*-values represent tests that the coefficients are equal to zero. It's not useful to compare the mean of the corm group to zero, so that very small *P*-value is of little interest. The *P*-value for `food_sourceCotton` tests whether the difference between the means of the corn and cotton groups is different from zero. This is a test we are interested in. In this case, the difference is likely different, because there is only a very small chance that the difference arose by chance alone.
 
 
-We will investigate the other parts of this summary in the coming units. Next, we will use a *t*-test to estimate the difference in means in the two treatments.
+#### Using `confint()`
 
-By default, the `t.test` function will perform a test that *does not* assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*. Refer back to to the summaries (mean, sd, variance) you calculated above.
+R has a very useful function for calculating confidence intervals for parameter estimates: `confint()`.
 
-Perform a *t*-test using the formula method to specify the groups to test. The formula will be identical to the formula for `lm()`. Print the results.
+Pass the linear model object you saved to the `confint()` function.
 
 ```{r}
 # FIXME
 
-myT <- t.test(eye_span ~ food_source, data = stalk)
-myT
+confint(fm)
 ```
 
-Study the printed output of `t.test()`. Do you find the means for the Corn and Cotton groups? Do these match your calculation above?
+What are the 95% confidence intervals for the "Intercept" and for the difference? Does the intercept agree with the corn CI you calculate above? If it does not, why do you think that might be? Does the difference CI make sense when interpreted in the context of the hypothesis test above?
 
-> Corn: 2.04; Cotton: 1.54. Yes, these are identical
+> The intercept is 1.95 - 2.14. The difference is -0.63 - -0.37. The CI for corn is narrower. This is because a different degrees of freedom is used here (43 vs. 20). The CI for the difference does not overlap with zero (and is very far from zero), which agrees with the *P*-value of 7 x 10^-10.
 
 
-`t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). A *t*-test is just a special kind of linear model (1 categorical predictor with 2 levels), so we can also fit the same model using `lm()`. There are a few different kinds of *t*-test that you can do with `t.test()`, but all of them are just specific kinds of linear models.
+## Lion noses
 
+In PS 4, we looked at a data set where lion age was related to the proportion of black coloration in the nose. The goal was to be able to predict a lion's age from only a photograph of its nose.
+
+### Activity
+
+Import the `LionAges.csv` data as you did in PS 4 and make a scatterplot of age regressed on proportion of black. Feel free to copy your code over.
+
+```{r}
+# FIXME
+
+LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
+
+ggplot(LA, aes(y = age, x = proportion.black)) +
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14) +
+  labs(x = "Proportion Black", y = "Age (y)")
+```
+
+Copy over the linear model you fit where age is modeled by proportion of black.
+
+```{r}
+# FIXME
+
+fm <- lm(age ~ proportion.black,
+         data = LA)
+summary(fm)
+```
+
+
+What are the slope and the intercept for the OLS regression line?
+
+> The slope is 10.6 and the intercept is 0.879.
+
+
+What is you interpretation of the intercept of the regression in biological terms?
+
+> A lion with no black coloring on its nose is 0.88 years old.
+
+
+What is you interpretation of the slope of the regression in mathematical terms?
+
+> For a 1 unit increase in proportion black, age increases by 10.6 years.
+
+
+What hypothesis test do the *t*-value and the *P*-value for the `proportion.black` coefficient of 10.6 represent?
+
+> They test the hypothesis that the slope equals zero.
+
+
+Is a slope of 10.6 likely to be observed by chance for these data?
+
+> No - the *P*-value is very small: 7 x 10^-8.
+
+
+Is proportion of black coloring a good predictor of age in lions?
+
+> It appears so based on these data.
