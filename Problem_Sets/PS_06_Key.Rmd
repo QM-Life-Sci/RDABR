@@ -219,12 +219,12 @@ stalk |>
   group_by(food_source) |> 
   summarize(mean_ES = mean(eye_span),
             SEM_ES = SEM(eye_span),
-            Approx_Lower = mean_ES - 2 * SEM_ES,
-            Approx_Upper = mean_ES + 2 * SEM_ES,
+            Approx_Lo = mean_ES - 2 * SEM_ES,
+            Approx_Hi = mean_ES + 2 * SEM_ES,
             df = length(eye_span) - 1,
             t_crit = abs(qt(p = 0.025, df = df)),
-            Exact_Lower = mean_ES - t_crit * SEM_ES,
-            Exact_Upper = mean_ES + t_crit * SEM_ES)
+            Exact_Lo = mean_ES - t_crit * SEM_ES,
+            Exact_Hi = mean_ES + t_crit * SEM_ES)
 ```
 
 How do the exact and approximate CIs compare for this dataset?
@@ -272,7 +272,9 @@ confint(fm)
 
 What are the 95% confidence intervals for the "Intercept" and for the difference? Does the intercept agree with the corn CI you calculate above? If it does not, why do you think that might be? Does the difference CI make sense when interpreted in the context of the hypothesis test above?
 
-> The intercept is 1.95 - 2.14. The difference is -0.63 - -0.37. The CI for corn is narrower. This is because a different degrees of freedom is used here (43 vs. 20). The CI for the difference does not overlap with zero (and is very far from zero), which agrees with the *P*-value of 7 x 10^-10.
+> The 95% CI for the intercept (i.e., corn group mean) is 1.95 - 2.14. The difference is -0.63 - -0.37. The CI for corn is different and wider here. This is not unexpected, because these two confidence intervals don't really represent the same thing. The CI for corn in isolation that you calculated above does not have in influence from the cotton points, whereas in the linear model it does. If you compare the standard errors, you see that the SE of the mean is 0.016, but the standard error of the Intercept parameter estimate is 0.047. So there is much more uncertainty in the parameter estimate, which is reflected in the wider CI. So in general, they should be close but not exact. 
+
+> The CI for the difference does not overlap with zero (and is very far from zero), which agrees with the *P*-value of 7 x 10^-10.
 
 
 ## Lion noses
