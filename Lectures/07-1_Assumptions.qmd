@@ -1,6 +1,6 @@
 ---
-title: "Unit 6: Assumptions"
-subtitle: "Summarizing data and models"
+title: "Unit 7: Data Organization and Wrangling"
+subtitle: "Assumptions of models"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -14,30 +14,363 @@ format:
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
 ---
 
 ```{r}
 #| label: setup
 #| echo: false
+
+library(tidyverse)
+library(Data4Ecologists)
+
+theme_set(theme_classic(base_size = 20))
 ```
 
 
+# Housekeeping {background-color="#40666e"}
 
-# "Linear" models {background-color="#40666e"}
 
-Why is `lm()` called `lm()`?
+# Data organization {background-color="#40666e"}
+
+
+## File organization
+
+R's Working directory model means that we need to be aware of where files are stored.
+
+Possible directory structure:
+
+```
+  /Project
+    /Raw_Data
+    /Processed_Data
+    /Analysis
+    /Plots
+```
+
+Some examples...
+
+
+## Data organization: file structure
+
+  - Raw Data
+    - raw data (read-only, backup, don't edit/overwrite)
+  - Processed Data
+    - intermediate and final R data sets (any data produced by a script)
+  - Analysis
+  - Plots
+  - ReadMe and/or ProjectNotes file
+    - Driving questions and purposes of the project
+    - Metadata & instructions for reproducing all analyses and plots
+    - Entries and notes for each time you work on the analysis
+
+
+## Data storage: general suggestions
+
+- Think about how to store your data *before* you start
+    - Sometimes it is difficult to change things later
+- Keep everything: Disk space is cheap
+    - Google Drive, OneDrive, Dropbox, etc.
+    - Iterate file names (*better* -- use version control)
+- Create a data dictionary in your metadata folder (explanations of what your columns represent)
+    - "Body mass in grams, measured to nearest 0.1 g."
+- Be consistent
+    - File names, variable names, file formats, etc.
+
+
+## Data storage: data files
+
+See [Broman and Woo: Data Organization in Spreadsheets](https://kbroman.org/dataorg/)
+
+- Store data in rectangular format
+    - **No empty cells**, no merged cells, repeat values if necessary
+    - Each unique **observation unit** is a row
+- Use only one header row
+- R is case sensitive so keep column headers in a case structure  (snake_case, dot.case, CamelCase)
+    - No spaces or units in column names, e.g., `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
+
+
+## Data storage: data files
+
+See [Broman and Woo: Data Organization in Spreadsheets](https://kbroman.org/dataorg/)
+
+- Use `NA` for missing data (not -9, -9999, or some variation of that)
+- Use words, not highlighting or color for metadata
+    - Have a "Notes" column
+- Store dates as three separate columns (`Year`, `Month`, `Day`)
+    - Combine them programmatically
+    - Excel does very weird things with dates
+
+
+## Examples: bad and good
+
+![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_1.png){fig-align="center"}
+
+
+## Examples: bad and good
+
+![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_2.png){fig-align="center"}
+
+
+## Data storage and relational data
+
+-  Strive for relational data to keep your file sizes small 
+    - Store data as smaller units (hierarchical and by type) and link through code
+    - Share identifiers so that you can match and merge data across files
+- Use coding to join by shared IDs
+    - Avoid confusion and repetition of data
+    - Great for large, interconnected data sets, especially those that can change
+    - Data management systems play well with data in this format (e.g., Tidy, databases)
+
+
+## Data Storage and Relational Data
+
+- Avoid "monolithic" files with redundant data
+- Relate smaller data files to each other by *keys*
+- Join files together for analysis
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_1.png){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_3.png){fig-align="center"}
+:::
+
+::::
+
+
+# Working with columns of data {background-color="#40666e"}
+
+
+## Data to work with: Swallowtail Butterflies
+
+![](http://www.pyrgus.de/bilder1/papilionidae/machaon_im2023.jpg){fig-align="center"}
+
+- 2 Sub-species, 2 sexes
+- Forewing and hindwing areas
+- Tail length
+
+
+## Data to work with: Swallowtail Butterflies
+
+```{r}
+STB <- Data4Ecologists::Swallowtail
+glimpse(STB)
+
+STB |> count(Species, Sex)
+```
+
+
+## Selecting
+
+- `$`: One column
+- `[ , ]`: Rows, Columns
+- `select()` and `slice()`
+
+```{r}
+STB$Forewing_area[1:5]
+
+STB[1:5, "Forewing_area"]
+```
+
+. . .
+
+```{r}
+STB |> select(Species:Sex) |> slice(1:5)
+```
+
+. . .
+
+```{r}
+STB |> select(Species, Forewing_area) |> slice(1:5)
+```
+
+
+## `select()` verbs
+
+```{r}
+STB |> select(starts_with("Sp")) |> head()
+```
+
+. . .
+
+```{r}
+STB |> select(ends_with("area")) |> head()
+```
+
+. . .
+
+```{r}
+STB |> select(contains("wing_area")) |> head()
+```
+
+
+## Creating and modifying: `mutate()`
+
+Mutate single columns:
+
+```{r}
+#| output: false
+STB |> mutate(Species = factor(Species))
+STB |> mutate(log_Forewing_area = log10(Forewing_area),
+              log_Hindwing_area = log10(Hindwing_area))
+```
+
+. . .
+
+`log10()` transformation across all numeric columns:
+
+```{r}
+STB |> mutate(across(where(is.numeric), log10)) |> slice(1:5)
+```
+
+
+## Splitting and combining
+
+```{r}
+STB |> separate(col = "Species",
+                into = c("Genus", "Species", "Subspecies"),
+                sep = " ") |> slice(1:5)
+```
+
+. . .
+
+```{r}
+STB |> separate(col = "Species",
+                into = c("Genus", "Species", NA),
+                sep = " ") |> slice(1:5)
+```
+
+. . .
+
+```{r}
+STB |> unite(col = "Spp_Sex", Species:Sex, sep = "_") |> slice(1:5)
+```
+
+
+## "Wide" data
+
+- Each row is an experimental unit (sample, individual, etc.)
+- Many columns contain data (usually numeric)
+- How you should enter and store data
+
+```{r}
+#| echo: false
+
+STB |> slice(1:10)
+```
+
+
+## "Long" data
+
+- Only one column has numeric data
+- Useful for plotting and other activities
+
+```{r}
+#| echo: false
+
+STB |> 
+  mutate(ID = 1:n()) |> 
+  relocate(ID) |> 
+  select(ID, Species, Sex, contains("area")) |> 
+  pivot_longer(cols = contains("area"),
+               names_to = "Measurement",
+               values_to = "Area") |> 
+  mutate(Measurement = str_remove(Measurement, "_area")) |> 
+  slice(1:10)
+```
+
+
+## Pivoting: moving from wide to long and long to wide
+
+- Longer - `pivot_longer()`
+    - Convert multiple columns into rows
+    - ~99% of use cases
+- Wider - `pivot_wider()`
+    - Convert rows into multiple columns
+    - ~1% of use cases
+
+
+## Pivoting to long format
+
+```{r}
+STB_long <- STB |> 
+  mutate(ID = 1:n()) |> # <1>
+  relocate(ID) |> # <2>
+  select(ID, Species, Sex, contains("area")) |>  # <3>
+  pivot_longer(cols = contains("area"), # <4>
+               names_to = "Measurement", # <5>
+               values_to = "Area") |> # <6>
+  mutate(Measurement = str_remove(Measurement, "_area")) # <7>
+STB_long
+```
+1. Create a new `ID` column with the numbers 1 to the number of rows (`n()`)
+2. Move the new `ID` column to the first position
+3. Select the identifier columns and "area" columns
+4. Choose the columns to pivot
+5. New column name to hold old column names
+6. New column name for old values
+7. Remove "_area" from new `Measurement` column
+
+
+## Why?
+
+Many plots work better with long data:
+
+```{r}
+#| output-location: slide
+#| fig-align: center
+
+STB_long |> 
+  mutate(Species = str_replace(Species, "Papilio machaon", "P. m. "),
+         Sex = if_else(Sex == "female", "Female", "Male")) |> 
+  ggplot(aes(x = Measurement, y = Area, color = Sex)) +
+  geom_point(position = position_jitter(width = 0.25, seed = 2377),
+             size = 2) +
+  facet_grid(Species ~ .) +
+  scale_color_manual(values = c("blue3", "darkgreen")) +
+  theme(strip.text = element_text(face = "italic"))
+```
+
+
+# Common issues {background-color="#40666e"}
+
+
+## Common issues with data
+
+- Missing (and shouldn't be)
+- Data entry error
+- Spelling error
+- Mis-coding of categorical variables ("f" and "F")
+
+
+## Identifying problematic data
+
+
+
+
+## Sorting: `arrange()`
+
+
+## Non-normailty, etc.
 
 
 # Assumptions {background-color="#40666e"}
+
+:::{.center}
+Requirements for sound inference
+:::
 
 
 # Checking model assumptions
 
 
 # Transformations
-
-
-# Summarizing data and models {background-color="#40666e"}
 
 
 # Questions {background-color="#f8c471"}

@@ -1,6 +1,6 @@
 ---
-title: "Unit 5: Data Integrity"
-subtitle: "Organizing and Tidying Data"
+title: "Unit 8: Summarizing data and models"
+subtitle: "Data Integrity"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -28,15 +28,16 @@ csl: evolution.csl
 - PC 1 due Thursday
 
 
+# Summarizing data and models {background-color="#40666e"}
+
+
 # Data Integrity {background-color="#40666e"}
 
 
 # Isolating data from analysis
 
 
-# Tidy vs. Untidy Data
-
-Pivoting and why
+## Joining data
 
 
 # Practice with lm() for OLS
