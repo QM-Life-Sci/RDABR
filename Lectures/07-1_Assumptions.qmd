@@ -351,13 +351,74 @@ STB_long |>
 
 ## Identifying problematic data
 
+- Unique values and counting
+- Plotting
+- Making tables, sorting
+- `max()` and `min()`, `which.max()` and `which.min()`
 
+
+## Unique values and counts
+
+```{r}
+unique(STB$Species)
+
+STB |> count(Species, Sex)
+```
+
+
+## Plotting
+
+```{r}
+#| echo: false
+
+STB <- STB |> 
+  mutate(ID = 1:n(),
+         Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)) |> 
+  relocate(ID)
+```
+
+```{r}
+ggplot(STB, aes(Forewing_area, Hindwing_area)) +
+  geom_point()
+```
+
+
+## Plotting with IDs labeled
+
+```{r}
+ggplot(STB, aes(Forewing_area, Hindwing_area, label = ID)) +
+  geom_label()
+```
 
 
 ## Sorting: `arrange()`
 
+```{r}
+STB |> arrange(desc(Forewing_area)) |> slice(1:5)
+```
 
-## Non-normailty, etc.
+Sort smallest to largest and print the last rows: `slice_tail()`
+
+```{r}
+STB |> arrange(Forewing_area) |> slice_tail(n = 5)
+```
+
+
+## Maximum and minimum
+
+```{r}
+max(STB$Forewing_area)
+```
+
+Using `which.max()`
+
+```{r}
+STB |> slice(which.max(Forewing_area))
+
+STB |> slice_max(Forewing_area)
+```
+
+Many `slice_()` functions.
 
 
 # Assumptions {background-color="#40666e"}
@@ -367,17 +428,189 @@ Requirements for sound inference
 :::
 
 
-# Checking model assumptions
+## Assumptions
+
+- Every model has *assumptions* that must be met to ensure an unbiased analysis
+- *Diagnostics* can evaluate models *post hoc*
+
+1. Linearity
+2. Independence
+3. Equal variance
+4. (Approximately) normal residuals
+
+2 and 3: "Independent and identically distributed" (IID)
 
 
-# Transformations
+## Problematic residuals
+
+![](https://openintro-ims.netlify.app/inf-model-slr_files/figure-html/fig-whatCanGoWrongWithLinearModel-1.png){fig-align="center" width=100%}
+
+From [Introduction to Modern Statistics](https://openintro-ims.netlify.app/) (Çetinkaya-Rundel and Hardin, 2021)
+
+
+## Model summary `Residuals`
+
+- `Median` should be ~ 0
+- `Min` and `Max` should be approximately equal
+- `1Q` and `3Q` should be approximately equal
+
+```{r}
+fm <- lm(Hindwing_area ~ Forewing_area, data = STB)
+summary(fm)
+```
+
+
+## Checking residuals
+
+```{r}
+ggplot(STB, aes(Forewing_area, Hindwing_area)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+```
+
+
+## Extracting residuals
+
+```{r}
+fm$residuals[1:10]
+
+library(broom)
+STB <- augment(fm, STB)
+str(STB)
+```
+
+
+## Bivariate model diagnostics
+
+[Performance package](https://easystats.github.io/performance/articles/check_model.html): `check_model()`
+
+- Posterior predictive checks: `check_predictions()`
+- Homogeneity of variance: `check_heteroskedasticity()`
+- Normality of residuals: `check_normality()`
+- Influential observations: `check_outliers()`
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+library(performance)
+library(see)
+
+check_model(fm)
+```
+
+
+## Posterior predictive check
+
+```{r}
+PP <- plot(check_model(fm, panel = FALSE))
+PP[[1]]
+```
+
+## Linearity
+
+```{r}
+PP[[2]]
+```
+
+
+## Homogeneity of variance
+
+```{r}
+PP[[3]]
+```
+
+
+## Influential observations
+
+```{r}
+PP[[4]]
+```
+
+
+## Normality of residuals
+
+```{r}
+PP[[5]]
+```
+
+
+## Additional checks
+
+```{r}
+#| echo: true
+
+check_heteroskedasticity(fm)
+check_normality(fm)
+check_outliers(fm)
+```
+
+
+## Drop and refit
+
+- `slice()` with `-` drops rows
+- `filter()` would also work
+
+```{r}
+#| output-location: slide
+
+STB_2 <- STB |> slice(-which.max(Forewing_area))
+
+fm2 <- lm(Hindwing_area ~ Forewing_area, data = STB_2)
+summary(fm2)
+```
+
+
+## Model check
+
+```{r}
+check_model(fm2)
+```
+
+
+## Assumptions when comparing means
+
+- Observations are independent
+- Observations normally distributed *within* groups
+    - Not between groups (e.g., bimodal distribution when all observations are combined)
+- Within-group variances are (approximately) equal
+
+
+## Formal tests of normality and homogeneity of variances
+
+(Shapiro-Wilk, Kolmogorov-Smirnov, Levene's, Bartlett's, etc.)
+
+- Be cautious with "positive" results
+    - Non-normality
+    - Unequal variances
+- Poor performance on both large and small sample size
+
+
+## Transformations to meet assumptions
+
+- Transformations are mathematical operations
+- Most often to address non-normality of residuals
+- e.g., `sqrt()`, `log()`, `log10()`
+
+```{r}
+#| echo: false
+Kung <- read_delim("https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv", delim = ";", show_col_types = FALSE) |> 
+  filter(male == 1)
+
+ggplot(Kung, aes(height, weight)) +
+  geom_point() +
+  labs(x = "Height (cm)",
+       y = "Body Mass (kg)",
+       title = "Mass and Height in Male !Kung")
+```
+
+
+## Naive model
+
+```{r}
+
+```
 
 
 # Questions {background-color="#f8c471"}
-
-
-## References
-
-::: {#refs}
-:::
 
