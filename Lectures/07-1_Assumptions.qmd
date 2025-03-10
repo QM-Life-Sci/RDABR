@@ -24,7 +24,6 @@ knitr:
 #| echo: false
 
 library(tidyverse)
-library(Data4Ecologists)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -159,18 +158,22 @@ See [Broman and Woo: Data Organization in Spreadsheets](https://kbroman.org/data
 ## Data to work with: Swallowtail Butterflies
 
 ```{r}
-STB <- Data4Ecologists::Swallowtail
+STB <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv", show_col_types = FALSE)
 glimpse(STB)
 
 STB |> count(Species, Sex)
 ```
 
 
-## Selecting
+## Selecting columns and rows
 
 - `$`: One column
-- `[ , ]`: Rows, Columns
-- `select()` and `slice()`
+- `[ , ]`: [Rows, Columns]
+- `select()`: Columns
+- `filter()` and `slice()`: Rows
+
+
+## Selecting
 
 ```{r}
 STB$Forewing_area[1:5]
@@ -230,7 +233,7 @@ STB |> mutate(across(where(is.numeric), log10)) |> slice(1:5)
 ```
 
 
-## Splitting and combining
+## Splitting
 
 ```{r}
 STB |> separate(col = "Species",
@@ -246,11 +249,16 @@ STB |> separate(col = "Species",
                 sep = " ") |> slice(1:5)
 ```
 
-. . .
+Also: `str_split()`
+
+
+## Combining
 
 ```{r}
 STB |> unite(col = "Spp_Sex", Species:Sex, sep = "_") |> slice(1:5)
 ```
+
+Also: `paste()`, `paste0()`, `glue` package
 
 
 ## "Wide" data
@@ -318,7 +326,7 @@ STB_long
 7. Remove "_area" from new `Measurement` column
 
 
-## Why?
+## Why long format?
 
 Many plots work better with long data:
 
@@ -338,15 +346,18 @@ STB_long |>
 ```
 
 
-# Common issues {background-color="#40666e"}
+# Questions {background-color="#f8c471"}
+
+
+# Common issues with data {background-color="#40666e"}
 
 
 ## Common issues with data
 
 - Missing (and shouldn't be)
-- Data entry error
+- Data entry error (decimal place shift)
 - Spelling error
-- Mis-coding of categorical variables ("f" and "F")
+- Mis-coding of categorical variables ("f" and "F", "M" and "M ")
 
 
 ## Identifying problematic data
@@ -418,7 +429,10 @@ STB |> slice(which.max(Forewing_area))
 STB |> slice_max(Forewing_area)
 ```
 
-Many `slice_()` functions.
+Many `slice_...()` functions.
+
+
+# Questions {background-color="#f8c471"}
 
 
 # Assumptions {background-color="#40666e"}
@@ -430,8 +444,9 @@ Requirements for sound inference
 
 ## Assumptions
 
-- Every model has *assumptions* that must be met to ensure an unbiased analysis
-- *Diagnostics* can evaluate models *post hoc*
+Every model has *assumptions* that must be met to ensure an unbiased analysis
+
+*Diagnostics* can evaluate models *after they are fit*:
 
 1. Linearity
 2. Independence
@@ -584,21 +599,26 @@ check_model(fm2)
     - Non-normality
     - Unequal variances
 - Poor performance on both large and small sample size
+    - Large samples $\rightarrow$ too much power
+    - Small samples $\rightarrow$ too little power
 
 
 ## Transformations to meet assumptions
 
 - Transformations are mathematical operations
 - Most often to address non-normality of residuals
-- e.g., `sqrt()`, `log()`, `log10()`
+- e.g., `sqrt()`, `log()`, `log10()`, $x^2$, $x^3$
 
 ```{r}
 #| echo: false
-Kung <- read_delim("https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv", delim = ";", show_col_types = FALSE) |> 
-  filter(male == 1)
+#| fig-align: center
 
-ggplot(Kung, aes(height, weight)) +
-  geom_point() +
+Kung <- read_delim("https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv", delim = ";", show_col_types = FALSE) |> 
+  filter(male == 1 & height > 100) |> 
+  rename(mass = weight)
+
+ggplot(Kung, aes(height, mass)) +
+  geom_point(color = "darkblue") +
   labs(x = "Height (cm)",
        y = "Body Mass (kg)",
        title = "Mass and Height in Male !Kung")
@@ -608,7 +628,112 @@ ggplot(Kung, aes(height, weight)) +
 ## Naive model
 
 ```{r}
+fm1 <- lm(mass ~ height, data = Kung)
+summary(fm1)
+```
 
+
+## Naive model
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+ggplot(Kung, aes(height, mass)) +
+  geom_point(color = "darkblue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "hotpink") +
+  labs(x = "Height (cm)",
+       y = "Body Mass (kg)",
+       title = "Mass and Height in Male !Kung")
+```
+
+
+## Model check: Linearity
+
+```{r}
+PP <- plot(check_model(fm1, panel = FALSE))
+PP[[2]]
+```
+
+
+## Model check: Variance
+
+```{r}
+PP[[3]]
+```
+
+
+## Model check: Residuals
+
+```{r}
+PP[[5]]
+```
+
+
+## Transformation
+
+The problem:
+
+$$ Mass \sim Height ^3 $$
+
+Log-transformation
+
+$$ \log(Mass) \sim 3 \times \log(Height) $$
+$$ \log_{10}(Mass) \sim 3 \times \log_{10}(Height) $$
+
+
+## Log-log plot
+
+```{r}
+#| output-location: slide
+#| fig-align: center
+
+ggplot(Kung, aes(height, mass)) +
+  geom_point(color = "darkblue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "hotpink") +
+  scale_x_log10() + # <1>
+  scale_y_log10() + # <1>
+  labs(x = "log10 Height (cm)",
+       y = "log10 Body Mass (kg)",
+       title = "Mass and Height in Male !Kung")
+```
+1. Convert x and y axes to log~10~.
+
+Note: no change to `geom_smooth()`.
+
+
+## Transform and re-fit
+
+```{r}
+Kung <- Kung |> 
+  mutate(log10_mass = log10(mass),
+         log10_height = log10(height))
+fm2 <- lm(log10_mass ~ log10_height, data = Kung)
+summary(fm2)
+```
+
+
+## Model check: Linearity
+
+```{r}
+PP <- plot(check_model(fm2, panel = FALSE))
+PP[[2]]
+```
+
+
+## Model check: Variance
+
+```{r}
+PP[[3]]
+```
+
+
+## Model check: Residuals
+
+```{r}
+PP[[5]]
 ```
 
 
