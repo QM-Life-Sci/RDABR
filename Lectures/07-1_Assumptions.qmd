@@ -411,7 +411,7 @@ STB_long |>
 - Missing (and shouldn't be)
 - Data entry error (decimal place shift)
 - Spelling error
-- Mis-coding of categorical variables (`f` and `F`, training spaces)
+- Mis-coding of categorical variables (`f` and `F`, trailing spaces)
 
 
 ## Identifying problematic data
