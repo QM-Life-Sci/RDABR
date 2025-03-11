@@ -22,11 +22,11 @@ csl: evolution.csl
 library(tidyverse)
 library(patchwork)
 library(ggExtra)
-library(latex2exp)
 
 theme_set(theme_classic(base_size = 20))
 
 ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
+  require(latex2exp)
   n <- length(X)
   pred <- (X * b + (mean(Y) - b * mean(X)))
   SSy <- sum((Y - pred) ^ 2)

@@ -26,6 +26,60 @@ knitr:
 library(tidyverse)
 
 theme_set(theme_classic(base_size = 20))
+
+ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE,
+                   xlab = NULL, ylab = NULL) {
+  require(latex2exp)
+  n <- length(X)
+  pred <- (X * b + (mean(Y) - b * mean(X)))
+  SSy <- sum((Y - pred) ^ 2)
+  
+  M <- tibble(X, Y, pred)
+  
+  if (is.null(xlab)) xlab <- "X"
+  if (is.null(ylab)) ylab <- "Y"
+  
+  if (do.plot) {
+    p <- ggplot() +
+      geom_point(data = tibble(X = mean(X), Y = mean(Y)),
+                 aes(X, Y), color = "navy", size = 7, pch = 1) +
+      geom_abline(slope = b, intercept = mean(Y) - b * mean(X),
+                  color = "navy", linewidth = 1) +
+      geom_segment(data = M, aes(x = X, xend = X, y = Y, yend = pred),
+                   color = "firebrick", linewidth = 1) +
+      geom_point(data = M, aes(x = X, y = Y), size = 3) +
+      labs(x = xlab, y = ylab)
+    
+    v1 <- round(b, 2)
+    v2 <- round(SSy, 2)
+    
+    ll1 <- glue::glue("$\\theta_1 = {v1}$")
+    ll2 <- glue::glue("$\\SS = {v2}$")
+    
+    xpos <- min(X) + 0.15 * diff(range(X))
+    ypos <- min(Y) + 0.8 * diff(range(Y))
+    
+    if(do.labels) {
+      p <- p +
+        annotate(geom = "text",
+                 label = TeX(ll1, output = "character"),
+                 x = xpos, y = ypos,
+                 parse = TRUE,
+                 hjust = 0,
+                 size = 9) +
+        annotate(geom = "text",
+                 label = TeX(ll2, output = "character"),
+                 x = xpos, y = ypos * 0.96,
+                 parse = TRUE,
+                 hjust = 0,
+                 size = 9)
+    }
+  } else {
+    p <- NULL
+  }
+  return(list(SSy, p))
+}
+
 ```
 
 
@@ -357,7 +411,7 @@ STB_long |>
 - Missing (and shouldn't be)
 - Data entry error (decimal place shift)
 - Spelling error
-- Mis-coding of categorical variables ("f" and "F", "M" and "M ")
+- Mis-coding of categorical variables (`f` and `F`, training spaces)
 
 
 ## Identifying problematic data
@@ -454,6 +508,21 @@ Every model has *assumptions* that must be met to ensure an unbiased analysis
 4. (Approximately) normal residuals
 
 2 and 3: "Independent and identically distributed" (IID)
+
+
+## Residuals
+
+```{r}
+#| echo: false
+
+LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
+  rename(Age = age,
+         `Proportion Black` = proportion.black)
+fm <- lm(Age ~ `Proportion Black`, data = LA)
+l <- ssPlot(X = LA$`Proportion Black`, Y = LA$Age, b = coef(fm)[2],
+       xlab = "Proportion Black", ylab = "Age", do.labels = FALSE)
+print(l[[2]] + scale_x_continuous(limits = c(0, 1)))
+```
 
 
 ## Problematic residuals
@@ -589,18 +658,6 @@ check_model(fm2)
 - Observations normally distributed *within* groups
     - Not between groups (e.g., bimodal distribution when all observations are combined)
 - Within-group variances are (approximately) equal
-
-
-## Formal tests of normality and homogeneity of variances
-
-(Shapiro-Wilk, Kolmogorov-Smirnov, Levene's, Bartlett's, etc.)
-
-- Be cautious with "positive" results
-    - Non-normality
-    - Unequal variances
-- Poor performance on both large and small sample size
-    - Large samples $\rightarrow$ too much power
-    - Small samples $\rightarrow$ too little power
 
 
 ## Transformations to meet assumptions
