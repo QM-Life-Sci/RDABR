@@ -18,18 +18,22 @@ library(tidyverse)
 library(performance)
 library(see)
 library(broom)
+library(readxl)
+library(cowplot)
 
 theme_set(theme_classic())
 ```
 
 ## Setup
 
-This problem set will use three additional packages that you might not have installed:
+This problem set will use some additional packages that you might not have installed:
 
 - "performance"
 - "see"
 - "ggplotr"
 - "broom"
+- "readxl"
+- "cowplot"
 
 If you do not have these packages installed already, go ahead and do that before you start. You can use the "Packages" pane or the function, e.g., `install.packages("performance`)
 
@@ -227,3 +231,131 @@ What do you notice about the residuals? Does this agree with the diagnostics abo
 
 > The corn residuals are very compact and probably normally distributed. The cotton residuals are much more spread out, and it's hard to tell of they are normal or not. This seems to agree with the diagnostics: different variances and non-normal distributions of residuals.
 
+
+## Working with lists
+
+Lists are one of the most flexible data structures in R. They can hold any combination of other types of R objects (including other lists). R functions like `lm()` return lists.^[R functions can only return a single object (unlike languages like python and MATLAB, which can return multiple objects). So everything that needs to be returned from a function is placed into a list, which gets returned.]
+
+Lists are indexed a little differently from vectors and matrices. List indices are indexed using double brackets: `[[1]]` extracts (or assigns) the first element. Run the following code:
+
+```{r}
+mylist <- list()
+mylist[[3]] <- 24
+mylist
+```
+
+We first create an empty list, using the `list()` function. The second line assigns 24 to the 3rd element. When we print the list (last line), you can see that the 1st and 2nd elements are created and left as `NULL`. Managing lists can be harrowing:
+
+```{r}
+mylist[[1]] <- "hello world"
+mylist[[2]] <- list(x = 12, y = "y", z = seq(1, 5, by = 0.2))
+mylist
+```
+
+Now the 1st element has a string, the 2nd has a list (which itself contains a numeric, a string, and a vector). How would you extract the 3rd element from the `z` vector?
+
+```{r}
+# FIXME
+mylist[[2]]$z[3]
+```
+
+We will use lists in a much less convoluted way, which is what you should do until you get comfortable (once you are comfortable with lists, their immense flexibility makes them a great way to pass collections of different kinds of data around among code).
+
+For now, we will use a list to hold 4 plots, which we will arrange in a grid to make a usable figure.
+
+
+### Activity
+
+The file `mammals.xlsx` contains data for about 50 different traits. *All* 5,416 species of mammals are included in the file, though none has data for all traits. We want to make some quick plots of four different traits plotted against body mass.
+
+Rather than creating separate plots, we want to make them inside a loop, where we iterate through the columns of interest. This will make it easy to modify the format of the plots all at once, reducing the amount of code to keep up with. For example, change all the points to be transparent in one line rather than in four places.
+
+1. Load the data from `mammals.xlsx`.
+2. Create a column that holds the log10 transformation of `adult_body_mass_g` and one for the log10 of `basal_met_rate_m_l_o2hr`.
+    - Good names might be "log_Mass" and "log_BMR"
+3. Create a vector of strings that we will use to iterate through the columns for analysis (we used `cols_analyze`). It should contain the following strings:
+    - `ageat_eye_opening_d`
+    - `log_BMR` (or whatever you called the log10 transformation of `basal_met_rate_m_l_o2hr`)
+    - `gestation_len_d`
+    - `litter_size`
+4. Create a vector of strings to use for the y axis labels. Make sure that the order matches the order in your vector #3.
+5. Drop any rows that have missing values for log10 Body Mass.
+6. Create an empty list to hold plots: `pp <- list()` for example.
+
+This is all we need for the setup. At this point, you have the data, two vectors (one of columns names and one of y-axis labels), and an empty list.
+
+```{r}
+# FIXME
+M <- read_excel("../data/mammals.xlsx", na = "NA") |>
+  mutate(log_Mass = log10(adult_body_mass_g),
+         log_BMR = log10(basal_met_rate_m_l_o2hr))
+
+cols_analyze <- c("ageat_eye_opening_d",
+                  "log_BMR",
+                  "gestation_len_d",
+                  "litter_size")
+
+axis_labels <- c("Age at Eye Opening",
+                 "log10 BMR",
+                 "Gestation Length",
+                 "Litter Size")
+
+M <- M |> 
+  select(log_Mass, all_of(cols_analyze)) |> 
+  drop_na(log_Mass)
+
+pp <- list()
+```
+
+No we can work on a loop to iterate through the columns, making a plot for each column. Here is the [pseudocode](https://builtin.com/data-science/pseudocode):
+
+1. Create the framework for a `for` loop.
+    - We want to iterate from 1 to `length(cols_analyze)`
+2. Extract the *ii*th element of the columns to analyze vector. Assign to an object `col`.
+3. Extract the *ii*th element of the y-axis label to `lab`.
+4. Make a bivariate plot of the column vs. log Body Mass (assign to an object). This will look a little different from ggplots you have made before, particularly the aesthetics. Because you are supplying raw strings, you need to use the `.data` object, which is what ggplot uses internally to keep track of data. It will look something like: 
+    - `aes(x = .data[["log_Mass"]], y = .data[[col]])` depending on what variable name you used for log10 Body mass
+5. Assign the plot to the *ii*th element of your list.
+
+```{r}
+# FIXME
+for (ii in 1:length(cols_analyze)) {
+  col <- cols_analyze[ii]
+  lab <- axis_labels[ii]
+  
+  p <- ggplot(M, aes(x = .data[["log_Mass"]], y = .data[[col]])) +
+    geom_point(alpha = 0.5, size = 0.5) +
+    labs(x = "log10 Body Mass (g)", y = lab) +
+    theme(axis.text = element_text(size = 10),
+          axis.title = element_text(size = 10))
+  pp[[ii]] <- p
+}
+```
+
+At the end of the loop you will have a list that contains 4 plots. Try printing a plot by running `pp[[1]]` at the command line. If you get warnings saying something like `Removed ... rows containing missing values (geom_point).`, that is just ggplot saying that there are `NA`s in the data. A nice fix-up would be to go back to the data and `drop_na()` for the *ii*th column before you plot.
+
+Now you can make a 2x2 grid of plots. The `cowplot` function `plot_grid()` can take a list of plots as an argument: `plotlist = ...`. Pass your list of plots, and specify 2 columns and 2 rows (check the help for `?plot_grid`).
+
+```{r}
+# FIXME
+plot_grid(plotlist = pp, ncol = 2, nrow = 2,
+          labels = c("a", "b", "c", "d"),
+          label_size = 8)
+```
+
+You will get 4 sets of warning messages about missing data. This is okay.
+
+Now you can fine tune the plots in the code chunk above:
+
+- Add labels for the x and y axes. The y label is the `lab` string you extracted from your vector of y axis labels.
+- Make the points smaller (`size = 0.5`) and transparent
+- Change the font size on the axis labels by adding the following code to your ggplot:
+
+```
++ theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 10))
+```
+
+- Pass the argument `labels = c("a", "b", "c", "d")` to `plot_grid()` to add labels for each plot.
+
+As you can see rather than sequentially editing 4 sets of code, trying to make sure they all stay in sync, we can just edit one plotting statement and change the data in each iteration.
