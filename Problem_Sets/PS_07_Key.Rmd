@@ -1,0 +1,117 @@
+---
+title: 'Problem Set 07'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+output:
+  html_document:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+theme_set(theme_classic())
+```
+
+
+## Stalk-eyed flies
+
+In Problem Set 5 we analyzed a data set where the eye span of stalk-eyed flies was measured in two different diet treatments: corn and cotton. We'll complete this analysis now by looking at hypothesis tests for the linear model.
+
+### Activity
+
+Import the `Stalkies.csv` as in PS 5. Feel free to copy your code or the code from the key.
+
+```{r}
+# FIXME
+
+stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |> 
+  mutate(food_source = factor(food_source))
+```
+
+#### Tests of means
+
+Return to the linear model you fit for PS 5. Those instructions were:
+
+1. Fit a linear model using `lm()` where `eye_span` is modeled by `food_source` and assign this to an object.
+2. Pass the object that you just created to the function `summary()` to generate the model summary.
+
+Copy the code here and execute it.
+
+```{r}
+# FIXME
+
+fm <- lm(eye_span ~ food_source, data = stalk)
+summary(fm)
+```
+
+Interpret the *P*-values for the two parameter estimates: `(Intercept)` and `food_sourceCotton`. What hypothesis tests do these values represent? How likely was each parameter estimate to have arisen by chance alone?
+
+> The *P*-values are both very small: 10^-16 and 7 x 10^-10 for the intercept and the difference between the means of the corn and cotton group. Both *P*-values represent tests that the coefficients are equal to zero. It's not useful to compare the mean of the corm group to zero, so that very small *P*-value is of little interest. The *P*-value for `food_sourceCotton` tests whether the difference between the means of the corn and cotton groups is different from zero. This is a test we are interested in. In this case, the difference is likely different, because there is only a very small chance that the difference arose by chance alone.
+
+
+## Lion noses
+
+In PS 4, we looked at a data set where lion age was related to the proportion of black coloration in the nose. The goal was to be able to predict a lion's age from only a photograph of its nose.
+
+### Activity
+
+Import the `LionAges.csv` data as you did in PS 4 and make a scatterplot of age regressed on proportion of black. Feel free to copy your code over.
+
+```{r}
+# FIXME
+
+LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
+
+ggplot(LA, aes(y = age, x = proportion.black)) +
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14) +
+  labs(x = "Proportion Black", y = "Age (y)")
+```
+
+Copy over the linear model you fit where age is modeled by proportion of black.
+
+```{r}
+# FIXME
+
+fm <- lm(age ~ proportion.black,
+         data = LA)
+summary(fm)
+```
+
+
+What are the slope and the intercept for the OLS regression line?
+
+> The slope is 10.6 and the intercept is 0.879.
+
+
+What is you interpretation of the intercept of the regression in biological terms?
+
+> A lion with no black coloring on its nose is 0.88 years old.
+
+
+What is you interpretation of the slope of the regression in mathematical terms?
+
+> For a 1 unit increase in proportion black, age increases by 10.6 years.
+
+
+What hypothesis test do the *t*-value and the *P*-value for the `proportion.black` coefficient of 10.6 represent?
+
+> They test the hypothesis that the slope equals zero.
+
+
+Is a slope of 10.6 likely to be observed by chance for these data?
+
+> No - the *P*-value is very small: 7 x 10^-8.
+
+
+Is proportion of black coloring a good predictor of age in lions?
+
+> It appears so based on these data.
