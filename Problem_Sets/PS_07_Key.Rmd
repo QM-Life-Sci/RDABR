@@ -343,7 +343,7 @@ plot_grid(plotlist = pp, ncol = 2, nrow = 2,
           label_size = 8)
 ```
 
-You will get 4 sets of warning messages about missing data. This is okay.
+You will get 4 sets of warning messages about missing data. This is okay. We could edit the code to subset and filter out NAs inside the loop to avoid these messages.
 
 Now you can fine tune the plots in the code chunk above:
 
