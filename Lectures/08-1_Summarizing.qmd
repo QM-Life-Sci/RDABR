@@ -28,6 +28,12 @@ csl: evolution.csl
 - PC 1 due Thursday
 
 
+# Analysis paralysis {background-color="#40666e"}
+
+What can we learn from Picasso
+
+
+
 # Summarizing data and models {background-color="#40666e"}
 
 
