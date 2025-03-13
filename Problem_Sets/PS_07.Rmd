@@ -23,7 +23,7 @@ This problem set will use some additional packages that you might not have insta
 
 - "performance"
 - "see"
-- "ggplotr"
+- "qqplotr"
 - "broom"
 - "readxl"
 - "cowplot"
