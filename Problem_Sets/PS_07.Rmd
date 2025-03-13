@@ -28,7 +28,7 @@ This problem set will use some additional packages that you might not have insta
 - "readxl"
 - "cowplot"
 
-If you do not have these packages installed already, go ahead and do that before you start. You can use the "Packages" pane or the function, e.g., `install.packages("performance`)
+If you do not have these packages installed already, go ahead and do that before you start. You can use the "Packages" pane or the function, e.g., `install.packages("performance")
 
 
 ## Lion noses
