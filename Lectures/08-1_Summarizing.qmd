@@ -14,42 +14,492 @@ format:
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
 ---
 
 ```{r}
 #| label: setup
 #| echo: false
+
+library(tidyverse)
+library(purrr)
+library(gt)
+
+theme_set(theme_classic(base_size = 20))
 ```
 
 
 # Housekeeping {background-color="#40666e"}
 
-- Questions about PC 1
-- PC 1 due Thursday
+- PS 8 due after Spring Break
+- PC 2 after Spring break
+    - Submit questions for discussion/review before Tuesday 4/1
+    - No class meeting on Thursday 4/3
+
+
+# Plan {background-color="#40666e"}
+
+- Why diagnostics? Checking assumptions
+- Errors in data and how to fix them
+- Joining data
+- Summarizing models
 
 
 # Analysis paralysis {background-color="#40666e"}
 
-What can we learn from Picasso
+Why are we checking assumptions?
+
+What to do with diagnostics gone wrong?
+
+What can we learn from Picasso?
 
 
+## Guernica (1937)
 
-# Summarizing data and models {background-color="#40666e"}
+![](./images/Picasso_3.png){fig-align="center"}
+
+
+## The Weeping Woman (1937)
+
+![](./images/Picasso_4.png){fig-align="center"}
+
+
+## Self-portrait Facing Death (1972)
+
+![](./images/Picasso_5.png){fig-align="center"}
+
+
+## Untitled (1894)
+
+![](./images/Picasso_1.png){fig-align="center"}
+
+
+## Untitled (1894)
+
+![](./images/Picasso_2.png){fig-align="center"}
+
+
+## Learn the most correct way first
+
+- What assumptions matter *most* for an analysis
+- *When* assumptions matter for an analysis
+
+:::{.center}
+:::{.alert}
+Experiment and Practice
+:::
+:::
+
+![](./images/Picasso_6.png){fig-align="center"}
+
+
+## Gradations of worries
+
+More important to lesser important:
+
+- Appropriate model
+- Small sample size
+- Independence
+- Normality of residuals
+- Constant variance (OLS)
+- Equal variance between groups
+
+Don't memorize this.
+
+
+## The unreasonable robustness of linear models
+
+*Robust*: Not biased despite violations of assumptions
+
+*Biased*: More or less significant results than expected
+
+:::{.center}
+:::{.alert}
+Don't panic when diagnotic tests report problems.
+:::
+:::
+
+
+## Convincing ourselves by simulation
+
+- n = 10
+- Means and standard deviations are equal
+- Calculate difference and *P*-value
+
+```{r}
+set.seed(145784)
+
+iter <- 10000
+
+d <- numeric(length = iter)
+P <- numeric(length = iter)
+
+for (ii in 1:iter) {
+  x1 <- rnorm(n = 10, mean = 0, sd = 1)
+  x2 <- rnorm(n = 10, mean = 0, sd = 1)
+  d[ii] <- mean(x1) - mean(x2)
+  
+  fm <- t.test(x1, x2, var.equal = TRUE)
+  P[ii] <- fm$p.value
+}
+```
+
+
+## Convincing ourselves by simulation
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+ggplot(tibble(d), aes(d)) +
+  geom_histogram(bins = 30, fill = "navy") +
+  labs(x = "Difference in Means", y = "Count")
+```
+
+
+## Convincing ourselves by simulation
+
+What proportion of *P*-values are less than or equal to 0.05?
+
+. . . 
+ 
+```{r}
+sum(P <= 0.05) / iter
+```
+
+. . .
+
+When there is *no difference* in group means:
+
+- 5% of the time we will find a "significant" *P*-value ($\alpha = 0.05$)
+- *All* significant tests are "false-positives"
+
+
+## Convincing ourselves by simulation
+
+- 2 groups, n = 10 in each
+- Means: 0, 0
+- Standard deviations:
+
+```{r}
+#| echo: false
+
+sds <- cbind(c(1, 1, 1, 1), c(1, 2, 4, 16))
+knitr::kable(as_tibble(sds, .name_repair = "unique") |> 
+               rename(`Group 1` = `...1`,
+                      `Group 2` = `...2`))
+```
+
+- *t*-test assuming equal variances
+- 100000 iterations: Proportion of *P*-values <= 0.05?
+
+:::{.center}
+:::{.alert}
+What do you predict?
+:::
+:::
+
+
+## Simulation
+
+```{r}
+#| cache: true
+
+set.seed(82346)
+
+t_tester <- function(m1, m2, sd1, sd2, ss = 10, niter = 100000) {
+  ps <- logical(length = niter)
+  for (jj in 1:niter) {
+    fm <- t.test(rnorm(ss, m1, sd1),
+                  rnorm(ss, m2, sd2),
+                  var.equal = TRUE)
+    ps[jj] <- fm$p.value < 0.05
+  }
+  return(mean(ps))
+}
+
+D <- tibble(m1 = 0,
+            m2 = 0,
+            sd1 = c(1, 1, 1, 1),
+            sd2 = c(1, 2, 4, 16))
+```
+
+
+## Simulation
+
+```{r}
+#| cache: true
+
+pmap_dbl(.l = D,
+         .f = t_tester)
+```
+
+- Equal standard deviation: ~5%
+- 2x difference: ~5.6%
+- 4x difference: ~6.1%
+- 16x difference: ~6.5%
+
+What does this mean if P = 0.048? Or 0.0000048?
+
+
+## Using Welch's Correction
+
+```{r}
+#| echo: true
+
+set.seed(234978)
+t_tester_welch <- function(m1, m2, sd1, sd2, ss = 10, niter = 10000) {
+  ps <- logical(length = niter)
+  for (jj in 1:niter) {
+    mod <- t.test(rnorm(ss, m1, sd1),
+                  rnorm(ss, m2, sd2),
+                  var.equal = FALSE)
+    ps[jj] <- mod$p.value < 0.05
+  }
+  return(mean(ps))
+}
+
+pmap_dbl(.l = D, # reuse D
+         .f = t_tester_welch)
+```
+
+
+# Questions {background-color="#f8c471"}
 
 
 # Data Integrity {background-color="#40666e"}
 
 
-# Isolating data from analysis
+## Goals for curating data
+
+- More than just no errors
+- [FAIR](https://www.go-fair.org/fair-principles/): Findable, Accessible, Interoperable, Reusable
+- Have a traceable path for all changes to data
+    - Similar to code giving a step-by-step set of repeatable analyses
+
+
+## Isolating raw data from analysis
+
+- Separate data cleaning/preparation from analysis
+    - Clean once, analyze often
+- Read raw data
+    - Process / fix
+- Write cleaned data to a new file (e.g., `Processed_data` directory)
+    - Read into analysis code
+
+
+## Fixing errors
+
+
+## Replacing values
 
 
 ## Joining data
+
+![](https://www.scientificlib.com/en/Biology/Animalia/Chordata/Aves/images/MalurusCyaneus1.jpg){fig-align="center"}
+
+- ~30 years of breeding data for ~1900 female Superb Fairywrens (*Malurus cyaneus*)
+- Individuals tracked for many years (number of fledged offspring, reproductive senescence, etc.)
+- Similar data for males
+
+
+## Relational Data
+
+- Try not to store redundant data (same data in multiple files) - prone to errors and mismatches
+- Compartmentalize datasets
+- Join them together via one or more columns containing values that connect one dataset to each other
+
+Relations are always built between pairs of tables. 
+
+- What column(s) uniquely defines these relationships?
+
+
+## Datasets
+
+```{r}
+#| echo: false
+
+wren_surv <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/wren_female_surv.csv",
+  show_col_types = FALSE,
+  col_types = "-cn-nc") |> 
+  rename(longevity = long_years) |> 
+  arrange(ID, longevity) |> 
+  group_by(ID) |> 
+  summarise(final_obs_year = max(year),
+            longevity = max(longevity),
+            sex = sex[1])
+
+wren_repro <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/wren_female_repro.csv",
+  show_col_types = FALSE,
+  col_types = "-cnnn-n-") |> 
+  rename(n_offspring = offspring_inde,
+         senescent = final_breed) |> 
+  mutate(mass = rnorm(n(), mean = 10.5, sd = 1) |> round(digits = 1))
+```
+
+```{r}
+#| echo: false
+
+wren_surv |> 
+  slice_head(n = 5) |> 
+  gt() |> 
+  tab_header("Survival")
+
+wren_repro |> 
+  slice_head(n = 5) |> 
+  gt() |> 
+  tab_header("Reproductive Success")
+
+```
+
+
+## Column names
+
+```{r}
+#| echo: true
+
+names(wren_surv)
+names(wren_repro)
+```
+
+- `join_`s will use column names to merge data frames (tibbles). 
+- Can join on non-matching names -- easier to `rename()` columns
+
+
+## Set Operations 
+
+```{r}
+#| echo: true
+
+intersect(names(wren_surv), names(wren_repro))
+
+union(names(wren_surv), names(wren_repro))
+
+```
+
+- Join will use `ID` by default
+
+
+## Kinds of joins in `dplyr`
+
+::: {.incremental}
+
+- `left_join(df1, df2)` and `right_join(df1, df2)`
+    - Merge one into the other by a subset of rows
+    - `left_join(df1, df2)` equals `right_join(df2, df1)`
+- `full_join()`: all rows, keep all values
+- `inner_join()`: only matching rows
+
+:::
+
+
+## Thinking about what you want to keep
+
+- Keep only rows in `df2` than match `df1`, duplicating information?
+- Keep all the rows in `df2`, adding `NA`s for missing data?
+- Keep only rows that match?
+
+
+## Fairywren data
+
+```{r}
+#| echo: false
+
+wren_surv |> 
+  slice_head(n = 5) |> 
+  gt() |> 
+  tab_header("Survival")
+
+wren_repro |> 
+  slice_head(n = 5) |> 
+  gt() |> 
+  tab_header("Reproductive Success")
+
+```
+
+
+## Table dimensions
+
+```{r}
+#| echo: true
+
+dim(wren_surv)
+dim(wren_repro)
+```
+
+- We should have 1,372 rows in the joined data
+
+
+## Checking matches
+
+```{r}
+#| echo: true
+
+# Reproduction not in survival
+setdiff(unique(wren_repro$ID), unique(wren_surv$ID))
+
+# Survival not in reproduction
+setdiff(unique(wren_surv$ID), unique(wren_repro$ID))
+```
+
+
+## Join survival to reproduction
+
+```{r}
+#| echo: true
+#| message: true
+
+WR <- left_join(wren_repro, wren_surv)
+```
+
+```{r}
+WR
+```
+
+
+## Join survival to reproduction
+
+```{r}
+#| echo: true
+#| message: true
+
+WR <- left_join(wren_repro, wren_surv, by = join_by(ID))
+WR
+```
+
+
+## Full join survival to reproduction
+
+- `ID`s in survival data but not in reproduction data are added with `NA`s filled
+
+```{r}
+#| echo: true
+#| message: true
+
+WR <- full_join(wren_repro, wren_surv, by = join_by(ID))
+WR |> filter(ID == "574717-YOO")
+```
+
+
+# Summarizing data and models {background-color="#40666e"}
+
+
+## What information to include?
+
 
 
 # Practice with lm() for OLS
 
 
 # Standard errors
+
+
+# More on Markdown {background-color="#f8c471"}
+
 
 
 # Questions {background-color="#f8c471"}
