@@ -213,8 +213,8 @@ t_tester <- function(m1, m2, sd1, sd2, ss = 10, niter = 100000) {
   ps <- logical(length = niter)
   for (jj in 1:niter) {
     fm <- t.test(rnorm(ss, m1, sd1),
-                  rnorm(ss, m2, sd2),
-                  var.equal = TRUE)
+                 rnorm(ss, m2, sd2),
+                 var.equal = TRUE)
     ps[jj] <- fm$p.value < 0.05
   }
   return(mean(ps))
@@ -241,7 +241,7 @@ pmap_dbl(.l = D,
 - 4x difference: ~6.1%
 - 16x difference: ~6.5%
 
-What does this mean if P = 0.048? Or 0.0000048?
+What does this mean if P = 0.048? Or P = 0.0000048?
 
 
 ## Using Welch's Correction
@@ -290,15 +290,64 @@ pmap_dbl(.l = D, # reuse D
     - Read into analysis code
 
 
-## Fixing errors
+## Finding and fixing errors
+
+- Develop a plan for data entry
+- Data exploration and initial plotting
+- Check your lab notebook and/or data sheet
+
+Two options for errors:
+
+1. Fix in the original data
+2. Fix in code and re-export
 
 
-## Replacing values
+## Some examples
+
+![](./images/M_co_go.png){fig-align="center"}
+
+
+## Fix in code and re-export
+
+
+
+## Locating errors
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+STB <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv", show_col_types = FALSE) |> 
+  mutate(ID = 1:n(),
+         Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)) |> 
+  relocate(ID)
+
+ggplot(STB, aes(Forewing_area, Hindwing_area)) +
+  geom_point(size = 3, color = "darkgreen")
+```
+
+
+```{r}
+STB |> arrange(desc(Forewing_area)) |> slice(1:5)
+STB$Forewing_area[176]
+```
+
+
+## Replacing values: `replace()`
+
+```{r}
+STB_correct <- STB |> 
+  mutate(Forewing_area = replace(Forewing_area, Forewing_area == 55.23, 5.523))
+
+ggplot(STB_correct, aes(Forewing_area, Hindwing_area)) +
+  geom_point(size = 3, color = "darkgreen")
+```
 
 
 ## Joining data
 
-![](https://www.scientificlib.com/en/Biology/Animalia/Chordata/Aves/images/MalurusCyaneus1.jpg){fig-align="center"}
+![](./images/Malurus_cyaneus.jpg){fig-align="center"}
+
 
 - ~30 years of breeding data for ~1900 female Superb Fairywrens (*Malurus cyaneus*)
 - Individuals tracked for many years (number of fledged offspring, reproductive senescence, etc.)
@@ -347,12 +396,26 @@ wren_repro <- read_csv(
 wren_surv |> 
   slice_head(n = 5) |> 
   gt() |> 
-  tab_header("Survival")
+  tab_header("Survival") |> 
+  data_color(
+    columns = ID,
+    rows = ID == "543774-MMY",
+    palette = c("hotpink")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ID))
 
 wren_repro |> 
   slice_head(n = 5) |> 
   gt() |> 
-  tab_header("Reproductive Success")
+  tab_header("Reproductive Success") |> 
+  data_color(
+    columns = ID,
+    rows = ID == "543774-MMY",
+    palette = c("hotpink")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ID))
 
 ```
 
@@ -373,12 +436,9 @@ names(wren_repro)
 ## Set Operations 
 
 ```{r}
-#| echo: true
-
 intersect(names(wren_surv), names(wren_repro))
 
 union(names(wren_surv), names(wren_repro))
-
 ```
 
 - Join will use `ID` by default
@@ -412,12 +472,26 @@ union(names(wren_surv), names(wren_repro))
 wren_surv |> 
   slice_head(n = 5) |> 
   gt() |> 
-  tab_header("Survival")
+  tab_header("Survival") |> 
+  data_color(
+    columns = ID,
+    rows = ID == "543774-MMY",
+    palette = c("hotpink")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ID))
 
 wren_repro |> 
   slice_head(n = 5) |> 
   gt() |> 
-  tab_header("Reproductive Success")
+  tab_header("Reproductive Success") |> 
+  data_color(
+    columns = ID,
+    rows = ID == "543774-MMY",
+    palette = c("hotpink")) |> 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(columns = ID))
 
 ```
 
@@ -425,8 +499,6 @@ wren_repro |>
 ## Table dimensions
 
 ```{r}
-#| echo: true
-
 dim(wren_surv)
 dim(wren_repro)
 ```
@@ -436,13 +508,15 @@ dim(wren_repro)
 
 ## Checking matches
 
+Reproduction not in survival:
+
 ```{r}
-#| echo: true
-
-# Reproduction not in survival
 setdiff(unique(wren_repro$ID), unique(wren_surv$ID))
+```
 
-# Survival not in reproduction
+Survival not in reproduction
+
+```{r}
 setdiff(unique(wren_surv$ID), unique(wren_repro$ID))
 ```
 
@@ -450,7 +524,6 @@ setdiff(unique(wren_surv$ID), unique(wren_repro$ID))
 ## Join survival to reproduction
 
 ```{r}
-#| echo: true
 #| message: true
 
 WR <- left_join(wren_repro, wren_surv)
@@ -464,7 +537,6 @@ WR
 ## Join survival to reproduction
 
 ```{r}
-#| echo: true
 #| message: true
 
 WR <- left_join(wren_repro, wren_surv, by = join_by(ID))
@@ -485,28 +557,122 @@ WR |> filter(ID == "574717-YOO")
 ```
 
 
-# Summarizing data and models {background-color="#40666e"}
+# Summarizing data and describing linear models {background-color="#40666e"}
 
 
-## What information to include?
+## What information to include about the data?
+
+::: {.incremental}
+
+- Structure of the experimental design
+    - Groups, sub-groups, etc
+    - Number of measures per individual/unit
+- Total number of observations (per group)
+    - Initial group sizes and final group sizes
+- Means and standard deviations or standard errors
+
+:::
+
+
+## What information to include about the model?
+
+::: {.incremental}
+
+- What would someone need to know in order to reproduce the analysis if they had the data?
+    - Ideally they have your code and data
+- Find examples in the literature or in this class
+- Give the model a name ("linear model", "OLS regression", "*t*-test") and also describe what it does
+    - "...OLS regression where age (years) is predicted by proportion of black coloration of the nose (range: 0.0 to 1.0)"
+    - "...*t*-test comparing the means of eye-span (mm) between stalk-eyed flies raised on corn vs. those raised on cotton"
+- Software, packages, versions
+
+:::
+
+
+## Model summaries: many options in R
+
+- `stargazer`, `sjPlot`, `flextable`
+- `knitr`, `kableExtra`, `gt`
+
+[`modelsummary` works well](https://modelsummary.com/)^[Also install `estimatr`]
+
+- Summary tables for observations: `datasummary_skim()`, `datasummary_balance()`, `datasummary_correlation()`, `datasummary_crosstab()`
+- Summaries for linear (and other) models: `modelsummary()`
+- Coefficient plots: `modelplot()`
+- `output = `: save directly to file (docx, html, etc.)
+
+
+## `datasummary_skim()`
+
+```{r}
+#| echo: false
+
+LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
+  rename(Age = age,
+         `Proportion Black` = proportion.black)
+```
+
+```{r}
+library(modelsummary)
+datasummary_skim(LA)
+```
+
+
+## `datasummary_balance()`
+
+```{r}
+#| echo: false
+
+HL <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/HornedLizards.csv", show_col_types = FALSE) |> 
+  drop_na() |> 
+  rename(`Horn Length` = horn_length,
+         Group = group) |> 
+  mutate(Group = if_else(Group == "alive", "Alive", "Dead"))
+```
+
+```{r}
+datasummary_balance(~ Group, data = HL)
+```
+
+
+## `modelsummary()`
+
+```{r}
+fm <- lm(Age ~ `Proportion Black`, data = LA)
+modelsummary(list("OLS" = fm),
+             estimate = "{estimate} ({conf.low}, {conf.high})",
+             statistic = c("s.e. = {std.error}", 
+                           "t = {statistic}",
+                           "p = {p.value}"),
+             gof_omit = ".*")
+```
 
 
 
-# Practice with lm() for OLS
+## `modelsummary()`
+
+```{r}
+fm <- lm(`Horn Length` ~ Group, data = HL)
+modelsummary(list("Horn Length ~ Group" = fm),
+             estimate = "{estimate} ({conf.low}, {conf.high})",
+             statistic = c("t = {statistic}",
+                           "p = {p.value}"),
+             gof_omit = ".*",
+             fmt = 2)
+```
 
 
-# Standard errors
+## `modelplot()`
+
+```{r}
+modelplot(fm)
+```
 
 
-# More on Markdown {background-color="#f8c471"}
+# RMarkdown / Quarto Markdown {background-color="#40666e"}
 
+Where we are headed...
 
 
 # Questions {background-color="#f8c471"}
-
-
-## References
-
-::: {#refs}
-:::
 
