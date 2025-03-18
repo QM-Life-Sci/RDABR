@@ -28,14 +28,14 @@ csl: evolution.csl
 ## What tools will we use?
 
 - R: statistical programming language
-- RStudio: Interface for R ([Introduction to RStudio Server](https://book.cds101.com/rstudio-server.html))
-- [RMarkdown](https://rmarkdown.rstudio.com/)
+- RStudio: Interface for R ([Introduction to RStudio Server](https://book.cds101.com/rstudio-server.html){target="_blank"})
+- [RMarkdown](https://rmarkdown.rstudio.com/){target="_blank"}
 - Hellbender computer cluster
 
 
 ## R
 
-> [R](https://www.r-project.org/) is a free software environment for statistical computing and graphics.
+> [R](https://www.r-project.org/){target="_blank"} is a free software environment for statistical computing and graphics.
 
 > The term "environment" is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
 
@@ -55,7 +55,7 @@ csl: evolution.csl
 
 ## RMarkdown
 
-[Markup language](https://en.wikipedia.org/wiki/Markup_language): Mix R code with text, images, etc. in a **plain text file**
+[Markup language](https://en.wikipedia.org/wiki/Markup_language){target="_blank"}: Mix R code with text, images, etc. in a **plain text file**
 
 > "A markup language is a set of rules governing what markup information may be included in a document and how it is combined with the content of the document in a way to facilitate use by humans and computer programs."
 
@@ -68,7 +68,7 @@ Many uses for plain text files
 
 ## Hellbender
 
-[Hellbender](https://docs.itrss.umsystem.edu/pub/hpc/hellbender):
+[Hellbender](https://docs.itrss.umsystem.edu/pub/hpc/hellbender){target="_blank"}:
 
 > "Hellbender is the latest High Performance Computing (HPC) resource available to researchers and students (with sponsorship by a PI) within the UM-System."
 

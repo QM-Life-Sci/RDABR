@@ -117,7 +117,7 @@ Reproducible data analysis is a step toward reproducible research.
 ## R Markdown (`Rmd`) / Quarto (`qmd`)
 
 - Text-based markup languages (i.e., HTML)
-- Variant of [markdown](https://www.markdownguide.org/)
+- Variant of [markdown](https://www.markdownguide.org/){target="_blank"}
 - Render to different formats (PDF, HTML, Word)
 - Inline code
     - Your text and analysis coexist together in one file
@@ -281,9 +281,9 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 
 ## Examples
 
-[Hard to understand](https://github.com/Middleton-Lab/EDMA/blob/main/Ch_4_pt1.R)
+[Hard to understand](https://github.com/Middleton-Lab/EDMA/blob/main/Ch_4_pt1.R){target="_blank"}
 
-[Easier to understand](https://github.com/Middleton-Lab/binning/blob/master/R/bin.running.R)
+[Easier to understand](https://github.com/Middleton-Lab/binning/blob/master/R/bin.running.R){target="_blank"}
 
 
 # Questions {background-color="#f8c471"}
