@@ -1,0 +1,4 @@
+conservation_status_id,status,description
+LC,Least Concern,No significant threats
+VU,Vulnerable,At risk due to habitat loss
+EN,Endangered,High risk of extinction

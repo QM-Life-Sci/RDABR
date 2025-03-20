@@ -1,0 +1,203 @@
+---
+title: 'Problem Set 08'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+format:
+  html:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(modelsummary)
+
+theme_set(theme_classic())
+```
+
+## Joins
+
+You have three files that contain data on field observation of four vertebrates:
+
+- `Spp_species.csv`: Information about the species (name, family, order)
+- `Spp_conservation_status.csv`: Information about the conservation status, which is also coded in the "species" file
+- `Spp_occurrences.csv`: List of observations of animals (location, date, observer code)
+
+Ultimately we want to have a single tibble with all the observations, but including the information about species and their conservation status. To accomplish this, we will need to join them together.
+
+### Activity
+
+Import each of the files into a separate tibble. Examine the structure of each (how many observations, what the columns are, etc.)
+
+```{r}
+# FIXME
+
+Spp <- read_csv("../data/Spp_species.csv", show_col_types = FALSE)
+Cons <- read_csv("../data/Spp_conservation_status.csv", show_col_types = FALSE)
+Occ <- read_csv("../data/Spp_occurrences.csv", show_col_types = FALSE)
+
+glimpse(Spp)
+glimpse(Cons)
+glimpse(Occ)
+```
+
+Why is it preferable to store these data in three separate files rather than in one single file? This data set is small, but also consider what would happen when the data set expands (more taxa or more information about each taxon).
+
+> We only need one file for the lists of species and conservation information. Adding more species is easier this way, especially if we decide later to add additional columns to the species data. The conservation status codes should not change that much, so it's easiest to just store one file with this information.
+
+
+Because joins always take place between two tibbles, you will have to do two separate joins (i.e., join two of the tibbles together into and object and then join that with the third).
+
+Determine the best sequence for joining the data and which join or joins to use (`left_join()`, `full_join()`, and/or `inner_join()`).
+
+How many rows of data do you think you should have in the final tibble?
+
+> There are 100 rows in the observation data, so 100.
+
+```{r}
+# FIXME
+
+Spp_Cons <- full_join(Spp, Cons, by = join_by(conservation_status_id))
+
+Spp_Cons_Occ <- full_join(Occ, Spp_Cons, by = join_by(species_id))
+glimpse(Spp_Cons_Occ)
+```
+
+Check the structure of the final tibble to see if your prediction was true. If not, see if you can figure out what happened.
+
+Theoretically, you could also have a fourth file with information about the `observer`s. 
+
+At what step would it be most logical to join the observer information and to which data set would you join it?
+
+> Since `observer` only appears in the occurrence file, then either joining the observer information to occurrence before joining to the other two or as a final step would be equivalent.
+
+
+In the data, but `species_id` and `occurrence_id` are integers. Can you think of any drawbacks with this kind of coding? Can you think of any alternative?
+
+
+> It might lead to confusion when looking at the data. Species are numbered 1-4 but occurrence 1-100, so species numbers keep reappearing in the occurrence data. You could just use the full string for name as the key value for species but with an underscore rather than a space: "Falco_peregrinus". That would be unambiguous.
+
+
+## Figures, tables, captions, and writing about analyses.
+
+We now want to get some practice 
+
+Packages to install:
+
+- `kableExtra`
+- `patchwork`
+- `modelsummary`
+- `estimatr`
+- `gt`
+
+
+### Activity
+
+Pick one of the analyses that we have been using as our examples, either the OLS regression example (lion noses) or the comparison of two means (stalk-eyed flies). You have already made plots of the data, summarized the observation, carried out the linear models and run the diagnostics in previous problem sets.
+
+Below I copied several code chunks from the `Manuscript_Template.qmd` file. Replace then demo code with your code to make a figure or figures and one or more tables and summaries.
+
+Copy code you already wrote to import the data, make the plots, run the model, etc. There is no need to start over. As you work your way through, make note of the chunk options (`#|`). These are mostly self-explanatory, but the [Quarto Guide](https://quarto.org/docs/guide/) has all the details.
+
+For cross-references (i.e., automatically writing "Figure 1" or "Table 1"), one thing to note is that figure labels have to start with `fig-`, and tables labels have to start with `tbl-`.
+
+#### Figures
+
+```{r}
+#| label: fig-scatter
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-height: 3
+#| fig-width: 10
+#| fig-cap: "Scelerisque vitae sodales sapien sed lobortis mauris . Lorem erat condimentum platea risus non porta tortor nam libero. Accumsan varius magnis habitasse senectus egestas torquent porttitor praesent condimentum phasellus turpis class praesent."
+
+set.seed(361263)
+
+tibble(x = runif(200),
+       y = 2 * x + rnorm(200)) %>% 
+  ggplot(aes(x = x, y = y)) +
+  geom_point()
+
+```
+
+Write a sentence or two describing the plot that includes a cross-reference to your figure.
+
+> 
+
+
+#### Tables
+
+Make a data table of your choosing. This can be just a table of the raw data or it can be a summary table of the observations from `modelsummary`.
+
+```{r}
+#| label: tbl-example
+#| echo: false
+#| warning: false
+#| message: false
+#| tbl-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
+
+set.seed(873624)
+
+n <- 100
+d <- tibble(Group = factor(rep(letters[1:5], each = n)),
+            Count = rpois(5 * n, lambda = 3))
+
+dd_tab <- table(d)
+
+row.names(dd_tab) <- paste("Group", letters[1:5])
+
+knitr::kable(dd_tab,
+             booktabs = TRUE)
+```
+
+
+Create a results table for the linear model using `modelsummary()`.
+
+```{r}
+#| label: tbl-model_summary
+#| echo: false
+#| warning: false
+#| message: false
+#| tbl-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
+
+
+```
+
+Create a model plot for the linear model using `modelplot()`.
+
+```{r}
+#| label: fig-model_plot
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
+
+
+```
+
+
+#### Writing about analyses
+
+Finally, try writing the text that would describe the methods and results. You can add cross-references to the figure(s) and table(s). These do not have to be long. Often a sentence or two is sufficient. There is no single best way to write results.
+
+Write your statistics methods:
+
+> 
+
+
+Write your data summary results (n, mean, SEM/sd, etc.):
+
+> 
+
+
+Write your statistical results:
+
+> 
+
