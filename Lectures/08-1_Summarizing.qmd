@@ -26,6 +26,8 @@ knitr:
 library(tidyverse)
 library(purrr)
 library(gt)
+library(modelsummary)
+library(estimatr)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -113,25 +115,27 @@ Don't memorize this.
 
 *Robust*: Not biased despite violations of assumptions
 
-*Biased*: More or less significant results than expected
+*Biased*: Larger or smaller proportion of significant results than expected when the null hypothesis is true (no difference, slope of 0).
 
 :::{.center}
 :::{.alert}
-Don't panic when diagnotic tests report problems.
+Don't panic when diagnostic tests report "problems". Investigate to understand.
 :::
 :::
 
 
 ## Convincing ourselves by simulation
 
-- n = 10
+- 2 groups; n = 10 in each
 - Means and standard deviations are equal
 - Calculate difference and *P*-value
 
 ```{r}
+#| cache: true
+
 set.seed(145784)
 
-iter <- 10000
+iter <- 100000
 
 d <- numeric(length = iter)
 P <- numeric(length = iter)
@@ -241,16 +245,17 @@ pmap_dbl(.l = D,
 - 4x difference: ~6.1%
 - 16x difference: ~6.5%
 
-What does this mean if P = 0.048? Or P = 0.0000048?
+What does this mean if the observed *P*-value is 0.048? Or if *P* = 0.0000048?
 
 
 ## Using Welch's Correction
 
 ```{r}
 #| echo: true
+#| cache: true
 
 set.seed(234978)
-t_tester_welch <- function(m1, m2, sd1, sd2, ss = 10, niter = 10000) {
+t_tester_welch <- function(m1, m2, sd1, sd2, ss = 10, niter = 100000) {
   ps <- logical(length = niter)
   for (jj in 1:niter) {
     mod <- t.test(rnorm(ss, m1, sd1),
@@ -357,8 +362,8 @@ ggplot(STB_correct, aes(Forewing_area, Hindwing_area)) +
 ## Relational Data
 
 - Try not to store redundant data (same data in multiple files) - prone to errors and mismatches
-- Compartmentalize datasets
-- Join them together via one or more columns containing values that connect one dataset to each other
+- Compartmentalize data sets
+- Join them together via one or more columns containing values that connect one data set to each other
 
 Relations are always built between pairs of tables. 
 
@@ -593,6 +598,8 @@ WR |> filter(ID == "574717-YOO")
 
 - `stargazer`, `sjPlot`, `flextable`
 - `knitr`, `kableExtra`, `gt`
+
+. . .
 
 [`modelsummary` works well](https://modelsummary.com/)^[Also install `estimatr`]
 
