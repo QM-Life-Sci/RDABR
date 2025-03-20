@@ -15,7 +15,7 @@ format:
 #| message: false
 #| warning: false
 
-
+library(tidyverse)
 ```
 
 ## Joins
@@ -108,7 +108,7 @@ For cross-references (i.e., automatically writing "Figure 1" or "Table 1"), one 
 set.seed(361263)
 
 tibble(x = runif(200),
-       y = 2 * x + rnorm(200)) %>% 
+       y = 2 * x + rnorm(200)) |> 
   ggplot(aes(x = x, y = y)) +
   geom_point()
 
