@@ -1,0 +1,101 @@
+occurrence_id,species_id,location,date,observer
+1,3,Rocky Mountains,2022-11-14,O_001
+2,1,Amazon,2021-09-22,O_002
+3,3,Everglades,2022-06-11,O_003
+4,3,Rocky Mountains,2022-05-25,O_003
+5,3,Siberia,2023-04-04,O_001
+6,1,Kruger Park,2022-02-10,O_004
+7,1,Grand Canyon,2022-10-31,O_004
+8,4,Yellowstone,2023-05-20,O_001
+9,4,Serengeti,2021-03-07,O_005
+10,1,Grand Canyon,2022-10-25,O_006
+11,1,Grand Canyon,2020-02-14,O_007
+12,1,Rocky Mountains,2023-10-14,O_005
+13,1,Grand Canyon,2023-04-28,O_002
+14,1,Grand Canyon,2021-03-15,O_008
+15,2,Serengeti,2023-02-05,O_008
+16,4,Kruger Park,2022-06-28,O_009
+17,3,Amazon,2020-06-12,O_003
+18,4,Siberia,2020-06-04,O_008
+19,2,Everglades,2020-02-21,O_001
+20,3,Kruger Park,2022-10-10,O_007
+21,1,Yellowstone,2021-01-06,O_002
+22,4,Serengeti,2023-03-25,O_006
+23,1,Amazon,2022-09-22,O_003
+24,3,Galápagos,2021-02-21,O_003
+25,1,Himalayas,2024-01-05,O_007
+26,3,Amazon,2021-11-12,O_010
+27,3,Himalayas,2020-06-22,O_007
+28,1,Siberia,2024-01-04,O_003
+29,1,Kruger Park,2021-06-08,O_004
+30,1,Serengeti,2021-01-27,O_010
+31,3,Siberia,2023-09-19,O_006
+32,3,Himalayas,2023-12-18,O_003
+33,3,Siberia,2023-08-05,O_001
+34,2,Kruger Park,2023-01-25,O_007
+35,1,Everglades,2023-02-06,O_009
+36,4,Himalayas,2023-11-22,O_006
+37,2,Grand Canyon,2022-07-12,O_008
+38,3,Siberia,2020-03-25,O_010
+39,3,Siberia,2022-10-05,O_005
+40,4,Himalayas,2020-05-11,O_007
+41,1,Kruger Park,2020-02-15,O_010
+42,2,Serengeti,2020-11-30,O_006
+43,1,Grand Canyon,2020-05-13,O_003
+44,1,Amazon,2021-07-28,O_003
+45,2,Serengeti,2020-08-26,O_010
+46,4,Himalayas,2024-01-22,O_008
+47,2,Grand Canyon,2020-03-27,O_009
+48,4,Himalayas,2022-11-02,O_001
+49,4,Yellowstone,2022-06-06,O_003
+50,3,Grand Canyon,2020-12-06,O_006
+51,2,Amazon,2023-09-28,O_009
+52,4,Kruger Park,2020-04-01,O_004
+53,4,Everglades,2021-08-22,O_010
+54,1,Grand Canyon,2021-09-04,O_007
+55,2,Himalayas,2022-11-27,O_005
+56,4,Galápagos,2023-04-16,O_009
+57,3,Grand Canyon,2020-08-12,O_005
+58,4,Everglades,2022-09-04,O_009
+59,3,Yellowstone,2022-05-22,O_009
+60,4,Amazon,2021-06-27,O_008
+61,1,Siberia,2020-05-17,O_004
+62,2,Rocky Mountains,2022-02-28,O_001
+63,1,Yellowstone,2023-04-07,O_001
+64,2,Grand Canyon,2023-04-14,O_009
+65,2,Serengeti,2020-12-04,O_005
+66,1,Rocky Mountains,2023-08-06,O_003
+67,1,Yellowstone,2021-12-22,O_002
+68,1,Himalayas,2021-12-17,O_008
+69,3,Kruger Park,2021-09-05,O_005
+70,4,Siberia,2023-07-27,O_005
+71,3,Amazon,2020-01-16,O_003
+72,1,Grand Canyon,2023-01-20,O_003
+73,2,Himalayas,2021-06-21,O_005
+74,4,Rocky Mountains,2023-08-13,O_004
+75,1,Galápagos,2023-07-29,O_007
+76,4,Siberia,2023-08-12,O_002
+77,2,Himalayas,2022-03-16,O_010
+78,1,Everglades,2022-12-25,O_004
+79,4,Galápagos,2022-02-14,O_009
+80,1,Himalayas,2023-03-13,O_010
+81,4,Grand Canyon,2021-02-25,O_006
+82,1,Himalayas,2020-03-30,O_005
+83,1,Serengeti,2022-10-01,O_009
+84,3,Yellowstone,2023-10-28,O_003
+85,1,Rocky Mountains,2021-10-16,O_010
+86,4,Serengeti,2022-01-13,O_002
+87,3,Everglades,2023-06-19,O_008
+88,2,Rocky Mountains,2022-07-15,O_001
+89,4,Himalayas,2023-12-03,O_006
+90,2,Siberia,2020-06-13,O_004
+91,2,Amazon,2023-08-06,O_008
+92,4,Kruger Park,2022-08-03,O_001
+93,4,Amazon,2020-01-29,O_001
+94,1,Grand Canyon,2021-04-21,O_006
+95,3,Amazon,2023-09-20,O_007
+96,2,Grand Canyon,2021-11-12,O_004
+97,1,Rocky Mountains,2021-01-12,O_004
+98,2,Rocky Mountains,2023-08-25,O_002
+99,4,Serengeti,2021-11-29,O_001
+100,1,Everglades,2023-08-22,O_005

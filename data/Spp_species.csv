@@ -1,0 +1,5 @@
+species_id,name,family,order,conservation_status_id
+1,Panthera leo,Felidae,Carnivora,VU
+2,Ursus arctos,Ursidae,Carnivora,EN
+3,Falco peregrinus,Falconidae,Falconiformes,LC
+4,Rana temporaria,Ranidae,Anura,VU
