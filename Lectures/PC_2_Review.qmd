@@ -256,14 +256,37 @@ What are the steps?
 > Should we be able to identify statistical tests that are best for different types of questions at this point? (Ex: when to use t-distribution vs. normal distribution)
 
 
+## Where do distributions show up?
+
+- Outcome variables
+- Predictor variables
+- Test statistics
+
+
 ## Distributions we have encountered
 
 - Binomial (globe-tossing water vs. land; heads and tails; alleles)
 - Uniform (simulating data)
 - Normal/Gaussian (lots of biology; Lecture 3-1)
+    - Outcome variables
+    - Predictor variables
 - *t* (confidence intervals; hypothesis tests for linear models)
 
 Brief mentions of $F$ and $\chi^2$ (more soon)
+
+
+## Brief digression
+
+Other distributions of outcome variables:
+
+- Binomial
+- Multinomial (e.g., Likert scales)
+- Poisson
+- etc.
+
+Require a different (related) model: *Generalized* Linear Model
+
+- Don't use *t*-distribution for hypothesis tests
 
 
 ## What is the *t*-distrbution?
