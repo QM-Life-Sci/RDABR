@@ -347,3 +347,4 @@ is a general equation that can be used to test any null hypothesized parameter e
 ## $t$-distribution in practice
 
 - Some example linear models with penguins data
+- Potentially useful: [Easystats report](https://easystats.github.io/report/)
