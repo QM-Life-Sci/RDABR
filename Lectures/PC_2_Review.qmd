@@ -1,0 +1,326 @@
+---
+title: "PC 2 Review"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(modelsummary)
+library(estimatr)
+library(palmerpenguins)
+
+theme_set(theme_classic(base_size = 20))
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- Micropublication dataset due Thursday
+- 4/15: Plan due
+    - Question
+    - Dataset
+    - Figure plan
+    - Analysis ideas
+- Review / questions
+
+
+## Tibbles and Tribbles
+
+> What is a tribble? This is used toward the end of the lecture for 6-1 (around line 967)
+
+```
+gall <- tribble(
+  ~ group, ~ y, ~ x, ~ Effect, ~ P, ~ Significant,
+  "g1", 1,  0.01, 0.31,  0.050, "*",
+  "g1", 1,  0.31, 0.31,  0.050, "*",
+  "g1", 1,  0.61, 0.31,  0.050, "*",
+  
+  "g2", 2,  0.08, 0.10,  0.008, "*",
+  "g2", 2,  0.10, 0.10,  0.008, "*",
+  "g2", 2,  0.12, 0.10,  0.008, "*",
+  ...
+```
+
+
+## Making Decisions
+
+```{r}
+#| echo: true
+#| output-location: slide
+#| fig-align: center
+
+gall <- tribble(
+  ~ group, ~ y, ~ x, ~ Effect, ~ P, ~ Significant,
+  "g1", 1,  0.01, 0.31,  0.050, "*",
+  "g1", 1,  0.31, 0.31,  0.050, "*",
+  "g1", 1,  0.61, 0.31,  0.050, "*",
+  
+  "g2", 2,  0.08, 0.10,  0.008, "*",
+  "g2", 2,  0.10, 0.10,  0.008, "*",
+  "g2", 2,  0.12, 0.10,  0.008, "*",
+  
+  "g3", 3,  0.64, 0.72,  0.001, "*",
+  "g3", 3,  0.72, 0.72,  0.001, "*",
+  "g3", 3,  0.80, 0.72,  0.001, "*",
+
+  "g4", 4,  0.00, 0.31,  0.310, "NS",
+  "g4", 4,  0.31, 0.31,  0.310, "NS",
+  "g4", 4,  0.62, 0.31,  0.310, "NS",
+  
+  "g5", 5, -0.18, 0.09,  0.700, "NS",
+  "g5", 5,  0.09, 0.09,  0.700, "NS",
+  "g5", 5,  0.36, 0.09,  0.700, "NS",
+  
+  "g6", 6,  0.32, 0.47,  0.005, "NS",
+  "g6", 6,  0.32, 0.47,  0.005, "NS",
+  "g6", 6,  0.32, 0.47,  0.005, "NS",
+  
+  "g7", 7,  0.04, 0.40,  0.020, "*",
+  "g7", 7,  0.44, 0.40,  0.020, "*",
+  "g7", 7,  0.84, 0.40,  0.020, "*",
+  
+  "g8", 8,  0.10, 0.18,  0.010, "*",
+  "g8", 8,  0.18, 0.18,  0.010, "*",
+  "g8", 8,  0.26, 0.18,  0.010, "*",
+  
+  "g9", 9, -0.05, 0.44,  0.200, "NS",
+  "g9", 9,  0.44, 0.44,  0.200, "NS",
+  "g9", 9,  0.93, 0.44,  0.200, "NS"
+)
+
+bks <- -log10(c(0.001, 0.01, 0.05, 0.2, 0.5))
+lbs <- c(0.001, 0.01, 0.05, 0.2, 0.5)
+
+dec.plot <- ggplot(gall, aes(x,y, group = group, color = -log10(P))) +
+  geom_rect(xmin = -0.4, xmax = 0.2, ymin = 0, ymax = 12,
+            fill = "lightgoldenrod", color = "lightgoldenrod") +
+  geom_rect(xmin = 0.2, xmax = 0.5, ymin = 0, ymax = 12,
+            fill = "grey", color = "grey") +
+  geom_rect(xmin = 0.5, xmax = 1.5, ymin = 0, ymax = 12,
+            fill = "thistle", color = "thistle") +
+  geom_vline(xintercept = 0, linetype = "dotted", color = "grey30") +
+  geom_line(linewidth = 3) +
+  geom_point(data=gall, aes(Effect,y,color = -log10(P)), size = 5) +
+  xlim(c(-0.2, 1)) +
+  ylab("Experiment") +
+  xlab("Standardized Effect Size") +
+  scale_color_gradient(breaks = bks, labels = lbs,
+                       low = "black", high = "red", name = "P-value") +
+  annotate("text", x = 0, y = 10.5, label = "Not Biologicaly\nMeaningful",
+           size = 6) +
+  annotate("text", x = 0.35, y = 10.5, label = "Uncertain",
+           size = 6) +
+  annotate("text", x = 0.75, y = 10.5,
+           label = "Clearly Biologicaly\nMeaningful",
+           size = 6) +
+  ylim(c(1,11)) +
+  theme(axis.text.y = element_blank(), text = element_text(size = 20),
+        axis.ticks.y = element_blank())
+
+dec.plot
+```
+
+
+## `tibble()`
+
+- Create column by column
+
+```{r}
+#| echo: true
+
+t1 <- tibble(x = 1:3,
+             y = c(1.2, 4, 8.11),
+             z = letters[1:3])
+t1
+class(t1)
+```
+
+
+## `tribble()`
+
+- Create row by row
+- First row is the column names `~ Column1, ~ Column2`
+- Rows added sequentially
+
+```{r}
+#| echo: true
+
+t2 <- tribble(~ x, ~ y, ~ z,
+              1, 1.2, "a",
+              2, 4, "b",
+              3, 8.11, "c")
+t2
+class(t2)
+```
+
+- Practical only for very small datasets
+
+
+## Loops
+
+- What do I want to accomplish?
+- Think through the steps
+- Set up one iteration
+
+
+## Convincing ourselves by simulation
+
+- 2 groups; n = 10 in each
+- Means and standard deviations are equal
+- Calculate difference and *P*-value
+
+```{r}
+set.seed(145784)
+
+iter <- 1000
+
+d <- numeric(length = iter)
+P <- numeric(length = iter)
+
+for (ii in 1:iter) {
+  x1 <- rnorm(n = 10, mean = 0, sd = 1)
+  x2 <- rnorm(n = 10, mean = 0, sd = 1)
+  d[ii] <- mean(x1) - mean(x2)
+  
+  fm <- t.test(x1, x2, var.equal = TRUE)
+  P[ii] <- fm$p.value
+}
+```
+
+
+## Palmer penguins
+
+`palmerpenguins` data: [https://allisonhorst.github.io/palmerpenguins/](https://allisonhorst.github.io/palmerpenguins/)
+- [Palmer Station Antarctica Long Term Ecological Research Network (LTER)](https://pallter.marine.rutgers.edu/)
+
+```{r}
+#| echo: true
+
+library(palmerpenguins)
+glimpse(penguins)
+```
+
+
+## Penguin body mass
+
+```{r}
+ggplot(penguins |> drop_na(body_mass_g),
+       aes(body_mass_g)) +
+  geom_histogram(bins = 30) +
+  geom_vline(xintercept = mean(penguins$body_mass_g, na.rm = TRUE),
+             color = "pink",
+             linewidth = 2) +
+  labs(x = "Body Mass (g)", y = "Count")
+```
+
+
+## Resampled body mass: Using the law of large numbers
+
+- If we take the mean of means from repeated samples, we will get an approximation of the true mean.
+- Less sensitive to extreme values and deviations from normality
+- Ignoring sex and species (for now)
+
+
+## How to proceed?
+
+What are the steps?
+
+
+```{r}
+#| echo: true
+
+
+```
+
+
+
+## Distributions, tests, and *t*
+
+> Can we go back over t-statistic?
+
+> Should we be able to identify statistical tests that are best for different types of questions at this point? (Ex: when to use t-distribution vs. normal distribution)
+
+
+## Distributions we have encountered
+
+- Binomial (globe-tossing water vs. land; heads and tails; alleles)
+- Uniform (simulating data)
+- Normal/Gaussian (lots of biology; Lecture 3-1)
+- *t* (confidence intervals; hypothesis tests for linear models)
+
+Brief mentions of $F$ and $\chi^2$ (more soon)
+
+
+## What is the *t*-distrbution?
+
+```{r}
+#| echo: false
+#| warning: false
+#| fig-height: 5
+#| fig-align: center
+
+x <- seq(-4, 4, by = 0.01)
+
+sim <- tibble(df = c(2, 5, 20)) |>
+  group_by(df) |>
+  do(tibble(x = x, y = dt(x, .$df))) |>
+  mutate(Parameters = paste0("df = ", df)) |>
+  ungroup() |>
+  mutate(Parameters = factor(Parameters, levels = unique(Parameters)))
+
+norm <- tibble(
+  x = x,
+  y = dnorm(x, 0, 1))
+
+pal <- palette()[2:4]
+
+ggplot() +
+  geom_line(data = norm, aes(x, y), linewidth = 3) +
+  geom_line(data = sim, aes(x, y, color = Parameters), linewidth = 1.5) +
+  scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
+  labs(x = "t", y = "Relative Likelihood") +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.85, 0.75))
+```
+
+
+## What is the (Student's) *t*-distrbution?
+
+- [No (?) real-world data follow a *t*-distribution]
+- Like a normal but more general
+    - *t*-distribution with df = $\infty$ == standard normal distribution
+- Used often when trying to estimate an unknown parameter
+    - e.g., confidence interval
+    - Degrees of freedom incorporate uncertainty
+    - Low n $\rightarrow$ small df $\rightarrow$ high uncertainty 
+
+
+## Testing different hypotheses
+
+$$t = \frac{\theta - \theta_{null}}{\mbox{SE}_{\theta}}$$
+
+is a general equation that can be used to test any null hypothesized parameter estimate.
+
+- $\theta$ is the parameter estimate
+- $\theta_{null}$ is the null hypothesized value
+    - often and by default $\theta_{null} = 0$
+
+
+## $t$-distribution in practice
+
+- Some example linear models with penguins data
