@@ -203,6 +203,14 @@ for (ii in 1:iter) {
 ```
 
 
+## Adding mutated data
+
+> How to you permanently add a mutation to a file?
+
+- In an R Session
+- Writing out a new file
+
+
 ## Palmer penguins
 
 `palmerpenguins` data: [https://allisonhorst.github.io/palmerpenguins/](https://allisonhorst.github.io/palmerpenguins/)
