@@ -110,26 +110,58 @@ For cross-references (i.e., automatically writing "Figure 1" or "Table 1"), one 
 #### Figures
 
 ```{r}
-#| label: fig-scatter
+#| label: fig-LAscatter
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-height: 3
-#| fig-width: 10
-#| fig-cap: "Scelerisque vitae sodales sapien sed lobortis mauris . Lorem erat condimentum platea risus non porta tortor nam libero. Accumsan varius magnis habitasse senectus egestas torquent porttitor praesent condimentum phasellus turpis class praesent."
+#| fig-height: 5
+#| fig-width: 6
+#| fig-cap: "Scatterplot of lion age (y) vs. the proportion of black coloration in the lion's nose (range 0-1). The gray line shows the ordinary least squares regression."
 
-set.seed(361263)
+LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
 
-tibble(x = runif(200),
-       y = 2 * x + rnorm(200)) %>% 
-  ggplot(aes(x = x, y = y)) +
-  geom_point()
-
+ggplot(LA, aes(y = age, x = proportion.black)) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "gray") +
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14) +
+  labs(x = "Proportion Black", y = "Age (y)")
 ```
 
 Write a sentence or two describing the plot that includes a cross-reference to your figure.
 
-> 
+> We measured the proportion of black coloration in the nose of n = `r nrow(LA)` lions whose ages were known from previous observation (@fig-LAscatter).
+
+
+```{r}
+#| label: fig-Stalkscatter
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-height: 5
+#| fig-width: 6
+#| fig-cap: "Eyespan measured in stalk-eyed flies raised on two different food treatments: corn and cotton. The gray points are individual observations (jittered to remove overplotting), and the purple points are group means with +1 SEM error bars."
+
+stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |> 
+  mutate(food_source = factor(food_source))
+
+ggplot(stalk, aes(x = food_source, y = eye_span)) +
+  geom_point(position = position_jitter(width = 0.2, seed = 423479),
+             size = 2, alpha = 0.25, pch = 16) +
+  stat_summary(fun = mean,
+               geom = "point",
+               size = 3, color = "purple") + 
+  stat_summary(fun.data = mean_se,
+               geom = "errorbar",
+               width = 0.1,
+               linewidth = 1,
+               color = "purple") +
+  labs(x = "Food Source", y = "Eye Span (mm)")
+```
+
+Write a sentence or two describing the plot that includes a cross-reference to your figure.
+
+> We measured eyespan (to the nearest 0.01 mm) in stalk-eyed flies that were raised on one of two food treatments: corn (n = `r nrow(stalk |> filter(food_source == "Corn"))`) or cotton (n = `r nrow(stalk |> filter(food_source == "Cotton"))`). All data and summary values are shown in @fig-Stalkscatter.
 
 
 #### Tables
@@ -137,48 +169,101 @@ Write a sentence or two describing the plot that includes a cross-reference to y
 Make a data table of your choosing. This can be just a table of the raw data or it can be a summary table of the observations from `modelsummary`.
 
 ```{r}
-#| label: tbl-example
+#| label: tbl-LA
 #| echo: false
 #| warning: false
 #| message: false
-#| tbl-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
+#| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
 
-set.seed(873624)
+datasummary_skim(LA |> 
+                   rename(`Age (y)` = age,
+                          `Proportion Black` = proportion.black),
+                 fun_numeric = list(n = N,
+                                    `Missing Pct.` = PercentMissing,
+                                    Mean = Mean, SD = SD,
+                                    Min = Min, Median = Median,
+                                    Max = Max),
+                 output = "tinytable",
+                 type = "numeric")
+```
 
-n <- 100
-d <- tibble(Group = factor(rep(letters[1:5], each = n)),
-            Count = rpois(5 * n, lambda = 3))
 
-dd_tab <- table(d)
+```{r}
+#| label: tbl-stalk
+#| echo: false
+#| warning: false
+#| message: false
+#| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
 
-row.names(dd_tab) <- paste("Group", letters[1:5])
-
-knitr::kable(dd_tab,
-             booktabs = TRUE)
+stalk_tbl <- stalk |> 
+  rename(`Food Source` = food_source,
+         `Eyespan (mm)` = eye_span)
+datasummary_balance(~ 1,
+                    data = stalk_tbl)
 ```
 
 
 Create a results table for the linear model using `modelsummary()`.
 
 ```{r}
-#| label: tbl-model_summary
+#| label: tbl-model_summary_LA
 #| echo: false
 #| warning: false
 #| message: false
-#| tbl-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
+#| tbl-cap: "Summary statistical table for the linear model predicting lion age by proportion of black nose coloration."
 
+fm_LA <- lm(age ~ proportion.black, data = LA)
+modelsummary(list("Age ~ Proportion Black" = fm_LA),
+             estimate = "{estimate} ({conf.low}, {conf.high})",
+             statistic = c("t = {statistic}",
+                           "df = {df.error}",
+                           "p = {p.value}"),
+             gof_omit = ".*",
+             fmt = 2)
+```
+
+```{r}
+#| label: tbl-model_summary_stalk
+#| echo: false
+#| warning: false
+#| message: false
+#| tbl-cap: "Summary statistical table for the linear model predicting eyespan in stalk-eyed flies by food source."
+
+
+fm_stalk <- lm(eye_span ~ food_source, data = stalk)
+
+modelsummary(list("Eyespan ~ Food Source" = fm_stalk),
+             estimate = "{estimate} ({conf.low}, {conf.high})",
+             statistic = c("t = {statistic}",
+                           "df = {df.error}",
+                           "p = {p.value}"),
+             gof_omit = ".*",
+             fmt = 2)
 
 ```
 
 Create a model plot for the linear model using `modelplot()`.
 
 ```{r}
-#| label: fig-model_plot
+#| label: fig-model_plot_LA
 #| echo: false
 #| warning: false
 #| message: false
-#| fig-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
+#| fig-cap: "Coefficient plot for the linear model predicting lion age by proportion of black nose coloration."
 
+modelplot(fm_LA)
+
+```
+
+
+```{r}
+#| label: fig-model_plot_stalk
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "Coefficient plot for the linear model predicting eyespan in stalk-eyed flies by food source."
+
+modelplot(fm_stalk)
 
 ```
 
@@ -191,13 +276,19 @@ Write your statistics methods:
 
 > 
 
+> 
+
 
 Write your data summary results (n, mean, SEM/sd, etc.):
 
 > 
 
+> 
+
 
 Write your statistical results:
+
+> 
 
 > 
 
