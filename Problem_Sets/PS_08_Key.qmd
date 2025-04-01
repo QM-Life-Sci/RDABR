@@ -7,6 +7,7 @@ format:
     toc: true
     toc_depth: 4
     toc_float: true
+    embed-resources: true
 ---
 
 ```{r}
@@ -195,11 +196,8 @@ datasummary_skim(LA |>
 #| message: false
 #| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
 
-stalk_tbl <- stalk |> 
-  rename(`Food Source` = food_source,
-         `Eyespan (mm)` = eye_span)
-datasummary_balance(~ 1,
-                    data = stalk_tbl)
+datasummary_balance(~ food_source,
+                    data = stalk)
 ```
 
 
@@ -274,21 +272,21 @@ Finally, try writing the text that would describe the methods and results. You c
 
 Write your statistics methods:
 
-> 
+> To determine the extent to which lion age can be predicted from an image of the nose (@fig-LAscatter; n = `r nrow(LA)`), we fit a linear model in which lion age is modeled by proportion of black coloration in the nose: age ~ proportion black.
 
-> 
+> To determine the effect of rearing diet on eyespan in stalk-eyed flies, we used a linear model comparing mean eyespan in two diet treatments (@fig-fig-Stalkscatter): corn and cotton. 
 
 
 Write your data summary results (n, mean, SEM/sd, etc.):
 
-> 
+> The mean age of lions in the sample was 4.3 y (sd = 2.7; range: 1.1 - 13.1) and the mean proportion of black coloration was 0.3 (sd = 0.2; range: 0.1 - 0.8), summarized in @tbl-LA.
 
-> 
+> The observed data are summariezed in @tbl-stalk. Mean eyespan in the corn treatment (n = `r nrow(stalk |> filter(food_source == "Corn"))`) was 2.0 mm (sd = 0.1). In the cotton (n = `r nrow(stalk |> filter(food_source == "Cotton"))`) treatment it was 1.5 mm (sd = 0.3). The mean difference between the treatments was 0.5 mm (SE = 0.1), with corn larger than cotton.
 
 
 Write your statistical results:
 
-> 
+> Results of the linear model predicting lion's age from proportion black in the nose showed a significant positive slope in which age increases 10.65 y (95% CI: 7.6 - 13.7) for each unit of increase in proportion black (t~30~ = 7.05; P < 0.001; @tbl-model_summary_LA; @fig-model_plot_LA).
 
-> 
+> Results of the linear model predicting eyespan by diet treatment showed a significant difference in mean eyespan between the two groups (t~43~ = 7.9; P < 0.001; @tbl-model_summary_stalk). Flies raised in cotton have eyespan, on average, 0.5 mm narrower than those raised on corn (95% CI of the difference: 0.37 - 0.63; @fig-model_plot_stalk).
 
