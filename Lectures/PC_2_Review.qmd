@@ -297,7 +297,7 @@ Require a different (related) model: *Generalized* Linear Model
 - Don't use *t*-distribution for hypothesis tests
 
 
-## What is the *t*-distrbution?
+## What is the *t*-distribution?
 
 ```{r}
 #| echo: false
