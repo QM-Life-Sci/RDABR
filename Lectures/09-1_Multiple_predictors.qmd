@@ -1,0 +1,1199 @@
+---
+title: "Unit 9: Multiple predictors"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(performance)
+library(multcomp)
+library(readxl)
+library(GGally)
+library(wesanderson)
+library(ggrepel)
+library(ggforce)
+library(plotly)
+
+source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R")
+
+theme_set(theme_classic(base_size = 20))
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- PC 2 check-in
+    - Due Thursday. Let me know if you need more time.
+- Data sources for micropublication
+    - [Dryad](https://datadryad.org/)
+    - [Figshare](https://figshare.com/browse)
+    - [Zenodo](https://zenodo.org/)
+    - [List of repositories](https://www.nature.com/sdata/policies/repositories)
+
+
+# Linear models as flexible prediction tools {background-color="#40666e"}
+
+## Review of kinds of predictors
+
+Categorical (2 or more groups)
+
+- Mean difference *change* for 0 $\rightarrow$ 1 change in group
+- Move the "intercept"
+
+Continuous
+
+- Change in outcome variable ($y$) for a 1 unit increase in the predictor
+- Change the "slope"
+
+:::{.center}
+:::{.alert}
+Note: this is *not* the outcome variable
+:::
+:::
+
+
+## Complex linear models
+
+$$\mbox{Outcome variable} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
+
+- One predictor is common
+- More than one predictor is common
+    - "Multiple regression"
+
+Similarities to models we have studied and new concerns
+
+
+## Red Deer on the Isle of Rum
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](https://i.imgur.com/5Y8u3wP.png){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+![](https://i.imgur.com/mUi9ker.png){fig-align="center"}
+:::
+
+::::
+
+
+## How will the population change over time?
+
+![](https://i.imgur.com/bIRba8Q.jpg){fig-align="center" width="100%"}
+
+
+## How will the population change over time?
+
+:::: {.columns}
+
+::: {.column width="60%"}
+![](https://i.imgur.com/JFdrljB.png){fig-align="center"}
+:::
+  
+::: {.column width="40%"}
+- What factors influence juvenile survival?
+- Changing climate
+- Changing timing of reproduction
+:::
+  
+::::
+
+  
+## Prediction
+
+$$Yearling~Survival \sim Date~of~Birth$$
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+tx <- "
+x, y
+1.0305064815074054, 0.8733454777138653
+1.3630764061931293, 0.8624783509965273
+1.7373967578464038, 0.8534867234401501
+2.050211383934821, 0.843848990909662
+2.356709690063555, 0.8350727316779885
+2.6403169359128706, 0.825735617434066
+2.9256712489850774, 0.8171343449662141
+3.215863594366828, 0.8099733481698179
+3.4913178598426517, 0.7998465500686487
+3.753557129658146, 0.7898184624496352
+4.0944144245037375, 0.7758823371052703
+4.401450289777976, 0.7641223292084317
+4.735408908922922, 0.7505361773917101
+5.036531623596606, 0.7394536823496685
+5.363457177254529, 0.7238349919685563
+5.696385474703923, 0.711262866013981
+5.976229806534703, 0.697999766684315
+6.299571632555925, 0.6815106293241922
+6.517955035417308, 0.6713299891418469
+6.7557353641123274, 0.6583361002180604
+7.0701178710418, 0.6444044617137934
+7.3157376039421, 0.6296068630706139
+7.528252652798387, 0.6187666573938638
+7.761822101520284, 0.6048664267702828
+7.998034549374247, 0.5929897610308964
+8.234023014250916, 0.5808124770049445
+8.455810958367163, 0.567782693360374
+8.674821513564968, 0.5548920017588413
+9.010168827169135, 0.5334808008112207"
+
+DD <- read_csv(file = tx, show_col_types = FALSE) |> 
+  rename(Date = x, Survival = y)
+
+fm <- lm(Survival ~ poly(Date, degree = 2), data = DD)
+Pred <- tibble(Date = seq(min(DD$Date),
+                          max(DD$Date), length.out = 100))
+Pred <- Pred |> 
+  mutate(Pred = predict(fm, newdata = Pred))
+
+date_labs <- seq(ymd('2012-05-25'),
+                                  ymd('2012-07-20'),
+                                  by = '1 week') |> 
+  str_remove("2012-")
+
+ggplot() +
+  geom_line(data = Pred, aes(Date, Pred),
+            linewidth = 1.5, color = "steelblue") +
+  scale_y_continuous(limits = c(0.5, 1)) +
+  scale_x_continuous(limits = c(1, 9),
+                     breaks = 1:9,
+                     labels = date_labs) +
+  labs(x = "Date of Birth",
+       y = "Yearling Survival") +
+  theme(axis.title = element_text(face = "bold"))
+```
+
+
+## Possible additional predictors
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- Birth date  
+- Birth mass
+- Year
+- Sex
+- Maternal fecundity
+- Maternal reproductive status
+:::
+  
+::: {.column width="50%"}
+- Maternal age
+- Population size
+- Temperature (min, max, mean, etc.)
+- Rainfall
+- Wind speed
+- ...
+:::
+  
+::::
+
+
+## Issues with multiple predictors
+
+1. How are my predictors related to *each other*?
+    - Correlations *between* predictors
+    - Predictors interacting with one another
+    - Predictors masking the effects of one another
+2. Which predictors should I include?
+    - Model too specific
+    - Model too general
+    - Model just right
+
+
+## General form for linear models
+
+Multiple predictors:
+
+$$Y = \theta_0 + \theta_1 X_1 + \theta_2 X_2 + \dots + \theta_k X_k$$
+
+- $X_k$  are some combination of continuous and categorical predictors.
+- $\theta_0$ is the intercept term (optional), the value when all other $\theta_k = 0$.
+- $\theta_k$ are the parameter estimates for the $X$.
+
+
+## No kitchen sink approach to modeling
+
+Don't put everything in the model and see what falls out
+
+- Model will be too specific
+- Predictors modify each others' effect on the outcome
+- "Causal Salad" (Richard McElreath)
+
+![](https://bigthink.com/wp-content/uploads/2018/08/origin-137.jpg){fig-align="center"}
+
+
+# Prediction with categorical variables {background-color="#40666e"}
+
+## Prediction with categorical variables
+
+We have done prediction with only two groups (levels)
+
+- Are the means different?
+- Horned lizards example
+
+Now predict with *three or more* groups
+
+- Is *at least* one mean different?
+    - Are the means *not different* than one another?
+- Then, *which* mean(s) is/are different
+
+
+## Does bright light treatment alleviate jet lag symptoms?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](https://i.imgur.com/X8kUEJq.jpg){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+- 3 groups
+    - No light (control)
+    - Bright light in knees (control)
+    - Bright light in eyes
+- Outcome
+    - Shift in circadian pattern (hours)
+:::
+
+::::
+
+
+## Linear Model: Multiple Categories
+
+A more general version of the two means comparison:
+
+- H~0~: $\mu_{1}=\mu_{2}=\mu_{3}\dots=\mu_{k}$
+- H~A~: At least one mean is different
+    - We won't know which yet
+- "One-way ANOVA": a single categorical variable
+
+
+## "Analysis of *Variance* (ANOVA)"
+
+Given the total observed variability in *Y*:
+
+1. Part explained by group membership
+1. Part remains unexplained ("error" or "residual")
+
+The test statistic (*F*) is the ratio of the two:
+
+$$
+F = \frac{Variation~explained~by~group}{Unexplained~variation}
+$$
+
+
+## Assumptions
+
+1. The measurements in every group represent a random, independent sample
+1. The variable is normally distributed in each group 
+1. The variance is the same in all groups
+
+- Linear models are robust to minor violations of these assumptions
+- Equal sample sizes helps with violations of equal variances
+- Given these assumptions, the model will give the *maximum likelihood estimate* 
+
+
+## Does bright light treatment alleviate jet lag symptoms?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](https://i.imgur.com/X8kUEJq.jpg){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+- 3 groups
+    - No light (control)
+    - Bright light in knees (control)
+    - Bright light in eyes
+- Outcome
+    - Shift in circadian pattern (hours)
+:::
+
+::::
+
+
+## Jet lag data
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+JL <- read_csv("../data/JetLag.csv", show_col_types = FALSE) |> 
+  mutate(Treatment = factor(Treatment, labels = c("Control", "Eyes", "Knee")))
+
+p1 <- ggplot(JL, aes(x = Treatment, y = Shift)) +
+  geom_point(position = position_jitter(width = 0.1, seed = 43577),
+             size = 4, color = "steelblue") +
+  xlab("Light Treatment") +
+  ylab("Shift in Circadian Rhythm (h)") +
+  theme(axis.title = element_text(face = "bold"))
+p1
+```
+
+
+## Compare group means and standard deviations
+
+```{r}
+#| echo: true
+JL |> 
+  summarize(mean(Shift),
+            sd(Shift),
+            .by = Treatment)
+```
+
+
+## Compare group means and standard errors
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+p1 +
+  stat_summary(fun.data = "mean_se",
+               position = position_dodge(width = 0.5),
+               colour = "firebrick",
+               size = 1,
+               linewidth = 1)
+
+```
+
+
+## Fit the linear model
+
+- `Shift` is modeled by `Treatment`
+- `Shift ~ Treatment` == `Shift ~ Treatment + 1`
+    - Intercept (`+ 1`) is assumed to be present
+    - Intercept can be dropped (`- 1`)
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+fm <- lm(Shift ~ Treatment, data = JL)
+summary(fm)
+```
+
+
+## Diagnostics
+
+```{r}
+#| echo: true
+
+check_model(fm)
+```
+
+
+## Parameter estimates
+
+```
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)
+## (Intercept)   -0.30875    0.24888  -1.241  0.22988
+## TreatmentEyes -1.24268    0.36433  -3.411  0.00293
+## TreatmentKnee -0.02696    0.36433  -0.074  0.94178
+```
+
+1. `(Intercept)`: Mean for 1st level of factor ("Control")
+1. `TreatmentEyes`: Adjustment from `(Intercept)` for eyes group (`Intercept` + `TreatmentEyes`)
+1. `TreatmentKnee`: Adjustment from `(Intercept)` for knee group (`Intercept` + `TreatmentKnee`)
+
+
+## ANOVA table from a Linear Model
+
+*t*-tests and *P* values are suggestive of significant differences, but we need to look at the overall ANOVA table first.
+
+```{r}
+anova(fm)
+```
+
+- *P* = 0.004 for the overall ANOVA.
+- It is possible (but uncommon) to have a significant parameter estimate but a non-significant overall ANOVA.
+
+
+## Where do Sum of Squares and Mean Squares come from? 
+
+![](https://i.imgur.com/dNF4ph0.png){fig-align="center"}
+
+$$
+F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}
+$$
+
+
+## Model Matrix
+
+`model.matrix()` converts `Treatment` into 0/1 variables
+
+```{r}
+set.seed(5)
+mm <- as.data.frame(model.matrix( ~ Treatment, data = JL))
+mm$Category <- JL$Treatment
+mm$Shift <- JL$Shift
+mm <- mm[ , c(5, 1, 2, 3, 4)]
+mm <- mm[sample(1:nrow(mm)), ]
+rownames(mm) <- seq(1, nrow(mm))
+mm
+```
+
+
+## Testing the hypothesis
+
+*F* distribution: Two different degrees of freedom:
+
+1. Numerator: *k* groups - 1
+1. Denominator: *N* - *k*
+
+```{r}
+JL |> count(Treatment)
+anova(fm)
+```
+
+
+## Shape of the *F*-distribution
+
+- 2 and 19 degrees of freedom ($F_{2,19}$)
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+shade_F(0.05, df1 = 2, df2 = 19, vline = 7.28) +
+  geom_vline(xintercept = 7.28, color = "steelblue", linewidth = 1)
+```
+
+
+## Parts of an ANOVA table
+
+```{r}
+anova(fm)
+```
+
+- `Sum Sq`: Variability accounted for by that part of the ANOVA
+- `Mean Sq`: `Sum Sq` / `Df`
+- `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
+- `Pr(>F)`: *P*-value for the *F*-test of that variable
+
+
+## Role of variation
+
+Large values of $F$ are more likely to be significant.
+
+*F* is a ratio:
+
+$$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
+
+What role does within vs. between group variation have in determining *F*?
+
+
+## Post hoc tests for linear models
+
+Significant test (*P* = 0.004) only says that at least one mean is different.
+
+Many options are available for *post hoc* (unplanned) comparisons:
+
+- Scheffé test
+- Duncan's multiple range test
+- Fisher's least significant difference test
+- Newman-Keuls test
+- Tukey-Kramer test (Tukey's Honestly Significant
+Difference)
+
+
+## Tukey-Kramer test
+
+- AKA: "Tukey's Honestly Significant Difference"
+- Assumes that we have already performed an ANOVA and rejected the null hypothesis
+- Tukey-Kramer test makes all the same assumptions as ANOVA.
+- Defaults to all pairwise combinations of levels
+
+
+## Tukey-Kramer test
+
+`multcomp` has all the tools for carrying out *post-hoc* tests [@Bretz2010-cy]
+
+- `glht()` carries out general linear hypothesis tests
+
+```{r}
+#| echo: true
+
+tukey <- glht(fm, linfct = mcp(Treatment = "Tukey"))
+summary(tukey)
+```
+
+
+## Planned Set of Comparisons
+
+- We might not want all pairwise comparisons
+- Choose a specific set of comparisons *before doing the analysis*
+- `Eyes - Control = 0` tests the hypothesis that the difference of Eyes - Control is 0.
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+post_hoc <- glht(fm,
+                 mcp(Treatment = c("Eyes - Control = 0",
+                                   "Knee - Control = 0")))
+summary(post_hoc)
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# How does multiple regression work? {background-color="#40666e"}
+
+
+## Goal of multiple regression
+
+Determine the association of each predictor while "controlling" for the other predictors.
+
+- Allow the other variables to account for variation *in the predictor of interest*
+    - Multiple regression of the predictor of interest on the remaining predictors (response variable not involved)
+- Regress the response on the *residual* of the predictor of interest
+
+
+## Multiple regression
+
+New concerns with multiple predictors
+
+1. How are my predictors related to *each other*?
+    - Correlations *between* predictors
+    - Predictors interacting with one another
+    - Predictors masking the effects of one another
+2. Which predictors should I include?
+    - Model too specific
+    - Model too general
+    - Model just right
+
+
+## Relationships between variables
+
+
+:::: {.columns}
+
+::: {.column width="30%"}
+
+![](https://i.imgur.com/6nLlp1w.png){fig-align="center"}
+:::
+
+::: {.column width="70%"}
+- What is the independent contribution of X1 to Y?
+- How much variation does X1 alone explain in Y?
+:::
+
+::::
+
+
+
+## Sources of milk energy in primates
+
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](https://images.fineartamerica.com/images-medium-large/goeldis-monkey-callimico-goeldii-thomas-marent.jpg){fig-align="center"}
+*Callimico goeldi*
+
+(photo by Thomas Marent)
+:::
+
+::: {.column width="50%"}
+What are the contributions of the fat and lactose content of primate milk to total milk energy?
+
+- *Outcome*: Milk energy (kCal/g)
+- *Predictors*:
+    - Percent fat
+    - Percent lactose
+:::
+
+::::
+
+
+## Milk content in primates
+
+```{r}
+#| echo: true
+
+Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+  dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
+  drop_na()
+Milk
+```
+
+Ignore that these are comparative species-level data.
+
+
+## Visualizing data
+
+```{r}
+#| fig-height: 6
+#| echo: false
+
+fig <- plot_ly() |>
+  add_markers(data = Milk,
+              x = ~ Fat,
+              y = ~ Lactose,
+              z = ~ Milk_Energy,
+              marker = list(size = 5),
+              showlegend = FALSE) |>
+  hide_colorbar() |>
+  layout(scene = list(xaxis = list(title = 'Fat'),
+                      yaxis = list(title = 'Lactose'),
+                      zaxis = list(title = 'Milk Energy')))
+
+fig
+```
+
+
+## Visualizing data
+
+```{r}
+#| echo: true
+
+library(GGally)
+ggscatmat(Milk, columns = 2:4)
+```
+
+
+## Multiple regression
+
+- Linear model using `lm()`
+- Effects of `Fat` and `Lactose`
+- Additive model: read `+` as "and"
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+fm <- lm(Milk_Energy ~ Fat + Lactose, data = Milk)
+summary(fm)
+```
+
+```{r}
+#| echo: false
+
+# Save the regression diagnostics for later
+PP <- performance::check_model(fm)
+```
+
+
+## What does multiple regression *really* do?
+
+$$Y = \theta_0 + \theta_1 X_1 + \theta_2 X_2$$
+
+To estimate the coefficient of $X_1$:
+
+- Regress $X_1$ on $X_2$
+
+
+## Where do the coefficients come from?
+
+$$X_1 = \beta_0 + \beta_1 X_2$$
+
+- Calculate residuals for the model.
+- Regress $Y$ on the residuals.
+- The estimated coefficient is $\theta_1$.
+
+Repeat for all predictors (i.e., more than $X_1$ and $X_2$)
+
+
+## Estimate `Fat` coefficient
+
+1. Use `Lactose` to predict `Fat`, which will take the effect of `Lactose` out of the model when we predict `Milk_Energy`
+2. Extract the residuals and add them onto the data.
+
+```{r}
+#| echo: true
+
+fm_Lact <- lm(Fat ~ Lactose, data = Milk)
+
+Milk <- Milk |> mutate(resid_Lact = residuals(fm_Lact))
+Milk |> arrange(resid_Lact) |> slice(1:5)
+```
+
+
+## Estimate `Fat` coefficient
+
+```{r}
+#| echo: false
+
+desc <- 'Large negative residual'
+
+F_v_L <- ggplot(Milk, aes(Lactose, Fat)) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "blue") +
+  geom_point() +
+  labs(x = "Percent Lactose", y = "Percent Fat")
+
+F_v_L +
+  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 1222) +
+  geom_mark_ellipse(aes(filter = Species == "Callimico goeldii",
+                        description = desc),
+                    label.buffer = unit(50, "mm"))
+```
+
+
+## Estimate `Fat` coefficient
+
+```{r}
+#| echo: false
+
+pred_Lactose <- data.frame(Lactose = seq(min(Milk$Lactose),
+                                         max(Milk$Lactose),
+                                         length.out = 200))
+pred_Lactose$Fat <- predict(fm_Lact, newdata = pred_Lactose)
+
+ggplot(Milk, aes(Lactose, Fat)) +
+  geom_ribbon(data = pred_Lactose,
+              aes(ymax = Fat), ymin = 0,
+              fill = "gray80") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "blue") +
+  geom_point() +
+  labs(x = "Percent Lactose", y = "Percent Fat")+
+  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 1222) +
+  geom_mark_ellipse(aes(filter = Species == "Callimico goeldii",
+                        description = desc),
+                    label.buffer = unit(50, "mm")) +
+  annotate(geom = "label", x = 40, y = 15,
+           label = "Less fat than predicted",
+           color = "firebrick4", size = 5)
+```
+
+
+## Estimate `Fat` coefficient
+
+```{r}
+#| echo: false
+
+milk_res_lact <- ggplot(Milk, aes(resid_Lact, Milk_Energy)) +
+  geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
+            fill = "gray80") +
+  geom_vline(xintercept = 0, color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
+  geom_point() +
+  labs(x = "Residual Fat Percent", y = "Milk Energy")
+
+milk_res_lact +
+  annotate(geom = "label", x = -5.4, y = 0.97,
+           label = "Less fat than predicted",
+           color = "firebrick4", size = 5) +
+  geom_text_repel(aes(label = Species),
+                  size = 3, force = 15) +
+  geom_mark_ellipse(aes(filter = Species == "Callimico goeldii"),
+                    label.fontsize = 8)
+```
+
+
+## Estimate `Fat` coefficient
+
+Compare coefficients:
+
+```{r}
+#| echo: true
+
+coef(lm(Milk_Energy ~ resid_Lact, data = Milk))
+coef(fm)
+```
+
+
+## Estimate `Lactose` coefficient
+
+1. Use `Fat` to predict `Lactose`, which will take the effect of `Fat` out of the model when we predict `Milk_Energy`
+2. Extract the residuals and add them onto the data.frame `Milk`.
+
+```{r}
+fm_Fat <- lm(Lactose ~ Fat, data = Milk)
+Milk$resid_Fat <- residuals(fm_Fat)
+```
+
+
+## Estimate `Lactose` coefficient
+
+```{r}
+#| echo: false
+
+L_v_F <- ggplot(Milk, aes(Fat, Lactose)) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "blue") +
+  geom_point() +
+  labs(y = "Percent Lactose", x = "Percent Fat")
+
+L_v_F +
+  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 23766)
+```
+
+
+## Estimate `Lactose` coefficient
+
+```{r}
+#| echo: false
+
+pred_Fat <- data.frame(Fat = seq(min(Milk$Fat),
+                                         max(Milk$Fat),
+                                         length.out = 200))
+pred_Fat$Lactose <- predict(fm_Fat, newdata = pred_Fat)
+
+ggplot(Milk, aes(Fat, Lactose)) +
+  geom_ribbon(data = pred_Fat,
+              aes(ymax = Lactose), ymin = 0,
+              fill = "gray80") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "blue") +
+  geom_point() +
+  labs(y = "Percent Lactose", x = "Percent Fat") +
+  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 23766) +
+  annotate(geom = "label", x = 20, y = 35,
+           label = "Less lactose than predicted",
+           color = "firebrick4", size = 5)
+```
+
+
+## Estimate `Lactose` coefficient
+
+```{r}
+#| echo: false
+
+milk_res_fat <- ggplot(Milk, aes(resid_Fat, Milk_Energy)) +
+  geom_rect(aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
+            fill = "gray80") +
+  geom_vline(xintercept = 0, color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
+  geom_point() +
+  labs(x = "Residual Lactose Percent", y = "Milk Energy")
+print(milk_res_fat +
+        annotate(geom = "label", x = -4.4, y = 0.97,
+                 label = "Less lactose than predicted",
+                 color = "firebrick4", size = 5) +
+        geom_text_repel(aes(label = Species), size = 3, force = 15))
+```
+
+
+## Estimate `Lactose` coefficient
+
+Compare coefficients:
+
+```{r}
+coef(lm(Milk_Energy ~ resid_Fat, data = Milk))
+coef(fm)
+```
+
+
+## Compare
+
+```{r}
+#| echo: false
+
+plot_grid(F_v_L + ggtitle("Estimate Fat coefficient"),
+          L_v_F + ggtitle("Estimate Lactose coefficient"),
+          ncol = 2)
+```
+
+
+## Compare
+
+```{r}
+#| echo: false
+
+plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
+coef(fm)
+```
+
+
+## What does multiple regression *really* do?
+
+Determine the association of each predictor while "controlling" for the other predictors.
+
+How?
+
+- Allow the other variables to account for variation *in the predictor of interest*
+    - Multiple regression of the predictor of interest on the remaining predictors (response variable not involved)
+- Regress the response on the *residual* variance of the predictor of interest
+
+
+## Visualizing multiple regression
+
+```{r}
+#| warning: false
+#| fig-height: 6
+#| echo: false
+
+# https://stackoverflow.com/questions/38331198/add-regression-plane-to-3d-scatter-plot-in-plotly
+
+# Graph resolution
+graph_reso <- 0.5
+
+# Setup axis
+axis_x <- seq(min(Milk$Fat), max(Milk$Fat), by = graph_reso)
+axis_y <- seq(min(Milk$Lactose), max(Milk$Lactose), by = graph_reso)
+
+# Sample points
+fm_surface <- expand.grid(Fat = axis_x,
+                          Lactose = axis_y,
+                          KEEP.OUT.ATTRS = FALSE)
+fm_surface$Milk_Energy <- predict.lm(fm, newdata = fm_surface)
+fm_surface <- reshape2::acast(fm_surface,
+                              Lactose ~ Fat,
+                              value.var = "Milk_Energy")
+
+fig2 <- add_trace(p = fig,
+                  z = fm_surface,
+                  x = axis_x,
+                  y = axis_y,
+                  opacity = 0.25,
+                  colorscale = list(c(0, 1), c("black", "black")),
+                  type = "surface",
+                  showlegend = FALSE) |>
+  hide_colorbar()
+
+fig2
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Mixed predictors {background-color="#40666e"}
+
+
+## Mixed predictors
+
+Ultimately we will mix arbitrary numbers of categorical and continuous predictors:
+
+- Start thinking beyond "slopes" for continuous predictors
+    - How many units of change in the outcome results from a 1 unit increase in the predictor?
+    
+For now:
+
+- One categorical predictor
+- One continuous predictor ("covariate")
+
+
+## Energy expenditure in naked mole rats
+
+![](https://i.imgur.com/ZzV5LNp.jpg){fig-align="center"}
+
+
+## Modeling energy expenditure
+
+```{r}
+#| echo: false
+
+M <- read_csv("../data/Molerats.csv", col_types = c("cdd")) |> 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) |> 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
+
+# Do the linear models here and add the predictions
+fm1 <- lm(Energy ~ 1, data = M)
+M <- M |> mutate(pred1 = predict(fm1))
+
+fm2 <- lm(Energy ~ Caste, data = M)
+M <- M |> mutate(pred2 = predict(fm2))
+
+fm3 <- lm(Energy ~ Mass, data = M)
+M <- M |> mutate(pred3 = predict(fm3))
+
+fm4 <- lm(Energy ~ Mass + Caste, data = M)
+M <- M |> mutate(pred4 = predict(fm4))
+
+ggplot(M, aes(x = Mass, y = Energy)) +
+  geom_point(size = 4) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Modeling energy expenditure
+
+```{r}
+#| echo: false
+
+NMR <- ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.justification = c(0, 1), legend.position = c(0.05, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+NMR
+```
+
+
+## Modeling energy expenditure
+
+*Only Categorical*:
+
+- Compare mean energy expenditure for non-workers vs. workers
+- Ignores the linear relationships with body mass
+
+*Only Continuous*:
+
+- Predicts energy expenditure from body mass alone
+- Ignores castes, which appear to have different mass-specific energy expenditure
+
+## Fit different models to these data
+
+1. Grand Mean (overall mean, no body mass)
+1. Categorical Only (group mean, no body mass)
+1. Continuous Only (body mass only, no grouping)
+1. Mixed predictors, intercepts varying
+
+
+## 1: Grand Mean
+
+```{r}
+fm1 <- lm(Energy ~ 1, data = M)
+```
+
+```{r}
+#| echo: false
+
+NMR +
+  geom_line(aes(x = Mass, y = pred1), lwd = 2,
+            color = wes_palette("Cavalcanti1")[5])
+```
+
+
+## 1: Grand Mean
+
+```{r}
+summary(fm1)
+```
+
+
+## 2: Categorical Only
+
+```{r}
+fm2 <- lm(Energy ~ Caste, data = M)
+```
+
+```{r}
+#| echo: false
+
+NMR +
+  geom_line(aes(x = Mass, y = pred2, color = Caste), lwd = 2)
+```
+
+
+## 2: Categorical Only
+
+```{r}
+summary(fm2)
+```
+
+
+## 3: Continuous Only
+
+```{r}
+fm3 <- lm(Energy ~ Mass, data = M)
+```
+
+```{r}
+#| echo: false
+
+NMR +
+  geom_line(aes(x = Mass, y = pred3, group = 1), lwd = 2,
+            color = wes_palette("Cavalcanti1")[5])
+```
+
+
+## 3: Continuous Only
+
+```{r}
+summary(fm3)
+```
+
+
+## 4: Mixed Predictors
+
+```{r}
+fm4 <- lm(Energy ~ Mass + Caste, data = M)
+```
+
+```{r}
+#| echo: false
+
+NMR +
+  geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2)
+```
+
+
+## 4: Mixed Predictors
+
+```{r}
+#| echo: true
+
+summary(fm4)
+```
+
+
+## 4: Mixed Predictors
+
+```
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) -0.09687    0.94230  -0.103   0.9188
+Mass         0.89282    0.19303   4.625 5.89e-05
+CasteWorker  0.39334    0.14611   2.692   0.0112
+```
+
+- `(Intercept)`: Intercept for non-workers
+- `Mass`: Slope for both groups
+- `CasteWorker`: *Offset* for the Worker group (difference in intercepts)
+
+
+## Fit different models to these data
+
+1. Grand Mean (overall mean, no body mass)
+1. Categorical Only (group mean, no body mass)
+1. Continuous Only (body mass only, no grouping)
+1. Mixed predictors, intercepts varying
+
+**Which model is best?**
+
+Model comparison in a few weeks...
+
+
+## Diagnostics
+
+```{r}
+performance::check_model(fm4)
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+## References
+
+::: {#refs}
+:::
