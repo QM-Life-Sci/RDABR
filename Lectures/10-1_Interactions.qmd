@@ -1,0 +1,200 @@
+---
+title: "Unit 9: Multiple predictors"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(performance)
+library(multcomp)
+library(readxl)
+library(GGally)
+library(wesanderson)
+library(ggrepel)
+library(ggforce)
+library(plotly)
+
+source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R")
+
+theme_set(theme_classic(base_size = 20))
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- PC 2 check-in
+    - Due Thursday. Let me know if you need more time.
+- Data sources for micropublication
+    - [Dryad](https://datadryad.org/)
+    - [Figshare](https://figshare.com/browse)
+    - [Zenodo](https://zenodo.org/)
+    - [List of repositories](https://www.nature.com/sdata/policies/repositories)
+
+
+# Multicollinearity {background-color="#40666e"}
+
+## Multicollinearity
+
+High correlation between predictors leaves little residual variation to be used for explaining the outcome variable.
+
+```{r}
+ggscatmat(Milk, columns = 2:4)
+```
+
+
+## How much correlation is too much?
+
+- No universal guidelines, much discussion:
+    - Farrar and Glauber [-@Farrar1967-mn]
+    - Graham [-@Graham2003-yz]
+    - Tu et al. [-@Tu2004-va]
+    - Vatcheva et al. [-@Vatcheva2016-tr]
+- Correlation (*r*) > 0.8 should get a closer look (some say 0.5)
+- Variance inflation factor (VIF): inflation of the parameter estimate variances due to shared variance
+
+
+## Diagnostics
+
+```{r}
+#| echo: true
+#| eval: false
+
+performance::check_model(fm)
+```
+
+```{r}
+print(PP)
+```
+
+
+## Masking
+
+Multiple predictors are useful for predicting outcomes when bivariate relationships with the response variable is not strong.
+
+But:
+
+- Associative relationships can be obscured when two predictors are somewhat correlated with one another.
+
+
+## Milk is a large energetic investment
+
+- Is there a significant association between energy content of milk while controlling for neocortex size and body size?
+- Do primates with larger brains produce significantly more nutritious milk so their offspring can grow quickly (because they must grow quickly) ?
+
+
+## Visualizing
+
+```{r}
+Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+  select(Species, Milk_Energy, Mass, Neocortex) |>
+  mutate(log_Mass = log(Mass)) |> 
+  drop_na()
+
+p1 <- ggplot(Milk, aes(log_Mass, Milk_Energy)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  labs(x = "log Mass (kg)", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(aes(label = Species), size = 3, force = 15)
+p2 <- ggplot(Milk, aes(Neocortex, Milk_Energy)) +
+  geom_point() +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  labs(x = "Percentage Neocortex", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(aes(label = Species), size = 3, force = 15)
+plot_grid(p2, p1, ncol = 2)
+```
+
+
+## Visualizing
+
+```{r}
+ggscatmat(Milk, columns = c(2, 4, 5))
+```
+
+
+## Bivariate model of Neocortex
+
+```{r}
+#| echo: true
+
+fm_Neo <- lm(Milk_Energy ~ Neocortex, data = Milk)
+summary(fm_Neo)
+```
+
+
+## Bivariate model of log Mass
+
+```{r}
+#| echo: true
+
+fm_Mass <- lm(Milk_Energy ~ log_Mass, data = Milk)
+summary(fm_Mass)
+```
+
+
+## Multiple predictors model
+
+```{r}
+#| echo: true
+
+fm_Multi <- lm(Milk_Energy ~ Neocortex + log_Mass, data = Milk)
+summary(fm_Multi)
+```
+
+
+## Interpretation
+
+- Both coefficients go up
+    - Neocortex: $0.005 \rightarrow 0.03$ (*P* = 0.004)
+    - log Mass: $-0.03 \rightarrow -0.1$ (*P* = 0.002)
+
+Regression *simultaneously* asks (and answers):
+
+1. Do species that have high neocortex percentage *for their mass* have higher energy milk?
+1. Do species with high body mass *for their neocortex percentage* have higher energy milk?
+
+
+## Neocortex vs. log Mass
+
+```{r}
+ggplot(Milk, aes(log_Mass, Neocortex)) +
+  geom_point() +
+  labs(x = "log Mass (kg)", y = "Neocortex Percentage") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  geom_text_repel(aes(label = Species), size = 3, force = 15)
+```
+
+
+## Milk Energy vs. Residual Neocortex
+
+```{r}
+Milk$resid_Neo <- residuals(lm(Neocortex ~ log_Mass, data = Milk))
+ggplot(Milk, aes(resid_Neo, Milk_Energy)) +
+  geom_vline(xintercept = 0, color = "blue") +
+  geom_point() +
+  labs(x = "Residual Neocortex", y = "Milk Energy") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "darkgreen") +
+  geom_text_repel(aes(label = Species), size = 3, force = 15)
+```
+
+
+# Questions {background-color="#f8c471"}
+
