@@ -49,9 +49,338 @@ theme_set(theme_classic(base_size = 20))
     - [List of repositories](https://www.nature.com/sdata/policies/repositories)
 
 
+# Prediction with categorical variables {background-color="#40666e"}
+
+## Linear models with multiple categories
+
+Prediction with only two groups (levels)
+
+- Are the means different?
+- Horned lizards example
+
+Predict with *three or more* groups
+
+- Is **at least** one mean different?
+    - Are the means *not different* than one another?
+- Then, *which* mean(s) is/are different
+
+
+## Does bright light treatment alleviate jet lag symptoms?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](https://i.imgur.com/X8kUEJq.jpg){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+- 3 groups
+    - No light (control)
+    - Bright light in knees (control)
+    - Bright light in eyes
+- Outcome
+    - Shift in circadian pattern (hours)
+:::
+
+::::
+
+
+## Linear Model: Multiple Categories
+
+A more general version of the two means comparison:
+
+- H~0~: $\mu_{1}=\mu_{2}=\mu_{3}\dots=\mu_{k}$
+- H~A~: At least one mean is different
+    - We won't know which yet
+- "One-way ANOVA": a single categorical variable
+
+
+## Analysis of *Variance* (ANOVA)
+
+Given the total observed variability in the outcome variable:
+
+1. Part explained by group membership
+1. Part remains unexplained ("error" or "residual")
+
+The test statistic (*F*) is the ratio of the two:
+
+$$
+F = \frac{Variation~explained~by~group}{Unexplained~variation}
+$$
+
+
+## Assumptions
+
+1. The measurements in every group represent a random, independent sample
+1. The variable is normally distributed in each group 
+1. The variance is the same in all groups
+
+- Linear models are robust to minor violations of these assumptions
+- Equal sample sizes helps with violations of equal variances
+
+
+## Does bright light treatment alleviate jet lag symptoms?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+![](https://i.imgur.com/X8kUEJq.jpg){fig-align="center"}
+:::
+
+::: {.column width="50%"}
+- 3 groups
+    - No light (control)
+    - Bright light in knees (control)
+    - Bright light in eyes
+- Outcome
+    - Shift in circadian pattern (hours)
+:::
+
+::::
+
+
+## Jet lag treatment
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+JL <- read_csv("../data/JetLag.csv", show_col_types = FALSE) |> 
+  mutate(Treatment = factor(Treatment,
+                            labels = c("Control", "Eyes", "Knee")),
+         Treatment = fct_relevel(Treatment, "Knee", after = 1L))
+
+p1 <- ggplot(JL, aes(x = Treatment, y = Shift)) +
+  geom_point(position = position_jitter(width = 0.1, seed = 43577),
+             size = 4, color = "steelblue") +
+  xlab("Light Treatment") +
+  ylab("Shift in Circadian Rhythm (h)") +
+  theme(axis.title = element_text(face = "bold"))
+p1
+```
+
+
+## Compare group means and standard deviations
+
+```{r}
+#| echo: true
+JL |> 
+  summarize(mean(Shift),
+            sd(Shift),
+            .by = Treatment)
+```
+
+
+## Compare group means and standard errors
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+p1 +
+  stat_summary(fun.data = "mean_se",
+               position = position_dodge(width = 0.5),
+               colour = "firebrick",
+               size = 1,
+               linewidth = 1)
+
+```
+
+
+## Fit the linear model
+
+- `Shift` is modeled by `Treatment`
+- `Shift ~ Treatment` == `Shift ~ Treatment + 1`
+    - Intercept (`+ 1`) is assumed to be present
+    - Intercept can be dropped (`- 1`)
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+fm <- lm(Shift ~ Treatment, data = JL)
+summary(fm)
+```
+
+
+## Diagnostics
+
+```{r}
+#| echo: true
+
+check_model(fm)
+```
+
+
+## Parameter estimates
+
+```
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)
+## (Intercept)   -0.30875    0.24888  -1.241  0.22988
+## TreatmentEyes -1.24268    0.36433  -3.411  0.00293
+## TreatmentKnee -0.02696    0.36433  -0.074  0.94178
+```
+
+1. `(Intercept)`: Mean for 1st level of factor ("Control")
+1. `TreatmentEyes`: Adjustment from `(Intercept)` for eyes group (`Intercept` + `TreatmentEyes`)
+1. `TreatmentKnee`: Adjustment from `(Intercept)` for knee group (`Intercept` + `TreatmentKnee`)
+
+
+## ANOVA table from a Linear Model
+
+*t*-tests and *P* values are suggestive of significant differences, but we need to look at the overall ANOVA table first.
+
+```{r}
+anova(fm)
+```
+
+- *P* = 0.004 for the overall ANOVA.
+- It is possible (but uncommon) to have a significant parameter estimate but a non-significant overall ANOVA.
+
+
+## Where do Sum of Squares and Mean Squares come from? 
+
+![](https://i.imgur.com/dNF4ph0.png){fig-align="center"}
+
+$$
+F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}
+$$
+
+
+## Model Matrix
+
+`model.matrix()` converts `Treatment` into 0/1 variables
+
+```{r}
+#| echo: false
+
+set.seed(5)
+mm <- as.data.frame(model.matrix( ~ Treatment, data = JL))
+mm$Category <- JL$Treatment
+mm$Shift <- JL$Shift
+mm <- mm[ , c(5, 4, 1, 2, 3)]
+mm <- mm[sample(1:nrow(mm)), ]
+rownames(mm) <- seq(1, nrow(mm))
+mm
+```
+
+
+## Testing the hypothesis
+
+*F* distribution: Two different degrees of freedom:
+
+1. Numerator: *k* groups - 1
+1. Denominator: *N* - *k*
+
+```{r}
+JL |> count(Treatment)
+anova(fm)
+```
+
+
+## Shape of the *F*-distribution
+
+- 2 and 19 degrees of freedom ($F_{2,19}$)
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+shade_F(0.05, df1 = 2, df2 = 19, vline = 7.28) +
+  geom_vline(xintercept = 7.28, color = "steelblue", linewidth = 1)
+```
+
+
+## Parts of an ANOVA table
+
+```{r}
+anova(fm)
+```
+
+- `Sum Sq`: Variability accounted for by that part of the ANOVA
+- `Mean Sq`: `Sum Sq` / `Df`
+- `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
+- `Pr(>F)`: *P*-value for the *F*-test of that variable
+
+
+## Role of variation
+
+Large values of $F$ are more likely to be significant.
+
+*F* is a ratio:
+
+$$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
+
+What role does within vs. between group variation have in determining *F*?
+
+
+## Post hoc tests for linear models
+
+Significant test (*P* = 0.004) only says that at least one mean is different.
+
+Many options are available for *post hoc* (unplanned) comparisons:
+
+- Scheffé test
+- Duncan's multiple range test
+- Fisher's least significant difference test
+- Newman-Keuls test
+- Tukey-Kramer test (Tukey's Honestly Significant
+Difference)
+
+
+## Tukey-Kramer test
+
+- AKA: "Tukey's Honestly Significant Difference"
+- Assumes that we have already performed an ANOVA and rejected the null hypothesis
+    - "Which of the means is different?"
+- All pairwise combinations of levels
+
+
+## Tukey-Kramer test
+
+`multcomp` has all the tools for carrying out *post-hoc* tests [@Bretz2010-cy]
+
+- `glht()` carries out general linear hypothesis tests
+    - `linfct` is the linear hypothesis function
+    - `mcp()` defines the procedure
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+tukey <- glht(fm, linfct = mcp(Treatment = "Tukey"))
+summary(tukey)
+```
+
+
+## Planned Set of Comparisons
+
+- We might not want all pairwise comparisons
+    - Factors with many levels
+- Choose a specific set of comparisons **before doing the analysis**
+- `Eyes - Control = 0` tests the hypothesis that the difference of Eyes - Control is 0.
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+post_hoc <- glht(fm,
+                 mcp(Treatment = c("Eyes - Control = 0",
+                                   "Knee - Control = 0")))
+summary(post_hoc)
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
 # Linear models as flexible prediction tools {background-color="#40666e"}
 
-## Review of kinds of predictors
+
+## Review: Types of predictors
 
 Categorical (2 or more groups)
 
@@ -60,7 +389,7 @@ Categorical (2 or more groups)
 
 Continuous
 
-- Change in outcome variable ($y$) for a 1 unit increase in the predictor
+- How much does the outcome variable ($y$) *change* for a 1 unit increase in the predictor
 - Change the "slope"
 
 :::{.center}
@@ -74,7 +403,8 @@ Note: this is *not* the outcome variable
 
 $$\mbox{Outcome variable} \sim \mbox{Predictor variable(s)} + \mbox{Error}$$
 
-- One predictor is common
+- One predictor
+    - Bivariate regression, *t*-test, one-way ANOVA
 - More than one predictor is common
     - "Multiple regression"
 
@@ -244,324 +574,6 @@ Don't put everything in the model and see what falls out
 - "Causal Salad" (Richard McElreath)
 
 ![](https://bigthink.com/wp-content/uploads/2018/08/origin-137.jpg){fig-align="center"}
-
-
-# Prediction with categorical variables {background-color="#40666e"}
-
-## Prediction with categorical variables
-
-We have done prediction with only two groups (levels)
-
-- Are the means different?
-- Horned lizards example
-
-Now predict with *three or more* groups
-
-- Is *at least* one mean different?
-    - Are the means *not different* than one another?
-- Then, *which* mean(s) is/are different
-
-
-## Does bright light treatment alleviate jet lag symptoms?
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-![](https://i.imgur.com/X8kUEJq.jpg){fig-align="center"}
-:::
-
-::: {.column width="50%"}
-- 3 groups
-    - No light (control)
-    - Bright light in knees (control)
-    - Bright light in eyes
-- Outcome
-    - Shift in circadian pattern (hours)
-:::
-
-::::
-
-
-## Linear Model: Multiple Categories
-
-A more general version of the two means comparison:
-
-- H~0~: $\mu_{1}=\mu_{2}=\mu_{3}\dots=\mu_{k}$
-- H~A~: At least one mean is different
-    - We won't know which yet
-- "One-way ANOVA": a single categorical variable
-
-
-## "Analysis of *Variance* (ANOVA)"
-
-Given the total observed variability in *Y*:
-
-1. Part explained by group membership
-1. Part remains unexplained ("error" or "residual")
-
-The test statistic (*F*) is the ratio of the two:
-
-$$
-F = \frac{Variation~explained~by~group}{Unexplained~variation}
-$$
-
-
-## Assumptions
-
-1. The measurements in every group represent a random, independent sample
-1. The variable is normally distributed in each group 
-1. The variance is the same in all groups
-
-- Linear models are robust to minor violations of these assumptions
-- Equal sample sizes helps with violations of equal variances
-- Given these assumptions, the model will give the *maximum likelihood estimate* 
-
-
-## Does bright light treatment alleviate jet lag symptoms?
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-![](https://i.imgur.com/X8kUEJq.jpg){fig-align="center"}
-:::
-
-::: {.column width="50%"}
-- 3 groups
-    - No light (control)
-    - Bright light in knees (control)
-    - Bright light in eyes
-- Outcome
-    - Shift in circadian pattern (hours)
-:::
-
-::::
-
-
-## Jet lag data
-
-```{r}
-#| echo: false
-#| fig-align: center
-
-JL <- read_csv("../data/JetLag.csv", show_col_types = FALSE) |> 
-  mutate(Treatment = factor(Treatment, labels = c("Control", "Eyes", "Knee")))
-
-p1 <- ggplot(JL, aes(x = Treatment, y = Shift)) +
-  geom_point(position = position_jitter(width = 0.1, seed = 43577),
-             size = 4, color = "steelblue") +
-  xlab("Light Treatment") +
-  ylab("Shift in Circadian Rhythm (h)") +
-  theme(axis.title = element_text(face = "bold"))
-p1
-```
-
-
-## Compare group means and standard deviations
-
-```{r}
-#| echo: true
-JL |> 
-  summarize(mean(Shift),
-            sd(Shift),
-            .by = Treatment)
-```
-
-
-## Compare group means and standard errors
-
-```{r}
-#| echo: false
-#| fig-align: center
-
-p1 +
-  stat_summary(fun.data = "mean_se",
-               position = position_dodge(width = 0.5),
-               colour = "firebrick",
-               size = 1,
-               linewidth = 1)
-
-```
-
-
-## Fit the linear model
-
-- `Shift` is modeled by `Treatment`
-- `Shift ~ Treatment` == `Shift ~ Treatment + 1`
-    - Intercept (`+ 1`) is assumed to be present
-    - Intercept can be dropped (`- 1`)
-
-```{r}
-#| echo: true
-#| output-location: slide
-
-fm <- lm(Shift ~ Treatment, data = JL)
-summary(fm)
-```
-
-
-## Diagnostics
-
-```{r}
-#| echo: true
-
-check_model(fm)
-```
-
-
-## Parameter estimates
-
-```
-## Coefficients:
-##               Estimate Std. Error t value Pr(>|t|)
-## (Intercept)   -0.30875    0.24888  -1.241  0.22988
-## TreatmentEyes -1.24268    0.36433  -3.411  0.00293
-## TreatmentKnee -0.02696    0.36433  -0.074  0.94178
-```
-
-1. `(Intercept)`: Mean for 1st level of factor ("Control")
-1. `TreatmentEyes`: Adjustment from `(Intercept)` for eyes group (`Intercept` + `TreatmentEyes`)
-1. `TreatmentKnee`: Adjustment from `(Intercept)` for knee group (`Intercept` + `TreatmentKnee`)
-
-
-## ANOVA table from a Linear Model
-
-*t*-tests and *P* values are suggestive of significant differences, but we need to look at the overall ANOVA table first.
-
-```{r}
-anova(fm)
-```
-
-- *P* = 0.004 for the overall ANOVA.
-- It is possible (but uncommon) to have a significant parameter estimate but a non-significant overall ANOVA.
-
-
-## Where do Sum of Squares and Mean Squares come from? 
-
-![](https://i.imgur.com/dNF4ph0.png){fig-align="center"}
-
-$$
-F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}
-$$
-
-
-## Model Matrix
-
-`model.matrix()` converts `Treatment` into 0/1 variables
-
-```{r}
-set.seed(5)
-mm <- as.data.frame(model.matrix( ~ Treatment, data = JL))
-mm$Category <- JL$Treatment
-mm$Shift <- JL$Shift
-mm <- mm[ , c(5, 1, 2, 3, 4)]
-mm <- mm[sample(1:nrow(mm)), ]
-rownames(mm) <- seq(1, nrow(mm))
-mm
-```
-
-
-## Testing the hypothesis
-
-*F* distribution: Two different degrees of freedom:
-
-1. Numerator: *k* groups - 1
-1. Denominator: *N* - *k*
-
-```{r}
-JL |> count(Treatment)
-anova(fm)
-```
-
-
-## Shape of the *F*-distribution
-
-- 2 and 19 degrees of freedom ($F_{2,19}$)
-
-```{r}
-#| fig-align: center
-#| echo: false
-
-shade_F(0.05, df1 = 2, df2 = 19, vline = 7.28) +
-  geom_vline(xintercept = 7.28, color = "steelblue", linewidth = 1)
-```
-
-
-## Parts of an ANOVA table
-
-```{r}
-anova(fm)
-```
-
-- `Sum Sq`: Variability accounted for by that part of the ANOVA
-- `Mean Sq`: `Sum Sq` / `Df`
-- `F value`: `Mean Sq` Treatment / `Mean Sq` Residual
-- `Pr(>F)`: *P*-value for the *F*-test of that variable
-
-
-## Role of variation
-
-Large values of $F$ are more likely to be significant.
-
-*F* is a ratio:
-
-$$F = \frac{\mbox{MS}_{group}}{\mbox{MS}_{error}}$$
-
-What role does within vs. between group variation have in determining *F*?
-
-
-## Post hoc tests for linear models
-
-Significant test (*P* = 0.004) only says that at least one mean is different.
-
-Many options are available for *post hoc* (unplanned) comparisons:
-
-- Scheffé test
-- Duncan's multiple range test
-- Fisher's least significant difference test
-- Newman-Keuls test
-- Tukey-Kramer test (Tukey's Honestly Significant
-Difference)
-
-
-## Tukey-Kramer test
-
-- AKA: "Tukey's Honestly Significant Difference"
-- Assumes that we have already performed an ANOVA and rejected the null hypothesis
-- Tukey-Kramer test makes all the same assumptions as ANOVA.
-- Defaults to all pairwise combinations of levels
-
-
-## Tukey-Kramer test
-
-`multcomp` has all the tools for carrying out *post-hoc* tests [@Bretz2010-cy]
-
-- `glht()` carries out general linear hypothesis tests
-
-```{r}
-#| echo: true
-
-tukey <- glht(fm, linfct = mcp(Treatment = "Tukey"))
-summary(tukey)
-```
-
-
-## Planned Set of Comparisons
-
-- We might not want all pairwise comparisons
-- Choose a specific set of comparisons *before doing the analysis*
-- `Eyes - Control = 0` tests the hypothesis that the difference of Eyes - Control is 0.
-
-```{r}
-#| echo: true
-#| output-location: slide
-
-post_hoc <- glht(fm,
-                 mcp(Treatment = c("Eyes - Control = 0",
-                                   "Knee - Control = 0")))
-summary(post_hoc)
-```
 
 
 # Questions {background-color="#f8c471"}
