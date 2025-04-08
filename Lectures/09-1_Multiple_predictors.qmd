@@ -47,6 +47,7 @@ theme_set(theme_classic(base_size = 20))
     - [Figshare](https://figshare.com/browse)
     - [Zenodo](https://zenodo.org/)
     - [List of repositories](https://www.nature.com/sdata/policies/repositories)
+    - [NIH NHANES](https://wwwn.cdc.gov/nchs/nhanes/), [NIH ECHO](https://echochildren.org/dash/)
 
 
 # Prediction with categorical variables {background-color="#40666e"}
@@ -56,7 +57,7 @@ theme_set(theme_classic(base_size = 20))
 Prediction with only two groups (levels)
 
 - Are the means different?
-- Horned lizards example
+- Horned lizards, Stalk-eyed flies
 
 Predict with *three or more* groups
 
