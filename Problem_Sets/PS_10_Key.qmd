@@ -1,0 +1,103 @@
+---
+title: 'Problem Set 09'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+format:
+  html:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    embed-resources: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(cowplot)
+library(performance)
+library(GGally)
+
+theme_set(theme_classic())
+```
+
+
+## Predicting height from limb lengths
+
+We should be able to predict someone's height from the lengths of their limbs. Based on a lot of measurements, we know that limb length is about 40-50% of total height. But we can still develop a linear model for prediction.
+
+The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths.
+
+
+### Activity
+
+Load the data for limb lengths. Try to use `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
+
+```{r}
+# FIXME
+LL <- read_csv("../data/Limb_Lengths.csv")
+LL |> head()
+LL |> summarize_all(.funs = c("mean", "sd"))
+```
+
+Make two plots, one for left limb length vs. height and one for right limb length vs. height. Add an OLS regression line to each using `geom_smooth(). Use `cowplot::plot_grid()` to put them side by side.
+
+```{r}
+# FIXME
+
+p1 <- ggplot(LL, aes(left_limb, height)) + 
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  geom_point() +
+  labs(x = "Limb Length (cm)", y = "Height (cm)") +
+  ggtitle("Left Limb")
+p2 <- ggplot(LL, aes(right_limb, height)) + 
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  geom_point() +
+  labs(x = "Limb Length (cm)", y = "Height (cm)") +
+  ggtitle("Right Limb")
+plot_grid(p1, p2, ncol = 2)
+```
+
+Based on the plots, what do you think the relationship between limb length and height is (positive, negative, or no relationship)?
+
+> 
+
+Fit a single linear model in which height is predicted by both left and right limb lengths (this is an "additive" model). Print out the summary of the model.
+
+```{r}
+# FIXME
+fm_LR <- lm(height ~ left_limb + right_limb, data = LL)
+summary(fm_LR)
+```
+
+Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit? Use `check_model()` if you wish.
+
+```{r}
+# FIXME
+cor(LL$left_limb, LL$right_limb)
+
+check_model(fm_LR)
+```
+
+> The correlation between them is > 0.99. When we fit a model that includes both limb lengths, there is severe multicollinearity. Separately each is probably a good predictor, but together, they are not good. All of the variation in Height is predicted by the 1st variable in the multiple regression, so there is no variation left for the 2nd variable to predict (and vice versa when the variables are reversed).
+
+
+Fit separate linear models in which height is predicted by left and then right limb length.
+
+```{r}
+# FIXME
+fm_L <- lm(height ~ left_limb, data = LL)
+summary(fm_L)
+fm_R <- lm(height ~ right_limb, data = LL)
+summary(fm_R)
+```
+
+Do these models make more sense?
+
+> Yes, for each limb length is a significant predictor of height. This result is what we expect to see.
+
+
