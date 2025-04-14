@@ -1055,8 +1055,10 @@ ggplot(M, aes(x = Mass, y = Energy)) +
 NMR <- ggplot(M, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
-  theme(legend.justification = c(0, 1), legend.position = c(0.05, 1)) +
-  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.05, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
 NMR
 ```
 

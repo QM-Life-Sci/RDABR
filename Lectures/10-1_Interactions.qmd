@@ -1,5 +1,5 @@
 ---
-title: "Unit 9: Multiple predictors"
+title: "Unit 10: Interactions"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -31,6 +31,8 @@ library(wesanderson)
 library(ggrepel)
 library(ggforce)
 library(plotly)
+library(cowplot)
+library(paletteer)
 
 source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R")
 
@@ -40,20 +42,68 @@ theme_set(theme_classic(base_size = 20))
 
 # Housekeeping {background-color="#40666e"}
 
-- PC 2 check-in
-    - Due Thursday. Let me know if you need more time.
-- Data sources for micropublication
-    - [Dryad](https://datadryad.org/)
-    - [Figshare](https://figshare.com/browse)
-    - [Zenodo](https://zenodo.org/)
-    - [List of repositories](https://www.nature.com/sdata/policies/repositories)
+- PC 2 
+- Micropublication *plan* due
+    - Figure
+    - Table
+    - Planned analysis
 
 
 # Multicollinearity {background-color="#40666e"}
 
-## Multicollinearity
+## How are coefficients estimated in multiple regression?
 
-High correlation between predictors leaves little residual variation to be used for explaining the outcome variable.
+:::: {.columns}
+
+::: {.column width="50%"}
+![](https://images.fineartamerica.com/images-medium-large/goeldis-monkey-callimico-goeldii-thomas-marent.jpg){fig-align="center"}
+*Callimico goeldi*
+
+(photo by Thomas Marent)
+:::
+
+::: {.column width="50%"}
+What are the contributions of the fat and lactose content of primate milk to total milk energy?
+
+- *Outcome*: Milk energy (kCal/g)
+- *Predictors*:
+    - Percent fat
+    - Percent lactose
+:::
+
+::::
+
+
+## Milk energy in primates
+
+```{r}
+#| fig-height: 6
+#| echo: false
+
+Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+  dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
+  drop_na()
+
+ggscatmat(Milk, columns = 2:4)
+```
+
+
+## Multiple regression
+
+- Linear model using `lm()`
+- Effects of `Fat` and `Lactose`
+- Additive model: read `+` as "and"
+
+```{r}
+#| echo: true
+#| output-location: slide
+
+fm <- lm(Milk_Energy ~ Fat + Lactose, data = Milk)
+summary(fm)
+```
+
+
+## Multicollinearity
 
 ```{r}
 ggscatmat(Milk, columns = 2:4)
@@ -75,19 +125,57 @@ ggscatmat(Milk, columns = 2:4)
 
 ```{r}
 #| echo: true
-#| eval: false
 
-performance::check_model(fm)
+check_model(fm)
 ```
 
+
+## Multicollinearity: the problem
+
+High correlation between predictors leaves little residual variation to be used for explaining the outcome variable.
+
 ```{r}
-print(PP)
+#| echo: false
+
+L_v_F <- ggplot(Milk, aes(Fat, Lactose)) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "blue") +
+  geom_point() +
+  labs(y = "Percent Lactose", x = "Percent Fat")
+
+F_v_L <- ggplot(Milk, aes(Lactose, Fat)) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
+              color = "blue") +
+  geom_point() +
+  labs(x = "Percent Lactose", y = "Percent Fat")
+
+plot_grid(F_v_L + ggtitle("Estimate Fat coefficient"),
+          L_v_F + ggtitle("Estimate Lactose coefficient"),
+          ncol = 2)
+```
+
+
+
+## Potential solutions
+
+- Only fit one predictor
+- Combine variables
+    - Principal components analysis (PCA)
+    - Use PCs as new predictor(s)
+
+
+## Only fit one predictor
+
+```{r}
+coef(lm(Milk_Energy ~ Fat + Lactose, data = Milk))
+coef(lm(Milk_Energy ~ Fat, data = Milk))
+coef(lm(Milk_Energy ~ Lactose, data = Milk))
 ```
 
 
 ## Masking
 
-Multiple predictors are useful for predicting outcomes when bivariate relationships with the response variable is not strong.
+Multiple predictors can be useful for predicting outcomes when bivariate relationships with the response variable is not strong.
 
 But:
 
@@ -96,36 +184,40 @@ But:
 
 ## Milk is a large energetic investment
 
-- Is there a significant association between energy content of milk while controlling for neocortex size and body size?
-- Do primates with larger brains produce significantly more nutritious milk so their offspring can grow quickly (because they must grow quickly) ?
+- Is there a significant association between energy content of milk while controlling for neocortex size *and* body size?
+- Do primates with larger brains produce significantly more nutritious milk so their offspring can grow quickly (because they must grow quickly)?
 
 
 ## Visualizing
 
 ```{r}
+#| echo: false
+
 Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
   select(Species, Milk_Energy, Mass, Neocortex) |>
   mutate(log_Mass = log(Mass)) |> 
   drop_na()
 
-p1 <- ggplot(Milk, aes(log_Mass, Milk_Energy)) +
-  geom_point() +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
-  labs(x = "log Mass (kg)", y = "Milk Energy (kcal/g)") +
-  geom_text_repel(aes(label = Species), size = 3, force = 15)
-p2 <- ggplot(Milk, aes(Neocortex, Milk_Energy)) +
-  geom_point() +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
-  labs(x = "Percentage Neocortex", y = "Milk Energy (kcal/g)") +
-  geom_text_repel(aes(label = Species), size = 3, force = 15)
-plot_grid(p2, p1, ncol = 2)
+ggscatmat(Milk, columns = c(2, 4, 5))
 ```
 
 
 ## Visualizing
 
 ```{r}
-ggscatmat(Milk, columns = c(2, 4, 5))
+#| echo: false
+
+p1 <- ggplot(Milk, aes(log_Mass, Milk_Energy)) +
+  geom_point(size = 3) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  labs(x = "log Mass (kg)", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(aes(label = Species), size = 4, force = 15)
+p2 <- ggplot(Milk, aes(Neocortex, Milk_Energy)) +
+  geom_point(size = 3) +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+  labs(x = "Percentage Neocortex", y = "Milk Energy (kcal/g)") +
+  geom_text_repel(aes(label = Species), size = 4, force = 15)
+plot_grid(p2, p1, ncol = 2)
 ```
 
 
@@ -149,7 +241,7 @@ summary(fm_Mass)
 ```
 
 
-## Multiple predictors model
+## Multiple regression model
 
 ```{r}
 #| echo: true
@@ -174,25 +266,484 @@ Regression *simultaneously* asks (and answers):
 ## Neocortex vs. log Mass
 
 ```{r}
+#| echo: false
+
 ggplot(Milk, aes(log_Mass, Neocortex)) +
-  geom_point() +
+  geom_point(size = 3) +
   labs(x = "log Mass (kg)", y = "Neocortex Percentage") +
   geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
-  geom_text_repel(aes(label = Species), size = 3, force = 15)
+  geom_text_repel(aes(label = Species), size = 4, force = 15)
 ```
 
 
 ## Milk Energy vs. Residual Neocortex
 
 ```{r}
+#| echo: false
+
 Milk$resid_Neo <- residuals(lm(Neocortex ~ log_Mass, data = Milk))
 ggplot(Milk, aes(resid_Neo, Milk_Energy)) +
   geom_vline(xintercept = 0, color = "blue") +
-  geom_point() +
+  geom_point(size = 3) +
   labs(x = "Residual Neocortex", y = "Milk Energy") +
   geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
               color = "darkgreen") +
-  geom_text_repel(aes(label = Species), size = 3, force = 15)
+  geom_text_repel(aes(label = Species), size = 4, force = 15)
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Interactions {background-color="#40666e"}
+
+
+## Additive model for energy expenditure in naked mole rats
+
+```{r}
+#| echo: false
+
+NMR <- read_csv("../data/Molerats.csv", col_types = c("cdd")) |> 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) |> 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
+
+fm4 <- lm(Energy ~ Mass + Caste, data = NMR)
+
+NMR <- NMR |> mutate(pred4 = predict(fm4))
+ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.05, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Interactions
+
+What if the the effect of body mass on energy expenditure depends on caste?
+
+- Different body mass to energy relationship for each caste
+
+How do we model that?  
+
+
+## Interactions
+
+```{r}
+fm5 <- lm(Energy ~ Mass * Caste, data = NMR)
+```
+
+```{r}
+#| echo: false
+
+NMR <- NMR |> mutate(pred5 = predict(fm5))
+ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  geom_line(aes(x = Mass, y = pred5, color = Caste), lwd = 2) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.05, 1)) +
+  labs(x = "ln Body Mass (g)",
+       y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Interaction model
+
+Add a new predictor ($\theta_3$) that is the product of $X_1$ and $X_2$:
+
+$$Y = \theta_0 + \theta_1 X_1 + \theta_2 X_2 + \theta_3 (X_1 X_2) + \epsilon$$
+
+The value of $X_1$ varies with change in the value of $X_2$ and vice versa (these are not really separable).
+
+Example formula: 
+
+- `Energy ~ Mass + Caste + Mass:Caste`
+- `Energy ~ Mass * Caste`
+
+
+## Interactions are new predictor variables
+
+- 0/1 representations of factors * continuous variables
+
+```{r}
+#| echo: false
+
+set.seed(3423411)
+
+NMR |> 
+  mutate(`Caste 0/1` = as.integer(Caste) - 1,
+         `Mass:Caste` = Mass * `Caste 0/1`) |> 
+  dplyr::select(-starts_with("pred")) |> 
+  slice_sample(n = 10)
+```
+
+
+## Summary interaction model
+
+```{r}
+#| echo: true
+
+summary(fm5)
+```
+
+
+## Factorial designs and interactions
+
+![](https://i.imgur.com/tcMSr7k.png){fig-align="center"}
+
+- Allow you to explore *interactions* (multiplicative effects)
+
+If you have multiple categorical variables, you should *always* do factorial designs (unless you know why you aren't).
+
+
+## Factorial data
+
+Biomass gain in plants fertilized with either added nitrogen or phosphorous.
+
+![](https://i.imgur.com/5VY9vwE.png){fig-align="center"}
+
+
+## Factorial data
+
+Biomass gain in plants fertilized with either added nitrogen or phosphorous.
+
+```{r}
+BM <- read_csv("../data/biomass.csv", show_col_types = FALSE)
+BM
+```
+
+
+## Factorial data
+
+Balanced data: Equal *n* in each group
+
+```{r}
+BM |> count(Nitrogen, Phosphorous)
+```
+
+Balanced data is the best to work with.
+
+
+## Visualizing factorial data
+
+```{r}
+#| echo: true
+#| output-location: slide
+#| fig-align: center
+
+ggplot(BM, aes(x = Nitrogen,
+               y = Biomass,
+               color = Phosphorous)) +
+  geom_point(position = position_jitter(width = 0.1, seed = 34234),
+             size = 3) +
+  scale_color_paletteer_d("ggsci::default_jco")
+```
+
+
+## Interaction plot
+
+```{r}
+#| echo: true
+#| output-location: slide
+#| fig-align: center
+
+int_plot1 <- ggplot(BM, aes(x = Nitrogen,
+                            y = Biomass,
+                            color = Phosphorous,
+                            group = Phosphorous)) +
+  geom_point(position = position_jitter(width = 0.1, seed = 34234),
+             size = 3, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 6) +
+  stat_summary(fun = mean, geom = "line", linewidth = 1.5) +
+  scale_color_paletteer_d("ggsci::default_jco") +
+  theme(legend.position = "bottom")
+int_plot1
+```
+
+
+## Interaction plot
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+int_plot2 <- ggplot(BM, aes(x = Phosphorous,
+               y = Biomass,
+               color = Nitrogen,
+               group = Nitrogen)) +
+  geom_point(position = position_jitter(width = 0.1, seed = 34234),
+             size = 3, alpha = 0.5) +
+  stat_summary(fun = mean, geom = "point", size = 6) +
+  stat_summary(fun = mean, geom = "line", linewidth = 1.5) +
+  scale_color_paletteer_d("ggsci::default_jco") +
+  theme(legend.position = "bottom")
+int_plot2
+```
+
+
+## Interaction plot
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+cowplot::plot_grid(int_plot1, int_plot2)
+```
+
+
+## Types of Interactions
+
+Many possible patterns of interactions between two variables:
+
+![](https://i.imgur.com/W4dqiiZ.png){fig-align="center"}
+
+
+## Group means
+
+```{r}
+#| echo: true
+
+BM |> 
+  summarize(mean = mean(Biomass),
+            .by = c(Nitrogen, Phosphorous))
+```
+
+
+## Linear model with an interaction
+
+```{r}
+fm <- lm(Biomass ~ Nitrogen * Phosphorous, data = BM)
+```
+
+`Nitrogen * Phosphorous` expands to:
+
+```{r}
+#| eval: false
+#| echo: true
+
+fm <- lm(Biomass ~ Nitrogen + Phosphorous + Nitrogen:Phosphorous, 
+         data = BM)
+```
+
+- Main effects of `Nitrogen` and `Phosphorous`
+- Interaction term of `Nitrogen:Phosphorous` ("Nitrogen by Phosphorus")
+
+
+## Linear model with an interaction
+
+```{r}
+#| echo: true
+
+summary(fm)
+```
+
+
+## ANOVA table
+
+If you have a significant interaction, the main effects not interpretable **without** clarification.
+
+```{r}
+#| echo: true
+
+fm <- lm(Biomass ~ Phosphorous * Nitrogen, data = BM)
+anova(fm)
+```
+
+
+## Interpretations
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+int_plot1
+```
+
+
+## Power to detect interactions is low [@Wahlsten1990-hc]
+
+For a 2 X 2 design
+
+- Power to detect a main effect is 87%
+- Power to detect the interaction is 16% 
+
+ANOVA will suggest additivity of effects when in fact they are multiplicative
+
+
+## Under the hood
+
+Numeric representations of `nitrogen` and `phosphorous`:
+
+```{r}
+#| echo: true
+
+BM$n_num <- ifelse(BM$Nitrogen == "N-", 0, 1)
+BM$p_num <- ifelse(BM$Phosphorous == "P-", 0, 1)
+```
+
+Numeric representation of the interaction (multiple the other two numeric representations):
+
+```{r}
+#| echo: true
+
+BM$interact <- BM$n_num * BM$p_num
+```
+
+1's only for the "N+" & "P+" groups. 0's for all others.
+
+
+## 4 parameters define 4 groups
+
+1. $\theta_0$ = `(Intercept)` = "N-" & "P-" group mean
+1. $\theta_1$ = `n_num` = "N+" & "P-" addition
+1. $\theta_2$ = `p_num` = "N-" & "P+" addition
+1. $\theta_3$ = `interact` = #2 + #3 + "N+" & "P+" addition
+
+
+## 4 parameters define 4 groups
+
+```{r}
+#| echo: true
+
+BM |> slice(c(1,21,41,61,81))
+```
+
+
+## Under the hood
+
+```{r}
+#| echo: true
+
+summary(lm(Biomass ~ n_num + p_num + interact, data = BM))
+```
+
+
+## Model matrix
+
+R does the factor $\rightarrow$ 0/1 conversion behind the scenes:
+
+```{r}
+#| echo: true
+
+mm <- model.matrix(Biomass ~ Nitrogen * Phosphorous, data = BM)
+mm[15:25,]
+```
+
+## 0/1 variables are like switches
+
+$$Y = \theta_0 + \theta_1 N + \theta_2 P + \theta_3 (N \times P ) + \epsilon$$
+
+- Turn on or off group membership
+
+```{r}
+
+mm <- model.matrix(Biomass ~ Nitrogen * Phosphorous, data = BM)
+mm[15:25,]
+```
+
+## Continuous interactions
+
+$$Y = \theta_0 + \theta_1 X_1 + \theta_2 X_2 + \theta_3 (X_1 X_2) + \epsilon$$
+
+- Mathematically the same
+- Multiply $X_1$ and $X_2$
+    - Use for prediction
+- Not all either 0 or 1
+
+
+## Higher order interaction terms
+
+It is difficult enough to interpret a 2-way interaction in a linear model.
+
+- Higher order terms multiply and become virtually impossible to comprehend
+
+$$Biomass = \theta_0 + ... + \theta_k (N \times P \times  K)$$
+
+- What does a significant Nitrogen X Phosphorus X Potassium interaction mean?
+
+
+# Visual communication of statistical models {background-color="#40666e"}
+
+## "Convenience" packages
+
+[`ggstatsplot`](https://indrajeetpatil.github.io/ggstatsplot/)[@Patil2021-zo]
+
+[`tidyplots`](https://tidyplots.org/) [@Engler2025-sk]
+
+- Functions to ease plotting (with ggplot)
+- Changing colors, lines, etc.
+- Adding common statistical "annotations"
+
+
+## Lion Ages
+
+```{r}
+#| echo: false
+
+LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
+  rename(Age = age,
+         `Proportion Black` = proportion.black)
+```
+
+```{r}
+#| echo: true
+#| message: false
+#| fig-align: center
+#| output-location: slide
+
+library(ggstatsplot)
+
+ggscatterstats(
+  data  = LA,
+  x     = `Proportion Black`,
+  y     = Age,
+  color = Caste,
+  xlab  = "Proportion of Black",
+  ylab  = "Age (y)",
+  title = "Prediction of Age from Proportion Black in the Nose",
+  bf.message = FALSE
+)
+```
+
+
+## Horn Length
+
+```{r}
+#| echo: false
+
+set.seed(3575575)
+
+Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
+Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
+Group <- c(rep("Alive", 150),
+           rep("Dead", 30))
+
+HL <- tibble(Horn_Length = c(Alive, Dead),
+             Group = factor(Group))
+```
+
+```{r}
+#| echo: true
+#| output-location: slide
+#| fig-align: center
+
+library(tidyplots)
+
+HL |> 
+  tidyplot(x = Group, y = Horn_Length) |> 
+  add_mean_dash(linewidth = 1) |> 
+  add_sem_errorbar(linewidth = 0.5) |> 
+  add_data_points_beeswarm(color = "firebrick4") |> 
+  add_test_pvalue(hide_info = TRUE, label.size = 4) |> 
+  adjust_size(120, 120) |> 
+  theme_tidyplot(fontsize = 12)+
+  ylab("Horn Length (mm)")
 ```
 
 
