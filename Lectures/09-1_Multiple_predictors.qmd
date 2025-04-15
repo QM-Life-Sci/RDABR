@@ -148,7 +148,8 @@ $$
 #| echo: false
 #| fig-align: center
 
-JL <- read_csv("../data/JetLag.csv", show_col_types = FALSE) |> 
+JL <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/JetLag.csv",
+               show_col_types = FALSE) |> 
   mutate(Treatment = factor(Treatment,
                             labels = c("Control", "Eyes", "Knee")),
          Treatment = fct_relevel(Treatment, "Knee", after = 1L))
@@ -654,7 +655,11 @@ What are the contributions of the fat and lactose content of primate milk to tot
 ```{r}
 #| echo: true
 
-Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+tf <- tempfile()
+
+download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+
+Milk <- read_excel(tf, na = "NA") |> 
   dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
   drop_na()
 Milk
@@ -1021,7 +1026,8 @@ For now:
 ```{r}
 #| echo: false
 
-M <- read_csv("../data/Molerats.csv", col_types = c("cdd")) |> 
+M <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
+              col_types = c("cdd")) |> 
   rename(Caste = caste,
          Mass = ln.mass,
          Energy= ln.energy) |> 

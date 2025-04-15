@@ -42,7 +42,9 @@ theme_set(theme_classic(base_size = 20))
 
 # Housekeeping {background-color="#40666e"}
 
-- PC 2 
+- PC 2
+    - Working on grading
+    - Key posted to canvas soon
 - Micropublication *plan* due
     - Figure
     - Table
@@ -80,7 +82,11 @@ What are the contributions of the fat and lactose content of primate milk to tot
 #| fig-height: 6
 #| echo: false
 
-Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+tf <- tempfile()
+
+download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+
+Milk <- read_excel(tf, na = "NA") |> 
   dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
   drop_na()
 
@@ -193,7 +199,11 @@ But:
 ```{r}
 #| echo: false
 
-Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+tf <- tempfile()
+
+download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+
+Milk <- read_excel(tf, na = "NA") |> 
   select(Species, Milk_Energy, Mass, Neocortex) |>
   mutate(log_Mass = log(Mass)) |> 
   drop_na()
@@ -303,7 +313,8 @@ ggplot(Milk, aes(resid_Neo, Milk_Energy)) +
 ```{r}
 #| echo: false
 
-NMR <- read_csv("../data/Molerats.csv", col_types = c("cdd")) |> 
+NMR <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
+              col_types = c("cdd")) |> 
   rename(Caste = caste,
          Mass = ln.mass,
          Energy= ln.energy) |> 
