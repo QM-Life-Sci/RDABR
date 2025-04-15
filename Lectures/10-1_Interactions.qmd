@@ -741,7 +741,7 @@ HL |>
   add_sem_errorbar(linewidth = 0.5) |> 
   add_data_points_beeswarm(color = "firebrick4") |> 
   add_test_pvalue(hide_info = TRUE, label.size = 4) |> 
-  adjust_size(120, 120) |> 
+  adjust_size(200, 100) |> 
   theme_tidyplot(fontsize = 12)+
   ylab("Horn Length (mm)")
 ```
