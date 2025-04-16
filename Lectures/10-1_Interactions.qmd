@@ -53,6 +53,7 @@ theme_set(theme_classic(base_size = 20))
 
 # Multicollinearity {background-color="#40666e"}
 
+
 ## How are coefficients estimated in multiple regression?
 
 :::: {.columns}
