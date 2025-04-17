@@ -1,5 +1,5 @@
 ---
-title: 'Problem Set 09'
+title: 'Problem Set 10'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
 format:
@@ -20,6 +20,7 @@ library(tidyverse)
 library(readxl)
 library(cowplot)
 library(performance)
+library(ggsci)
 library(GGally)
 
 theme_set(theme_classic())
@@ -28,18 +29,19 @@ theme_set(theme_classic())
 
 ## Predicting height from limb lengths
 
-We should be able to predict someone's height from the lengths of their limbs. Based on a lot of measurements, we know that limb length is about 40-50% of total height. But we can still develop a linear model for prediction.
+We should be able to predict someone's height from the lengths of their limbs. Based on measurements from a very large number of people, we know that limb length is about 40-50% of total height. So we should be able to develop a linear model for prediction.
 
 The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths.
 
 
 ### Activity
 
-Load the data for limb lengths. Try to use `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
+Load the data for limb lengths. Try to use the function `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
 
 ```{r}
 # FIXME
-LL <- read_csv("../data/Limb_Lengths.csv")
+
+LL <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Limb_Lengths.csv")
 LL |> head()
 LL |> summarize_all(.funs = c("mean", "sd"))
 ```
@@ -64,34 +66,38 @@ plot_grid(p1, p2, ncol = 2)
 
 Based on the plots, what do you think the relationship between limb length and height is (positive, negative, or no relationship)?
 
-> 
+> There appears to be a positive relationship between limb length and height. People with longer legs are taller.
+
 
 Fit a single linear model in which height is predicted by both left and right limb lengths (this is an "additive" model). Print out the summary of the model.
 
 ```{r}
 # FIXME
+
 fm_LR <- lm(height ~ left_limb + right_limb, data = LL)
 summary(fm_LR)
 ```
 
-Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit? Use `check_model()` if you wish.
+Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit? Use `ggscatmat()` and `check_model()` to help diagnose the problem.
 
 ```{r}
 # FIXME
-cor(LL$left_limb, LL$right_limb)
 
+ggscatmat(LL)
 check_model(fm_LR)
 ```
 
-> The correlation between them is > 0.99. When we fit a model that includes both limb lengths, there is severe multicollinearity. Separately each is probably a good predictor, but together, they are not good. All of the variation in Height is predicted by the 1st variable in the multiple regression, so there is no variation left for the 2nd variable to predict (and vice versa when the variables are reversed).
+> The correlation between left and right limb lengths is > 0.99. When we fit a model that includes both limb lengths, there is extreme multicollinearity. All of the variation in Height is predicted by the 1st variable in the multiple regression, so there is no variation left for the 2nd variable to predict (and vice versa when the variables are reversed).
 
 
-Fit separate linear models in which height is predicted by left and then right limb length.
+Fit separate linear models in which height is predicted by left and then right limb length. Look at the summaries of these linear models.
 
 ```{r}
 # FIXME
+
 fm_L <- lm(height ~ left_limb, data = LL)
 summary(fm_L)
+
 fm_R <- lm(height ~ right_limb, data = LL)
 summary(fm_R)
 ```
@@ -101,3 +107,87 @@ Do these models make more sense?
 > Yes, for each limb length is a significant predictor of height. This result is what we expect to see.
 
 
+## Neandertal Brains
+
+There are well-known differences in both body size between modern humans and Neanderthals. But are there differences in brain size as well, adjusted for body size? Ruff and colleagues (1997) tried to answer just that question.^[Ruff, C.B., E. Trinkaus, and T.W. Holliday. 1997. Body mass and encephalization in Pleistocene *Homo*. *Nature* 387: 173-176.]
+
+### Activity
+
+The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and then:
+
+1. Convert `Species` to a factor.
+2. Re-level `Species` so that "Recent" is the base level of the factor.
+    - Or do both steps at the same time.
+
+```{r}
+# FIXME
+NBS <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/NeandertalBrainSize.csv",
+                col_types = "ddc") |> 
+  mutate(Species = fct_relevel(Species, "Recent"))
+```
+
+Make a scatterplot of brain size vs. body mass, with points colored by species. 
+
+- See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
+- Add a linear regression line to the plots
+
+```{r}
+# FIXME
+
+NBS |> ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+  geom_point(size = 3) +
+  geom_smooth(formula = y ~ x, se = FALSE, method = "lm") +
+  scale_color_d3() +
+  guides(color = guide_legend(position = "inside")) +
+  theme(legend.position = "inside",
+        legend.justification.inside = c(1, 0)) +
+  labs(x = "ln Body Mass", y = "ln Brain Size")
+
+# Alternately
+# NBS |> ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+#   geom_point(size = 3) +
+#   geom_smooth(formula = y ~ x, se = FALSE, method = "lm") +
+#   scale_color_d3() +
+#   guides(color = guide_legend(position = "inside")) +
+#   theme(legend.position = "inside",
+#         legend.position.inside = c(0.75, 0.12)) +
+#   labs(x = "ln Body Mass", y = "ln Brain Size")
+
+```
+
+What is your interpretation of the plot? What patterns do you observe?
+
+> (log) brain size increases with (log) body mass in both Recent human and Neandertals. For a given body size, Recent humans appear to have larger brains.
+
+
+Fit three linear models and assign each to an object:
+
+1. Brain size modeled by body mass
+2. Brain size modeled by body mass and species (additive)
+3. Brain size modeled by body mass and species with the mass X species interaction
+
+Then print the summary for each model.
+
+```{r}
+# FIXME
+
+fm1 <- lm(ln_Brain ~ ln_Mass, data = NBS)
+fm2 <- lm(ln_Brain ~ ln_Mass + Species, data = NBS)
+fm3 <- lm(ln_Brain ~ ln_Mass * Species, data = NBS)
+
+summary(fm1)
+summary(fm2)
+summary(fm3)
+```
+
+In words, describe what each regression model represents. Feel free to follow the example in the slides for units 9 and 10.
+
+> Model 1: A single regression line (Brain size vs. Mass) passes through all points, regardless of the Species. Model 2: Separate intercepts are fit for both Species, but a single slope is shared between the two. The lines are constrained to be parallel. Model 3: Separate slopes and intercepts for both Species. Essentially this fits two separate lines.
+
+Which model do the lines in the figure above represent?
+
+> Model 3 with the interaction.
+
+What does each line in the summary of Model 3 represent?
+
+> (intercept): The intercept for the Recent group. ln_Mass: The slope for the recent group. SpeciesNeanderthal: The change in (Intercept) for being in the Neandertal group. ln_Mass:SpeciesNeanderthal: The change in the ln_Mass slope for being in the Neandertal group.
