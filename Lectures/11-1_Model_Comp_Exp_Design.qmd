@@ -1,0 +1,1116 @@
+---
+title: "Unit 11: Model Copmarison"
+sibtitle: "Experimental Design"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(readxl)
+library(wesanderson)
+library(ggrepel)
+library(glue)
+library(ICC)
+
+options(scipen = 999)
+
+theme_set(theme_classic(base_size = 20))
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- Micropublication *plan* due Thursday
+    - Figure
+    - Table
+    - Planned analysis
+- Reminder
+    - Presentation day food
+
+
+# Outline {background-color="#40666e"}
+
+- Model Comparison
+    - Information criteria
+    - Cross-validation
+- Experimental design
+    - "Repeatability"
+    - Power
+    - Planning experiments
+
+# Model Comparison {background-color="#40666e"}
+
+
+## No model represents the true biological process
+
+- This is actually good. We want abstraction.
+
+Which model comes *closest* to the true biological process from a *(small) set of working hypotheses*?
+
+- What is "close"?
+- How should we designate "preferred"?
+- How good is good enough?
+- How should we compare among them?
+
+
+## Tradeoff in model specification
+
+**Underfitting** ("bias"):
+
+- Model doesn't describe the observed sample *well enough*.
+- Leads to poor prediction
+
+**Overfitting** ("variance")
+
+- Model describes the observed sample *too well*.
+- Leads to poor prediction
+
+
+## Balancing overfitting and underfitting
+
+- Think of models as "learning" about the observed data
+- Find a balance between *regular* features (what we want to model) and *irregular* features (noise we want to ignore).
+
+
+## Brain volume and (estimated) body mass in hominins (*Homo*)
+
+```{r}
+#| echo: false
+Species <- c("afarensis", "africanus", "habilis", "boisei",
+             "rudolfensis", "ergaster", "sapiens")
+Brain_Vol <- c(438, 452, 612, 521, 752, 871, 1350)
+Mass <- c(37, 35.5, 34.5, 41.5, 55.5, 61, 53.3)
+M <- data.frame(Species, Brain_Vol, Mass)
+M |> knitr::kable(col.names = c("Species",
+                                "Brain Volume (cc)",
+                                "Mass (kg)"),
+                  format = "html")
+```
+
+
+## Brain volume and body mass in hominins
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 4) +
+  geom_text_repel(size = 4, force = 15,
+                  fontface = "italic",
+                  box.padding = unit(0.5, "lines"),
+                  point.padding = unit(0.5, "lines"),
+                  seed = 29) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 6 polynomial models {.smaller}
+
+1. $BV \sim \theta_0 + \theta_1 M$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3 + \theta_4 M^4$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3 + \theta_4 M^4 + \theta_5 M^5$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3 + \theta_4 M^4 + \theta_5 M^5 + \theta_6 M^6$
+
+Compare *R*^2^ among these models.
+
+
+## 1: $BV \sim \theta_0 + \theta_1 M$
+
+```{r}
+fm1 <- lm(Brain_Vol ~ Mass, data = M)
+coef(fm1)
+summary(fm1)$r.squared
+```
+
+
+## 1: $BV \sim \theta_0 + \theta_1 M$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(formula = y ~ x, method = "lm", color = "firebrick4", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 2. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2$
+
+```{r}
+fm2 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2), data = M)
+coef(fm2)
+summary(fm2)$r.squared
+```
+
+
+## 2. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 2)',
+              color = "firebrick4", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 3. $BV \sim \theta_0 + ... + \theta_3 M^3$
+
+```{r}
+fm3 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3), data = M)
+coef(fm3)
+summary(fm3)$r.squared
+```
+
+
+## 3. $BV \sim \theta_0 + ... + \theta_3 M^3$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 3)',
+              color = "firebrick4", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 4. $BV \sim \theta_0 + ... + \theta_4 M^4$
+
+```{r}
+fm4 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
+            I(Mass ^ 4), data = M)
+coef(fm4)
+summary(fm4)$r.squared
+```
+
+
+## 4. $BV \sim \theta_0 + ... + \theta_4 M^4$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 4)',
+              color = "firebrick4", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 5. $BV \sim \theta_0 + ... + \theta_5 M^5$
+
+```{r}
+fm5 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
+            I(Mass ^ 4) + I(Mass ^ 5), data = M)
+coef(fm5)
+summary(fm5)$r.squared
+```
+
+
+## 5. $BV \sim \theta_0 + ... + \theta_5 M^5$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 5)',
+              color = "firebrick4", lwd = 1.5) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 6. $BV \sim \theta_0 + ... + \theta_6 M^6$
+
+```{r}
+fm6 <- lm(Brain_Vol ~ Mass + I(Mass ^ 2) + I(Mass ^ 3) +
+            I(Mass ^ 4) + I(Mass ^ 5) + I(Mass ^ 6), data = M)
+coef(fm6)
+summary(fm6)$r.squared
+```
+
+
+## 6. $BV \sim \theta_0 + ... + \theta_6 M^6$
+
+```{r}
+#| echo: false
+#| warning: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(method = "lm", formula = 'y ~ poly(x, 6)',
+              color = "firebrick4", lwd = 1.5,
+              se = FALSE) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## Summary R^2^
+
+Polynomial Degree  | R^2^  |
+------------------:|------:|
+1                  | `r round(summary(fm1)$r.squared, 2)`
+2                  | `r round(summary(fm2)$r.squared, 2)`
+3                  | `r round(summary(fm3)$r.squared, 2)`
+4                  | `r round(summary(fm4)$r.squared, 2)`
+5                  | `r round(summary(fm5)$r.squared, 2)`
+6                  | `r round(summary(fm6)$r.squared, 2)`
+
+
+## Which model(s) balance under- vs. overfitting?
+
+Model 0: Mean only
+
+- Poor *in-sample* prediction
+- Poor *out-of-sample* prediction
+
+. . .
+
+Model 1: Maybe enough information?
+
+. . .
+
+Model 6: Clearly overfit
+
+- Perfect *in-sample* prediction
+- Poor *out-of-sample* prediction
+
+
+## Methods for model comparison
+
+1. Likelihood ratio tests (not covered here)
+2. Information criteria
+3. Cross validation
+
+
+# Information Criteria {background-color="#40666e"}
+
+
+## Tradeoff in model specification
+
+> "Overfitting: **fitting is easy; prediction is hard**. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+
+
+## Kullback-Leibler information
+
+**No model represents the true process that generated the outcomes.**
+
+**Information** is the distance between a proposed model and reality
+
+  - Information lost when trying to approximate the true model
+  - Amount of "surprise" when a model predicts new data
+
+K-L information doesn't aid directly in model evaluation (what is the true model?)
+
+
+## Estimation of K-L information
+
+Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
+
+- Maximized log-likelihood could be used to estimate the *expected* K-L divergence between the candidate model and the true model.
+
+![](https://i.imgur.com/WLVjbKW.jpg){fig-align="center"}
+
+
+## Akaike's Information Criterion
+
+"An Information Criterion": AIC is proportional to the *relative* K-L information of a model:
+
+$$\mbox{AIC} = -2 LL + 2 k$$
+
+- $LL$ is model log-likelihood
+- $-2$ comes in "for historical reasons" having to do with the $\chi^2$ distribution.
+
+
+## Calculating AIC
+
+log-likelihood for the intercept only (overall mean) model for the naked mole rats data:
+
+```{r}
+#| echo: true
+
+logLik(fm1)
+-2 * as.numeric(logLik(fm1)) + 2 * 2
+AIC(fm1)
+```
+
+
+## AIC
+
+- AIC is a measure of the *lack* of model fit
+    - Smaller AIC is better
+- No notion of "significance".
+    - Comparison is the key
+
+
+## AIC
+
+- Negative twice the log-likelihood + 2 X *number of estimated parameters*
+    - Penalization of models with large number of estimated parameters, because they will always fit the observed data better
+    - Parsimony as a side-effect
+- AIC was defined for large sample sizes
+
+
+## AICc
+
+- AICc adapts AIC for small samples
+    - AICc is asymptotic with AIC for large samples but less biased for small *n*
+
+$$AICc = -2 LL + 2 k + \frac{2k(k+1)}{n - k - 1}$$
+
+- $LL$ is log-likelihood
+- Added "parameter" $\rightarrow$ 0 as $n \rightarrow \infty$
+- Use AICc except when n/k > ~40 [@Burnham2002-xt]
+
+
+## Comparing models with AIC (AICc)
+
+1. Fit a set of candidate models (hypotheses)
+1. Rank models according to AIC
+1. Find the model with the lowest AIC
+1. $\Delta$AIC is the value of AIC~lowest~ - AIC~model~
+
+
+## Comparing models with AIC (AICc)
+
+Rules of thumb:
+
+- $\Delta$AIC $\leq$ 2: Substantial support
+- $\leq$ 4 $\Delta$AIC $\leq$ 7: Considerably less support
+- $\Delta$AIC $\geq$ 10: very little support
+
+In practice:
+
+- $\Delta$AIC < 4: Equally well supported
+
+**This does not mean that the model you have ranked highest is a good model for the data in any absolute sense.**
+
+
+## Akaike weights: evidence ratios
+
+Back-transforming the logged likelihoods allows us to standardize AICs:
+
+$$w_i = \frac{e^{-\Delta_i / 2}}{\sum_{r = 1}^R e^{-\Delta_r / 2}}$$
+
+$w$ is a rescaled AIC on a scale of 0 $\rightarrow$ 1, giving the probability of a model actually being the best K-L model among *R* models.
+
+- Still conditional on the data and the models
+    - Maybe a better model is not in the sample of models
+
+
+## Energy expenditure in naked mole rats
+
+```{r}
+#| echo: false
+
+NMR <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
+              col_types = c("cdd")) |> 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) |> 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
+
+ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.15, 0.85)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Fit different models to these data
+
+1. Grand mean (overall mean, no body mass)
+1. Categorical only (group mean, no body mass)
+1. Continuous only (body mass only, no grouping)
+1. Mixed predictors, intercepts varying
+1. Interaction model, slopes varying & intercepts varying
+
+
+## Models
+
+```{r}
+fm1 <- lm(Energy ~ 1, data = NMR)
+fm2 <- lm(Energy ~ Caste, data = NMR)
+fm3 <- lm(Energy ~ Mass, data = NMR)
+fm4 <- lm(Energy ~ Mass + Caste, data = NMR)
+fm5 <- lm(Energy ~ Mass * Caste, data = NMR)
+```
+
+
+## Working with AIC
+
+AIC is built-in to R:
+
+```{r}
+#| echo: true
+
+AIC(fm1)
+```
+
+AICc is not:
+
+```{r}
+#| echo: true
+
+library(AICcmodavg)
+AICc(fm1)
+```
+
+Get in the habit of using AICc.
+
+
+## AIC Tables
+
+`AICcmodavg::aictab()` for model comparison:
+
+```{r}
+#| echo: true
+
+aictab(cand.set = list("~ 1" = fm1, "~ Caste" = fm2, "~ Mass" = fm3,
+                       "~ Mass + Caste" = fm4, "~ Mass * Caste" = fm5))
+```
+
+`Mass + Caste` and `Mass * Caste` are not that different
+
+- What should we do?
+
+
+## General approach
+
+1. Define hypotheses (models)
+1. Calculate AICc for each. 
+1. Sort by AICc. Calculate $\Delta$AICc.
+1. Models with $\Delta$AICc within ~4 are all roughly equivalent
+1. Decide what to do.
+    - Describe multiple models
+    - Compare Akaike weights
+
+AIC answers the question: what model is most likely to have best out-of-sample prediction
+
+
+# Cross-Validation {background-color="#40666e"}
+
+## Logic of cross-validation
+
+For each candidate model:
+
+- Use part of the data to fit a model (split into groups: *folds*)
+- Use the model to predict the values of the rest of the data
+- Calculate some estimate of error for each split
+- Average the error
+
+Compare the models
+
+
+## Prediction for a model
+
+Drop 1 observation:
+
+```{r}
+fm1_cv <- lm(Energy ~ 1, data = NMR |> slice(-1))
+```
+
+Predict that observation using the model:
+
+```{r}
+(pred <- predict(fm1_cv, newdata = NMR |> slice(1)))
+```
+
+Calculate squared error:
+
+```{r}
+(NMR$Energy[1] - pred) ^ 2
+```
+
+
+## Data splits
+
+Leave-one-out
+
+- Sequentially drop each observation
+- Calculate prediction error for each
+- Square-root of the mean squared error (RMSE)
+
+$k$-fold
+
+- Split the data into $k$ equal groups
+- Calculate the square-root of the *mean* error for each fold
+    - Mean of means across folds
+- 5 or 10 are common
+
+
+## Cross-validation with `cvFit()`
+
+```{r}
+library(cvTools)
+
+cvFit(fm1, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+cvFit(fm2, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+cvFit(fm3, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+cvFit(fm4, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+cvFit(fm5, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Experimental Design {background-color="#40666e"}
+
+
+## Planning experiments
+
+- Define (and write down) your main question
+    - What do I want to learn?
+- Define useful models
+
+Key questions to ask at every step:
+
+1. **What question am I trying to answer?**
+1. **What processes could have produced the pattern I am observing?**
+    - Don't fool yourself
+
+
+## Parsing real variation vs. measurement error
+
+How good are my observations?
+
+1. Continuous measurements: **intraclass correlation coefficient** (ICC)
+1. Discrete measurements: **interrater reliability** (IRR)
+
+## Visualizing ANOVA
+
+![](https://i.imgur.com/dNF4ph0.png){fig-align="center"}
+
+$$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
+
+
+## Collecting data for ICC
+
+- Measure the same individual or sample multiple times (*technical replicates*)
+- Randomize the order of samples
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+tf <- tempfile()
+download.file("https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/G44_Morphometrics.xlsx", destfile = tf)
+
+G44 <- read_excel(tf) |> 
+  mutate(MouseID = factor(MouseID))
+
+G44_long <- G44 |> 
+  dplyr::select(MouseID, Len1, Len2) |> 
+  pivot_longer(cols = -MouseID, names_to = "Replicate", values_to = "Length")
+
+icc <- ICCest(x = G44_long$MouseID, y = G44_long$Length)$ICC |> round(digits = 3)
+
+ggplot(G44, aes(Len1, Len2)) +
+  geom_abline(slope = 1, linetype = "dotted") +
+  geom_point(size = 2) +
+  coord_equal() +
+  scale_x_continuous(limits = c(14.5, 17.5),
+                     breaks = seq(14.5, 17.5, by = 0.5)) +
+  scale_y_continuous(limits = c(14.5, 17.5),
+                     breaks = seq(14.5, 17.5, by = 0.5)) +
+  labs(x = "Length #1 (mm)", y = "Length #2 (mm)",
+       title = glue("ICC = {icc}"))
+
+```
+
+
+## Intraclass Correlation Coefficient
+
+Uses the results of the linear model (ANOVA):
+
+$$\mbox{Measurement} \sim \mbox{Sample ID}$$
+
+or the multilevel model
+
+$$\mbox{Measurement} \sim 1 + (1 | \mbox{Sample ID})$$
+
+
+## Intraclass Correlation Coefficient
+
+For continuously varying measurements:
+
+$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
+
+$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
+
+- $n$ = Number of measurements per specimen (*not the sample size*).
+
+
+## Repeatability of lipid levels in the same sample
+
+![](https://i.imgur.com/6nkJATA.png){fig-align="center"}
+
+
+## Calculation of ICC
+
+What is the ICC of repeated measurements of lipid levels in fruit flies?
+
+```{r}
+#| echo: false
+#| message: false
+
+MM <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/macromol_optim.csv", show_col_types = FALSE) |> 
+  mutate(replicate = rep(paste0("rep",c(1,2)),439),
+         Line = factor(Line))
+glimpse(MM)
+
+```
+
+
+## Pairs of measurements
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+wideM <- MM |>
+  select(replicate,Line,Lipid.per.Fly) |>
+  pivot_wider(names_from = replicate, values_from = Lipid.per.Fly)
+
+ggplot(wideM, aes(rep1, rep2)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dotted") +
+  geom_point() +
+  xlab("Lipid Level #1") +
+  ylab("Lipid Level #2") +
+  coord_equal() +
+  scale_x_continuous(limits = c(0, 3)) +
+  scale_y_continuous(limits = c(0, 3)) +
+  theme(text = element_text(size = 20))
+
+```
+
+
+## ICC via ANOVA
+
+```{r}
+#| echo: true
+
+fm <- lm(Lipid.per.Fly ~ Line, data = MM)
+print(anova(fm), digits = 5)
+
+var_a <- (0.39597 - 0.10035) / 2
+var_a / (var_a + 0.10035)
+
+```
+
+ICC is 0.60 for these measurements.
+
+
+## With `ICCest()`
+
+```{r}
+#| echo: true
+
+library(ICC)
+
+ICCest(Line,
+       Lipid.per.Fly,
+       data = MM,
+       alpha = 0.05,
+       CI.type = "Smith")
+
+```
+
+
+## Additional utility functions in `ICC` package
+
+`Nest()`: Given a predicted ICC and *k* measures per individual/group, this function will calculate the *N* individuals/groups required to obtain a desired confidence interval
+
+`effort()`: Given a fixed researcher effort (e.g., total number of assays able to be run), this function plots the optimum *k* measurements per individual to use in order to obtain the smallest confidence interval at an expected intraclass correlation coefficient (ICC) estimate.
+
+
+## Interrater reliability
+
+How well do observers agree on an observation or categorization?
+
+- Different observers (should be randomized and blinded)
+- Same observer on different occasions (should be randomized and blinded; hours/days/weeks apart)
+
+Measured by Cohen's $\kappa$. See Fleiss [-@Fleiss1971-pa] for details.
+
+- Fleiss's method generalizes Cohen's method to more than two observers (but works fine for only two).
+
+
+## Scoring archosaur suture morphology
+
+![](https://i.imgur.com/y9SByTR.png){fig-align="center"}
+
+From Bailleul et al. [-@Bailleul2016-tk]
+
+
+## Characters
+
+```{r}
+#| echo: true
+
+tf <- tempfile()
+download.file("https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/GatorObs.xlsx", destfile = tf)
+
+MM <- read_excel(tf)
+MM |> filter(Specimen == "MOR-OST-1645")
+```
+
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+#| echo: true
+
+Obs1 <- MM |> 
+  select(-Specimen) |> 
+  filter(Observer == 1) |>
+  as.matrix() |> 
+  as.numeric()
+
+Obs2 <- MM |> 
+  select(-Specimen) |> 
+  filter(Observer == 2) |>
+  as.matrix() |> 
+  as.numeric()
+```
+
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+#| echo: true
+
+Obs1[1:20]
+Obs2[1:20]
+```
+
+
+## Calculating IRR with `CohenKappa()`
+
+```{r}
+#| echo: true
+#| warning: false
+
+library(DescTools)
+CohenKappa(Obs1, Obs2, conf.level = 0.95)
+```
+
+Arbitrary categorizations:
+
+- Over 0.75 = excellent
+- Between 0.75 and 0.4 = good to fair
+- Less than 0.4 = poor
+
+
+## Additional diagnostics
+
+```{r}
+#| echo: true
+
+cor.test(Obs1, Obs2, method = "spearman", exact = FALSE)
+sum(Obs1 != Obs2) / length(Obs1) # Percent disagreement
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Power {background-color="#40666e"}
+
+
+## Decision errors
+
+Mistake #1: Concluding predictor(s) is important when it really isn't. 
+
+```{r}
+#| echo: true
+
+set.seed(10)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+gg <- c(rep('a',nn), rep('b',nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type I error = A false positive = A false discovery
+
+
+## Decision errors
+
+Mistake #2: predictor(s) is not important when it really is. 
+
+```{r}
+#| echo: true
+
+set.seed(93)
+nn <- 10
+group1.mean <- 5
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+gg <- c(rep('a', nn), rep('b', nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type II error = False Negative
+
+
+## Types of errors and statistical power {.smaller}
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+Type I error occurs when:
+
+- *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+Type II error probability depends on:
+
+- The value of $\alpha$
+- How "wrong" H~0~ is
+
+
+## Power
+
+- Given a true effect, the probability that a random sample will lead to a rejection of H~0~
+    - The proportion of times you **DO NOT** make a Type II error
+- Dependent on how different the truth is from the null hypothesis
+- Inversely related to type II errors
+    - High power $\rightarrow$ low type II errors
+    - Low power $\rightarrow$ high type II errors
+
+
+## Power depends on effect size
+
+*Effect size*: The magnitude of the deviation from H~0~.
+
+If we can estimate effect size *before we do the study*, we can estimate the power.
+
+- Use previous information
+    - Your own pilot studies
+    - Other similar studies
+- Determine how big a difference we *wan*t to be able to detect
+    - How small of a difference is not biologically meaningful?
+
+
+## Effect size
+
+> "a standardized measure that quantifies the size of the difference between two groups or the strength of an association between two variables." [@Button2013-vg]
+
+Measures of effect size:
+
+1. Pearson's *r*
+1. *R*^2^: but note caveats of *R*^2^
+1. Cohen's *d*: *t*-tests [@Cohen1960-kq]
+1. Cohen's $f^2$, $\eta^2$: ANOVA-like [@Olejnik2003-km]
+1. Odds ratio (logistic regression)
+
+
+## Example calculation of effect size (~2,500 mice)
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
+tf <- tempfile()
+download.file("https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/Mouse_Weaning_Data.xlsx", destfile = tf)
+
+M <- read_excel(tf) |>
+  mutate(Sex = ifelse(Sex == 0, "Female", "Male"),
+         Sex = factor(Sex)) |> 
+  select(Sex, WnMass) |> 
+  drop_na()
+
+ggplot(M, aes(x = WnMass)) +
+  geom_histogram(bins=30) +
+  facet_grid(Sex ~ .)
+```
+
+
+## Cohen's *d*
+
+Standardized differences measured in standard deviations.
+
+General guide for *t*-tests [also see @Sullivan2012-rr]:
+
+- 0.2 = "Small"
+- 0.5 = "Medium"
+- 0.8 = "Large"
+
+What you do with "small", "medium", and "large" is up to you.
+
+
+## According to Cohen
+
+> "there is a certain risk inherent in offering conventional operational definitions for those terms for use in power analysis in as diverse a field of inquiry as behavioral science"
+
+$$ d = \frac{\bar{Y_F} - \bar{Y_M}}{s_{\mbox{pooled}}} $$
+
+
+## Cohen's *d* using the `DescTools` package
+
+```{r}
+library(DescTools)
+Females <- M |> filter(Sex == "Female") |> pull(WnMass)
+Males <- M |> filter(Sex == "Male") |> pull(WnMass)
+CohenD(Females, Males)
+```
+
+But...
+
+```{r}
+t.test(WnMass ~ Sex, data = M, var.equal = TRUE)
+```
+
+
+## $\eta^2$ for jet lag data with `EtaSq()`
+
+Also in `DescTools`:
+
+```{r}
+#| echo: true
+
+JL <- read_csv("../data/JetLag.csv", col_types = "cd") |> 
+  mutate(Treatment = factor(Treatment))
+fm <- lm(Shift ~ Treatment, data = JL)
+EtaSq(fm)
+```
+
+
+## Power analysis is used for planning
+
+1. What sample size do I need for some level of power?
+1. What is my power for some sample size?
+1. How large of a difference can I detect for some power and sample size?
+
+How much power is enough power? Some say 0.8.
+
+
+## Post-analysis power calculations
+
+Hoenig and Heisey [-@Hoenig2001-hz]:
+
+> "There is a large literature advocating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statistically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
+
+- Don't be tempted to calculate power after the data is collected (and no significant effect is found)
+
+
+## Power analysis in R
+
+1. `pwr` package
+    - `pwr.t.test()`
+    - `pwr.anova.test()`
+    - `pwr.r.test()`
+1. Do it yourself. For all but the simplest experimental designs, this is the only option.
+    - Simulate data across a range of sample sizes and effect sizes.
+
+
+## Commonalities
+
+1. *n* samples (*k* groups)
+1. *d* or *f* for hypothesized effect size (*r* hypothesized correlation)
+1. $\alpha$ level
+1. Power
+
+```{r}
+#| echo: true
+
+library(pwr)
+cohen.ES(test = "anov", size = "medium")
+```
+
+
+## Power analysis for a *t*-test
+
+Possible questions:
+
+1. What sample size do I need for a given effect size, $\alpha$, and power?
+1. What will my power be, for a given effect size, $\alpha$, and sample?
+1. What effect size will I be able to detect for a given sample, power, and $\alpha$? (This is difficult, because how do you know power?)
+
+
+## What sample size?
+
+```{r}
+#| echo: true
+
+pwr.t.test(d = 0.5, sig.level = 0.05, power = 0.80,
+           type = "two.sample")
+```
+
+
+## What is my power?
+
+```{r}
+#| echo: true
+
+pwr.t.test(d = 0.5, sig.level = 0.05, n = 15,
+           type = "two.sample")
+```
+
+
+## What effect size can I detect?
+
+```{r}
+#| echo: true
+
+pwr.t.test(power = 0.80, sig.level = 0.05, n = 1227,
+           type = "two.sample")
+```
+
+
+## Power analysis via simulation
+
+```{r}
+#| echo: true
+
+library(pwr)
+pwr.t.test(power = 0.8, d = 0.6)
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+## References
+
+::: {#refs}
+:::
+
