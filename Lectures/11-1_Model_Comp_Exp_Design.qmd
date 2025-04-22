@@ -500,7 +500,11 @@ aictab(cand.set = list("~ 1" = fm1, "~ Caste" = fm2, "~ Mass" = fm3,
 
 `Mass + Caste` and `Mass * Caste` are not that different
 
-- What should we do?
+:::{.center}
+:::{.alert}
+What should we do?
+:::
+:::
 
 
 ## General approach
@@ -551,20 +555,22 @@ Calculate squared error:
 ```
 
 
-## Data splits
+## Types of Cross-validation
 
-Leave-one-out
+Leave-one-out (LOO)
 
 - Sequentially drop each observation
 - Calculate prediction error for each
 - Square-root of the mean squared error (RMSE)
+- Can be slow (approximations available)
 
 $k$-fold
 
 - Split the data into $k$ equal groups
 - Calculate the square-root of the *mean* error for each fold
     - Mean of means across folds
-- 5 or 10 are common
+- 5-fold or 10-fold are common
+- Better for large datasets and/or slow analyses
 
 
 ## Cross-validation with `cvFit()`
@@ -573,11 +579,28 @@ $k$-fold
 library(cvTools)
 
 cvFit(fm1, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+```
+
+. . .
+
+```{r}
 cvFit(fm2, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+```
+
+. . .
+
+```{r}
 cvFit(fm3, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
 cvFit(fm4, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
 cvFit(fm5, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
 ```
+
+
+## More Resources
+
+[James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. *An Introduction to Statistical Learning*](https://www.statlearning.com/)
+
+![](https://images.squarespace-cdn.com/content/v1/5ff2adbe3fe4fe33db902812/1611294680091-25SIDM9AHA8ECIFFST23/Screen+Shot+2021-01-21+at+11.02.06+AM.png){width=35% fig-align="center"}
 
 
 # Questions {background-color="#f8c471"}
