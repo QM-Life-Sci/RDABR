@@ -941,14 +941,14 @@ Type II error probability depends on:
 
 ## Power depends on effect size
 
-*Effect size*: The magnitude of the deviation from H~0~.
+*Effect size*: The standardized magnitude of the deviation from H~0~.
 
 If we can estimate effect size *before we do the study*, we can estimate the power.
 
 - Use previous information
     - Your own pilot studies
     - Other similar studies
-- Determine how big a difference we *wan*t to be able to detect
+- Determine how big a difference we *want* to be able to detect
     - How small of a difference is not biologically meaningful?
 
 
@@ -983,7 +983,8 @@ M <- read_excel(tf) |>
 
 ggplot(M, aes(x = WnMass)) +
   geom_histogram(bins=30) +
-  facet_grid(Sex ~ .)
+  facet_grid(Sex ~ .) +
+  labs(x = "Weaning Mass (g)", y = "Count")
 ```
 
 
@@ -1116,16 +1117,6 @@ pwr.t.test(d = 0.5, sig.level = 0.05, n = 15,
 
 pwr.t.test(power = 0.80, sig.level = 0.05, n = 1227,
            type = "two.sample")
-```
-
-
-## Power analysis via simulation
-
-```{r}
-#| echo: true
-
-library(pwr)
-pwr.t.test(power = 0.8, d = 0.6)
 ```
 
 
