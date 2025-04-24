@@ -33,7 +33,7 @@ Packages you will need for this problem set:
 - `ICC`
 - `pwr`
 - `AICcmodavg`
-- `cvtools`
+- `cvTools`
 
 Install them now using the "Packages" pane (if you haven't already).
 
