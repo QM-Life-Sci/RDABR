@@ -1,0 +1,267 @@
+---
+title: 'Problem Set 11'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+format:
+  html:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    embed-resources: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+
+theme_set(theme_classic())
+```
+
+
+Packages you will need for this problem set:
+
+- `ICC`
+- `pwr`
+- `AICcmodavg`
+- `cvtools`
+
+Install them now using the "Packages" pane (if you haven't already).
+
+
+## Neandertal Brains
+
+In Problem Set 10, we looked at a dataset of Neandertal brain size. Review that question.
+
+Using the code you wrote (or the code from the key), load the `NeandertalBrainSize.csv` dataset and relevel so that "Recent" is the base level for the `Species` variable.
+
+```{r}
+
+
+```
+
+Copy the code you wrote for making a scatterplot of the data to remind yourself of the patterns.
+
+```{r}
+
+
+```
+
+We fit three linear models and assigned each to an object:
+
+1. Brain size modeled by body mass
+2. Brain size modeled by body mass and species (additive)
+3. Brain size modeled by body mass and species with the mass X species interaction
+
+Copy your model code from PS 10 and fit the models:
+
+```{r}
+
+
+```
+
+We had left off at this point: fitting the models but not deciding which was the best fit to the data.
+
+
+### Information criteria
+
+Use the `aictab()` function from the `AICcmodavg` to generate the AICc model comparison table for the three models.
+
+```{r}
+
+
+```
+
+Notice that the values of AICc are negative. This can happen and is not a problem at all or a sign that something has gone wrong. You have to think a little harder about what "lower" means (in this case *more negative*). The interpretation stays the same -- lower AICc is better.
+
+Which model has the lowest AICc value?
+
+> 
+
+
+What is the difference (Delta-AICc) between the best and 2nd best model?
+
+> 
+
+
+Overall, what is your interpretation of the `Delta_AICc` column?
+
+> 
+
+
+Interpret the model weights in the `AICCWt` column. Remember that model weights can be interpreted as a probability that the model in that row is the best model for out-of-sample prediction.
+
+> 
+
+
+If these were your data, how would you proceed in the "Results" and "Discussion" sections of your maunscript?
+
+> 
+
+
+### Cross-validation
+
+Follow the example in the lecture slides to carry out leave-one-out cross validation on these models using the `cvFit()` function from the `cvTools()` package. Cross-validation uses the data to determine the root-mean-squared prediction error for a model (RMSE).
+
+```{r}
+
+
+```
+
+What are the RMSE values for the three models?
+
+> 
+
+
+What is your interpretation of the LOO cross-validation model comparison?
+
+> 
+
+
+Considering both the AICc table and the cross-validation, do the results agree or disagree? Why or why not?
+
+> 
+
+
+What do you interpret about the possible differences in brain scaling vs. body size in Recent humans vs. Neandertals based on these analyses?
+
+> 
+
+
+## Repeatability: Intraclass correlation coefficient
+
+The model you use to calculate the intraclass correlation coefficient *is* a type of multilevel model -- you have repeated measurements for a single specimen. Those measurements are obviously not independent from one another (that is the point of repeated measurements -- to estimate the consistency of measurements as compared to the differences between individuals). In this case, we can use the non-independence to get as estimate of the relative between *measurement* variation vs. between *specimen* variation?
+
+The data we will be working with includes repeated measurements of the "femur" of Walking Sticks:
+
+![](https://i.imgur.com/CVTtMkJ.png){fig-width=50%}
+
+Because the measurements are small (~ 0.25 cm), you are concerned that they will not be very repeatable. Before collecting all the data, you want to estimate the intraclass correlation coefficient of these measurements using a small, preliminary dataset.
+
+You take 2 measurements each on 25 different walking stick femurs, which are included in the files `WalkingStickFemurs.csv`.
+
+
+### Activity
+
+Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
+
+```{r}
+
+
+```
+
+Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
+
+The code block below pivots the data to wide format. The steps are:
+
+- Use `Specimen` as the `id_cols`
+- Take values from `Femur_length`
+- Take column names from `Measurement`
+- Use the `names_prefix =` option to place the string "Measurement_" before the column name
+
+Change `eval: false` to `eval: true`. You might need to change the name `WSF` to match your object name from above.
+
+```{r}
+#| eval: false
+
+WSF_wide <- WSF |> 
+  pivot_wider(id_cols = Specimen,
+              values_from = Femur_length,
+              names_from = Measurement,
+              names_prefix = "Measurement_")
+WSF_wide |> head()
+```
+
+The top of the resulting tibble should look like:
+
+```
+# A tibble: 25 × 3
+   Specimen Measurement_1 Measurement_2
+   <fct>            <dbl>         <dbl>
+ 1 1                 0.26          0.26
+ 2 2                 0.23          0.19
+ 3 3                 0.25          0.23
+ ```
+
+There will be 25 rows total.
+
+Using the "wide" data, plot the pairs of observations as a scatterplot. We have to use the wide data because we need the two measurements in different columns.
+
+- Add a line with a slope of 1 and intercept of 0 using `geom_abline()`
+- Set the axis coordinates to equal scaling with `coord_equal()`
+
+```{r}
+
+
+```
+
+
+Based on your plot, do you expect ICC to be high or low? Give an estimate?
+
+> 
+
+
+Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides. 
+
+Note that you will need to use the original data (not the pivoted data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
+
+```{r}
+
+
+```
+
+
+Would you be comfortable going forward with data collection given this value for ICC?
+
+> 
+
+
+## Planning experiments
+
+Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+
+
+### Activity
+
+Use `cohen.ES()` from the `pwr` package to look up the effect size for a "small" effect for a *t*-test.
+
+```{r}
+
+
+```
+
+Before we do the calculation. Take a guess how many individuals you would need in each independent group (a "two-sample t-test") to detect a small effect size with alpha = 0.05 and power = 0.80.
+
+> 
+
+Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
+
+```{r}
+
+
+```
+
+Repeat the test above but for a paired *t*-test.
+
+```{r}
+
+
+```
+
+Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+
+```{r}
+
+
+```
+
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+
+```{r}
+
+
+```

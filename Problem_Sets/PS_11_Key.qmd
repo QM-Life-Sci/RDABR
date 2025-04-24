@@ -1,0 +1,308 @@
+---
+title: 'Problem Set 11'
+author: "Your Name Here"
+date: 'Last updated: `r Sys.Date()`'
+format:
+  html:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    embed-resources: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(ggsci)
+library(ICC)
+library(AICcmodavg)
+library(cvTools)
+library(pwr)
+
+theme_set(theme_classic())
+```
+
+
+Packages you will need for this problem set:
+
+- `ICC`
+- `pwr`
+- `AICcmodavg`
+- `cvtools`
+
+Install them now using the "Packages" pane (if you haven't already).
+
+
+## Neandertal Brains
+
+In Problem Set 10, we looked at a dataset of Neandertal brain size. Review that question.
+
+Using the code you wrote (or the code from the key), load the `NeandertalBrainSize.csv` dataset and relevel so that "Recent" is the base level for the `Species` variable.
+
+```{r}
+# FIXME
+
+NBS <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/NeandertalBrainSize.csv",
+                col_types = "ddc") |> 
+  mutate(Species = fct_relevel(Species, "Recent"))
+```
+
+Copy the code you wrote for making a scatterplot of the data to remind yourself of the patterns.
+
+```{r}
+# FIXME
+
+NBS |> ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+  geom_point(size = 3) +
+  geom_smooth(formula = y ~ x, se = FALSE, method = "lm") +
+  scale_color_d3() +
+  guides(color = guide_legend(position = "inside")) +
+  theme(legend.position = "inside",
+        legend.justification.inside = c(1, 0)) +
+  labs(x = "ln Body Mass", y = "ln Brain Size")
+```
+
+We fit three linear models and assigned each to an object:
+
+1. Brain size modeled by body mass
+2. Brain size modeled by body mass and species (additive)
+3. Brain size modeled by body mass and species with the mass X species interaction
+
+Copy your model code from PS 10 and fit the models:
+
+```{r}
+# FIXME
+
+fm1 <- lm(ln_Brain ~ ln_Mass, data = NBS)
+fm2 <- lm(ln_Brain ~ ln_Mass + Species, data = NBS)
+fm3 <- lm(ln_Brain ~ ln_Mass * Species, data = NBS)
+
+```
+
+We had left off at this point: fitting the models but not deciding which was the best fit to the data.
+
+
+### Information criteria
+
+Use the `aictab()` function from the `AICcmodavg` to generate the AICc model comparison table for the three models.
+
+```{r}
+# FIXME
+
+aictab(cand.set = list("~ ln_Mass" = fm1,
+                       "~ ln_Mass + Species" = fm2,
+                       "~ ln_Mass * Species" = fm3))
+```
+
+Notice that the values of AICc are negative. This can happen and is not a problem at all or a sign that something has gone wrong. You have to think a little harder about what "lower" means (in this case *more negative*). The interpretation stays the same -- lower AICc is better.
+
+Which model has the lowest AICc value?
+
+> `ln_Mass + Species` has a value of -94.5
+
+
+What is the difference (Delta-AICc) between the best and 2nd best model?
+
+> `ln_Mass + Species` has a value of -93.1. The difference is 1.44 units.
+
+
+Overall, what is your interpretation of the `Delta_AICc` column?
+
+> All the models are within 4 units of each other, so there is not one that is clearly superior.
+
+
+Interpret the model weights in the `AICCWt` column. Remember that model weights can be interpreted as a probability that the model in that row is the best model for out-of-sample prediction.
+
+> The additive model has a weight of 0.61 and the interaction 0.3. These are clearly the best, but 10% of the weight is on the simplest model. 
+
+
+If these were your data, how would you proceed in the "Results" and "Discussion" sections of your maunscript?
+
+> You answer may vary, but I would talk about all of them.
+
+
+### Cross-validation
+
+Follow the example in the lecture slides to carry out leave-one-out cross validation on these models using the `cvFit()` function from the `cvTools()` package. Cross-validation uses the data to determine the root-mean-squared prediction error for a model (RMSE).
+
+```{r}
+# FIXME
+
+cvFit(fm1, data = NBS, y = NBS$ln_Brain, K = nrow(NBS))
+cvFit(fm2, data = NBS, y = NBS$ln_Brain, K = nrow(NBS))
+cvFit(fm3, data = NBS, y = NBS$ln_Brain, K = nrow(NBS))
+```
+
+What are the RMSE values for the three models?
+
+> Mass only: 0.072, Mass + Species: 0.071, Mass * Species: 0.072
+
+
+What is your interpretation of the LOO cross-validation model comparison?
+
+> They all have about the same predictive error. The additive model is best, but only very slightly.
+
+
+Considering both the AICc table and the cross-validation, do the results agree or disagree? Why or why not?
+
+> Generally they agree. Both find that the Mass + Species model is best but they also both show that all three models are pretty similar. 
+
+
+What do you interpret about the possible differences in brain scaling vs. body size in Recent humans vs. Neandertals based on these analyses?
+
+> If there is a difference in scaling, it is not very large.
+
+
+## Repeatability: Intraclass correlation coefficient
+
+The model you use to calculate the intraclass correlation coefficient *is* a type of multilevel model -- you have repeated measurements for a single specimen. Those measurements are obviously not independent from one another (that is the point of repeated measurements -- to estimate the consistency of measurements as compared to the differences between individuals). In this case, we can use the non-independence to get as estimate of the relative between *measurement* variation vs. between *specimen* variation?
+
+The data we will be working with includes repeated measurements of the "femur" of Walking Sticks:
+
+![](https://i.imgur.com/CVTtMkJ.png){fig-width=50%}
+
+Because the measurements are small (~ 0.25 cm), you are concerned that they will not be very repeatable. Before collecting all the data, you want to estimate the intraclass correlation coefficient of these measurements using a small, preliminary dataset.
+
+You take 2 measurements each on 25 different walking stick femurs, which are included in the files `WalkingStickFemurs.csv`.
+
+
+### Activity
+
+Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
+
+```{r}
+# FIXME
+
+WSF <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") |> 
+  mutate(Specimen = factor(Specimen))
+glimpse(WSF)
+```
+
+Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
+
+The code block below pivots the data to wide format. The steps are:
+
+- Use `Specimen` as the `id_cols`
+- Take values from `Femur_length`
+- Take column names from `Measurement`
+- Use the `names_prefix =` option to place the string "Measurement_" before the column name
+
+Change `eval: false` to `eval: true`. You might need to change the name `WSF` to match your object name from above.
+
+```{r}
+#| eval: true
+# FIXME
+
+WSF_wide <- WSF |> 
+  pivot_wider(id_cols = Specimen,
+              values_from = Femur_length,
+              names_from = Measurement,
+              names_prefix = "Measurement_")
+WSF_wide |> head()
+```
+
+The top of the resulting tibble should look like:
+
+```
+# A tibble: 25 × 3
+   Specimen Measurement_1 Measurement_2
+   <fct>            <dbl>         <dbl>
+ 1 1                 0.26          0.26
+ 2 2                 0.23          0.19
+ 3 3                 0.25          0.23
+ ```
+
+There will be 25 rows total.
+
+Using the "wide" data, plot the pairs of observations as a scatterplot. We have to use the wide data because we need the two measurements in different columns.
+
+- Add a line with a slope of 1 and intercept of 0 using `geom_abline()`
+- Set the axis coordinates to equal scaling with `coord_equal()`
+
+```{r}
+# FIXME
+
+ggplot(WSF_wide, aes(Measurement_1, Measurement_2)) +
+  geom_point() +
+  geom_abline(slope = 1, intercept = 0) +
+  coord_equal() +
+  labs(x = "Measurement 1", y = "Measurement 2")
+```
+
+
+Based on your plot, do you expect ICC to be high or low? Give an estimate?
+
+> The points are fairly close to the line, so ICC should be pretty good.
+
+
+Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides. 
+
+Note that you will need to use the original data (not the pivoted data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
+
+```{r}
+# FIXME
+
+ICCest(x = WSF$Specimen, y = WSF$Femur_length)
+```
+
+
+Would you be comfortable going forward with data collection given this value for ICC?
+
+> Maybe or maybe not. If we expect fairly large differences between groups, then it's probably fine. But if the differences are small, then there may be so much variation associated with taking measurements that it will swamp out the variation between groups. It's probably fine.
+
+
+## Planning experiments
+
+Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
+
+
+### Activity
+
+Use `cohen.ES()` from the `pwr` package to look up the effect size for a "small" effect for a *t*-test.
+
+```{r}
+# FIXME
+
+cohen.ES(test = "t", size = "small")
+```
+
+Before we do the calculation. Take a guess how many individuals you would need in each independent group (a "two-sample t-test") to detect a small effect size with alpha = 0.05 and power = 0.80.
+
+> You answer may vary. I was pretty surprised by the answer.
+
+Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
+
+```{r}
+# FIXME
+
+pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
+```
+
+Repeat the test above but for a paired *t*-test.
+
+```{r}
+# FIXME
+
+pwr.t.test(d = 0.2, power = 0.80, type = "paired")
+```
+
+Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+
+```{r}
+# FIXME
+
+pwr.r.test(r = 0.6, power = 0.8)
+```
+
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+
+```{r}
+# FIXME
+
+pwr.r.test(r = 0.4, n = 15)
+```
