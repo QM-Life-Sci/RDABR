@@ -1,6 +1,6 @@
 ---
-title: "Unit 12: Multiple Hypothesis Testing"
-subtitle: "Multiple comparisons procedures"
+title: "Unit 12: Multiple comparisons procedures"
+subtitle: "PCA"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -14,11 +14,28 @@ format:
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
 ---
 
 ```{r}
 #| label: setup
 #| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(qvalue)
+library(wesanderson)
+library(plotly)
+library(GGally)
+library(smatr)
+library(cowplot)
+library(factoextra)
+
+theme_set(theme_classic(base_size = 20))
 ```
 
 
@@ -35,56 +52,55 @@ csl: evolution.csl
 # Questions {background-color="#f8c471"}
 
 
-# Decision errors {background-color="#40666e"}
+# Making decisions with data {background-color="#40666e"}
 
 [Cochrane](https://www.cochrane.org/){target="_blank"}
 
 
 # Multiple testing {background-color="#40666e"}
 
-## Types of errors and statistical power {.smaller}
 
-|               | Reject H~0~    | Fail to reject H~0~   |
-|--------------:|:--------------:|:---------------------:|
-|H~0~ is true   | Type I error   | *Correct*             |
-|H~0~ is false  | *Correct*      | Type II error         |
-
-
-## Problems of Multiplicity
+## Problems of multiple tests
 
 If you set a Type I error rate ($\alpha$) of 0.05 for any one test and then perform more than one such test on related data:
 
-- The overall Type I error rate for all your tests together (familywise) is greater than 0.05
-- You will be more likely than 5% to erroneously reject a _true_ null hypothesis.
-- You will claim a significant effect when one does not exist.
+- The overall Type I error rate for all your tests together (familywise) is *greater than* 0.05
+    - You will be more likely than 5% to erroneously reject a _true_ null hypothesis.
+    - You will claim a significant effect when one does not exist.
 
 
-## Problems of Multiplicity
+## Simulate data for two groups with no difference
+
 
 ``` {r}
-#| echo: true
+#| cache: true
 
 set.seed(3210)
+
 nn <- 10
 group1.mean <- 6
 group2.mean <- 6
-niter <- 1000
-ps<-data.frame('p1' = numeric(length = niter),
-               'p2' = numeric(length = niter))
+niter <- 10000
+
+ps <- data.frame('p1' = numeric(length = niter), 
+                 'p2' = numeric(length = niter))
 
 for(ii in 1:niter) {
   yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
   yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-  gg <- c(rep('a',nn), rep('b',nn))
-  ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
-  ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
+  gg <- c(rep(c('a', 'b'), each = nn))
+
+  ps[ii, 1] <- summary(lm(yy1 ~ gg))$coefficients[2, 4]
+  ps[ii, 2] <- summary(lm(yy2 ~ gg))$coefficients[2, 4]
 }
 ```
 
 
-## Problems of Multiplicity
+## False positives: 1 test
 
-What is the probability of a false positive for yy1?
+What is the probability of a false positive for `yy1`?
+
+. . .
 
 ```{r}
 #| echo: true
@@ -92,10 +108,11 @@ What is the probability of a false positive for yy1?
 mean(ps[, 'p1'] < 0.05)
 ```
 
+. . .
 
-## Problems of Multiplicity
+What is the probability of a false positive for `yy2`?
 
-What is the probability of a false positive for yy2?
+. . .
 
 ```{r}
 #| echo: true
@@ -104,13 +121,13 @@ mean(ps[, 'p2'] < 0.05)
 ```
 
 
-## Problems of Multiplicity
+## False positives: 2 tests
 
-What is the probability of a false positive for yy1 or yy2?
+What is the probability of a false positive for `yy1` **or** `yy2`?
+
+. . .
 
 ```{r}
-#| echo: true
-
 sm.set <- ps[c(8, 12, 13), ]
 sm.set$FP <- ifelse((sm.set[, 'p1'] < 0.05 | sm.set[, 'p2'] < 0.05),"Yes","No")
 
@@ -130,20 +147,24 @@ FWER is also sometimes termed
 - Experiment-wide error rate
 - Experiment-wise error rate
 
-We will use $\alpha$ = 0.05 throughout, but the general principles apply to any $\alpha$ (0.1, 0.05, 0.01, 0.001, etc.).
+We will use $\alpha$ = 0.05 throughout, but the general principles apply to any $\alpha$ (0.05, 0.01, 0.001, etc.).
 
 
-## Calculating FWER {.smaller}
+## Calculating FWER
 
 For a family of $k$ tests, where $\alpha$ is the error rate for a single test:
 
 $$\mbox{FWER} = 1-(1-\alpha)^k$$
 
-For example, if you perform $k = 20$ tests and judge them all at $\alpha = 0.05$, then there is a 64% chance committing a type I error.
+For example, if you perform $k = 20$ tests and judge them all at $\alpha = 0.05$ there is a 64% chance committing a type I error.
+
+. . .
 
 Note that:
 
 $$\lim_{k \to \infty} (1 - \alpha)^k = 0$$
+
+. . .
 
 And thus
 
@@ -152,15 +173,29 @@ $$\lim_{k \to \infty} \mbox{FWER} = 1$$
 
 ## Calculating FWER
 
+20 tests:
+
 ```{r}
-#| echo: true
 #| message: false
 
 library(Rmpfr)
 alpha <- 0.05
 1 - ((1 - alpha) ^ 20)
-1 - ((1 - alpha) ^ 100)
+```
 
+. . .
+
+100 tests:
+
+```{r}
+1 - ((1 - alpha) ^ 100)
+```
+
+. . .
+
+1000 tests:
+
+```{r}
 options(scipen=0)
 mpfr(1 - mpfr(((1 - alpha) ^ 1000), 128),128)
 
@@ -170,6 +205,9 @@ mpfr(1 - mpfr(((1 - alpha) ^ 1000), 128),128)
 ## Probability of a Type I Error  
 
 ```{r FWER_figure}
+#| echo: false
+#| fig-align: center
+
 calcFWER <- function(k, alpha){
   return(round(1 - (1 - alpha) ^ k, 3))
 }
@@ -182,13 +220,20 @@ FWERs <- FWERs |>
          alpha = factor(alpha))
 
 ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
-  geom_hline(yintercept = 1, color = "red") +
-  geom_path(lwd = 2) +
+  geom_hline(yintercept = 1, color = "firebrick4",
+             linetype = "dotted",
+             linewidth = 2) +
+  geom_path(lwd = 1.5) +
   ylab("Familywise Error Rate") +
   xlab("k Tests") +
   scale_color_manual(values = wes_palette("Moonrise3"),
                      name = "Alpha",
-                     breaks = c("0.05", "0.01", "0.001")) 
+                     breaks = c("0.05", "0.01", "0.001")) +
+  scale_x_continuous(limits = c(1, 200),
+                                expand = c(0, 0.05)) +
+  scale_y_continuous(limits = c(0, 1.05),
+                     expand = expansion(mult = c(0, 0.05),
+                                        add = c(0, 0)))
 ```
 
 
@@ -197,13 +242,14 @@ ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
 
 # Multiple comparisons procedures {background-color="#40666e"}
 
-## A menu of MCPs {.smaller}
+
+## A menu of MCPs
 
 1. <s>Do nothing</s>
     - Not an option 
 2. Methods to control the Family-Wise Error Rate (FWER):
-    - MCs within a single linear model (e.g. Tukey, etc.; see 08-2)
-    - Bonferroni correction
+    - MCs within a single linear model (e.g., Tukey HSD)
+    - <s>Bonferroni correction</s>
       - Not recommended - overly conservative
     - Sequential Bonferroni procedure
     - Randomization procedures to empirically control FWER 
@@ -231,14 +277,14 @@ Type I and Type II errors will trade-off.
     - A single publication
     - A single thesis
     - All of science?
-1. Collect the resulting *P* values into a single vector or `data.frame`.
+1. Collect the resulting *P*-values into a single vector.
 1. Perform a multiple comparisons procedure (directly adjust or calculate new $\alpha$ level)
 1. Assess significance of your tests *as a whole*
 
 
 ## FWER vs. False discovery rate
 
-Controlling FWER is appropriate when you want to guard against **any** false positives.
+Controlling Family-Wise Error Rate is appropriate when you want to guard against **any** false positives.
 
 - When might this be appropriate?
 
@@ -251,7 +297,7 @@ If so, the more relevant quantity to control is the false discovery rate (FDR).
 
 Proposed by Benjamini and Hochberg [-@Benjamini1995-cw].
 
-- Also see Curran-Everett (2000).
+- Also see Curran-Everett [-@Curran-Everett2000-qv].
 
 Controls FDR (i.e., rate of Type I errors), rather than FWER
 
@@ -259,16 +305,17 @@ $$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
 
 e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
 
-Note: False Positive Rate = $\frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
+Note: $FPR = \frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
 
 
-## Distribution of *P* values 
+## Distribution of *P*-values 
 
-*P* values resulting from chance alone have a uniform distribution
+*P*-values resulting from chance alone have a uniform distribution
 
 ```{r }
 #| message: true
 #| cache: true
+#| echo: false
 
 set.seed(3210)
 nn <- 10
@@ -281,88 +328,95 @@ ps <- data.frame('p1' = numeric(length = niter),
 for(ii in 1:niter) {
   yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
   yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-  gg <- c(rep('a',nn), rep('b',nn))
-  ps[ii,1] <- summary(lm(yy1 ~ gg))$coefficients[2,4]
-  ps[ii,2] <- summary(lm(yy2 ~ gg))$coefficients[2,4]
+  gg <- c(rep('a', nn), rep('b', nn))
+  ps[ii, 1] <- summary(lm(yy1 ~ gg))$coefficients[2, 4]
+  ps[ii, 2] <- summary(lm(yy2 ~ gg))$coefficients[2, 4]
 }
 
 ggplot(ps, aes(x = p1)) +
-  geom_histogram(bins = 20) +
-  labs(x = "P value")
+  geom_histogram(bins = 20, fill = "firebrick4") +
+  labs(x = "P-value", y = "Count")
 ```
 
 
-## Distribution of *P* values 
+## Distribution of *P*-values 
 
-*P* values resulting from chance alone have a uniform distribution
+*P*-values resulting from chance alone have a uniform distribution
 
 ```{r}
 #| message: false
 #| fig-align: center
+#| echo: false
 
 Ps <- ps |> arrange(-log10(p1))
 Pp <- data.frame("P"= -log10(Ps$p1),
                  "X" = sort(-log10(runif(nrow(ps), 0, 1)))) 
+
 ggplot(Pp, aes(x = X, y = P)) + 
-  geom_point() +
+  geom_point(size = 2, color = "firebrick4") +
   geom_abline(intercept = 0, slope = 1) +
   xlim(c(0, 5)) +
+  ylim(c(0, 5)) +
   ylab("Observed -log10 P values") +
   xlab("Expected -log10 P values") +
   coord_equal()
 ```
 
 
-## Example *P* values to work with 
+## Example *P*-values to work with 
 
 Turning kinematics in hummingbirds
 
 ```{r}
-#| echo: true
-
 Ps <- read_excel("../data/P_values.xlsx")
 glimpse(Ps)
 range(Ps$P)
 ```
 
-203 *P* values. Range: 10^-16^ to 0.992
+203 *P*-values. Range: 10^-16^ to 0.992
 
 
-## Example *P* values
+## Example *P*-values
 
 ```{r}
-ggplot(Ps, aes(P)) + geom_histogram(bins = 20)
+#| echo: false
+#| fig-align: center
+
+ggplot(Ps, aes(P)) + 
+  geom_histogram(bins = 20, fill = "firebrick4") +
+  labs(x = "P-value", y = "Count")
 ```
 
 We have disproportionately more nominally significant tests. Otherwise relatively uniform.
 
 
-## Distribution of *P* values
+## Distribution of *P*-values
 
 ```{r}
 #| message: false
+#| echo: false
 #| fig-align: center
 
 Ps <- Ps |> arrange(-log10(P))
-Pp <- data.frame("P"= -log10(Ps$P), "X"=sort(-log10(runif(nrow(Ps),0,1)))) 
-ggplot(Pp, aes(x=X, y=P)) + 
-  geom_point() +
-  geom_abline(intercept=0, slope=1) +
-  xlim(c(0,9)) +
-  ylim(c(0,18)) +
+Pp <- data.frame(P = -log10(Ps$P),
+                 X = sort(-log10(runif(nrow(Ps), 0, 1))))
+
+ggplot(Pp, aes(x = X, y = P)) +
+  geom_point(size = 2, color = "firebrick4") +
+  geom_abline(intercept = 0, slope = 1) +
+  xlim(c(0, 18)) +
+  ylim(c(0, 18)) +
   ylab("Observed -log10 P values") +
   xlab("Expected -log10 P values") +
   coord_equal()
 ```
 
 
-## Sort *P* values
+## Sort *P*-values
 
 It will be easier to follow the procedures if the rows are sorted smallest to largest:
 
 ```{r}
-#| echo: true
-
 Ps <- Ps |> arrange(P)
 head(Ps)
 ```
@@ -370,14 +424,12 @@ head(Ps)
 
 ## Sequential Bonferroni
 
-- Sort the *P* values from smallest ($p_1$) to largest ($p_k$)
+- Sort the *P*-values from smallest ($p_1$) to largest ($p_k$)
 - Start with the smallest ($i = 1$), and evaluate the inequality:
 
 $$p_i \leq \frac{\alpha}{k - i + 1}$$
 
 - If the inequality is *true*, call that test significant
-- No difference from the the Bonferroni correction yet.
-    - Step 1 equals Bonferroni correction
 
 
 ## Sequential Bonferroni
@@ -386,13 +438,11 @@ $$p_i \leq \frac{\alpha}{k - i + 1}$$
 - At each step, the test value increases:
 
 ```{r}
-#| echo: true
-
 0.05 / 203
 0.05 / 202
 ```
 
-The last observed *P* value is compared to $\alpha$.
+The last observed *P*-value is compared to $\alpha$.
 
 
 ## Sequential Bonferroni
@@ -403,26 +453,25 @@ If the inequality is *ever* false:
 - Fail to reject that test.
 - Fail to reject all remaining tests (because the list is sorted)
 
-This and standard Bonferroni are "step-up" methods (start at the smallest and work up).
-
 
 ## R's `p.adjust()` function
 
 `p.adjust()` can do some multiple comparisons procedures, given a vector of *P*.
 
 ```{r}
-#| echo: true
-
 Ps$Seq_Bonf <- p.adjust(Ps$P, "holm") < 0.05   # Sequential Bonferroni
 sum(Ps$Seq_Bonf)
 ```
 
 Only 33 of the original 62 significant tests remain.
 
-## False discovery rate {.smaller}
+- 5% chance that 1 is a false positive
 
-- Sort the *P* values from largest ($p_k$) to smallest ($p_1$)
-- Starting at the *largest* *P* value ($p_k$), calculate the critical significance level ($d_k^*$) for that *P* value:
+
+## False discovery rate
+
+- Sort the *P*-values from largest ($p_k$) to smallest ($p_1$)
+- Starting at the *largest* *P*-value ($p_k$), calculate the critical significance level ($d_k^*$) for that *P*-value:
 
 $$d_k^* = q^* \frac{k}{k}$$
 
@@ -430,23 +479,23 @@ Where $q^*$ is the desired false discovery rate (e.g., 0.05).
 
 - If $p_k \leq d_k^*$, then reject the null hypothesis for this and all remaining tests.
     - 1st comparison is vs. $q^*$
-    - Rarely will the largest *P* value be less than $q^*$.
+    - Rarely will the largest *P*-value be less than $q^*$.
 
 
-## False discovery rate {.smaller}
+## False discovery rate
 
-- Move to the 2nd largest *P* value and calculate the critical significance level
+- Move to the 2nd largest *P*-value and calculate the critical significance level
 
 $$d_k^* = q^* \frac{k - 1}{k}$$
 
 - 2nd test vs. $q^* \times 202/203 = 0.04975$
-- Continue until $p_k \leq d_k^*$ then call that and all remaining tests (smaller *P* values) significant.
-    - Last test vs. $q^* \times 1/203 = 0.00025$ (Bonferroni)
-
-"Step-down" method
+- Continue until $p_k \leq d_k^*$ then call that and all remaining tests (smaller *P*-values) significant.
+    - Last test vs. $q^* \times 1/203 = 0.00025$
 
 
 ## False discovery rate
+
+At FDR of 5%:
 
 ```{r}
 #| echo: true
@@ -457,19 +506,12 @@ sum(Ps$FDR)
 
 44 of the original 62 significant tests remain.
 
-
-## False discovery rate
-
-```{r}
-#| echo: true
-
-Ps |> slice(32:47)
-```
+- $44 \times 5\% = 2.2$ may be false positives
 
 
-## Positive false discovery rate
+## Positive false discovery rate (pFDR)
 
-- First method to deal with actual distribution of *P* values from the study in question.
+- First method to deal with actual distribution of *P*-values from the study in question.
     - This is a major advance.
 - "Positive" refers to the fact that positive findings have occurred (rejection of null hypotheses).
 - But which of these apparent positive findings are actually false (i.e., which are most likely Type I errors)?
@@ -484,7 +526,7 @@ Seek a balance between false positives and true positives
 - We will accept a pFDR of 0.05 or 0.10, meaning that 5% or 10% of the tests we call true (nominally statistically significant) are actually false.
 
 
-## Positive false discovery rate {.smaller}
+## Positive false discovery rate
 
 Estimate $\pi_0$ (ratio of true null tests to total tests) *from the distribution of P values*
 
@@ -495,7 +537,7 @@ $$\pi_0 = \frac{\mbox{n True Null Tests}}{\mbox{n Total Tests}}$$
 
 - FDR = pFDR when $\pi_0 = 1$
 - More powerful than Bonferroni, sequential Bonferroni or FDR approaches
-    - But the underlying assumptions of FDR and pFDR differ from Bonferroni and sequential Bonferroni
+    - But the underlying assumptions are different
 
 
 ## pFDR and the `qvalue` package
@@ -503,12 +545,12 @@ $$\pi_0 = \frac{\mbox{n True Null Tests}}{\mbox{n Total Tests}}$$
 pFDR is implemented in `qvalue`. Installation is a little different, because it is not in CRAN.
 
 ```{r}
-#| echo: true
 #| eval: false
 
-source("https://bioconductor.org/biocLite.R")
-biocLite("qvalue")
-library(qvalue)
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("qvalue")
 ```
 
 
@@ -516,19 +558,23 @@ library(qvalue)
 
 ```{r }
 #| message: false
+#| echo: false
 
 ggplot(Ps, aes(P)) +
-  geom_histogram(aes(y = ..density..), fill = "gray", bins = 20) +
-  geom_hline(yintercept = 1, color = "blue")
+  geom_histogram(aes(y = after_stat(density)),
+                 fill = "gray", bins = 20) +
+  geom_hline(yintercept = 1, color = "firebrick4",
+             linewidth = 1.5, linetype = "dotted") +
+  labs(x = "P-value", y = "Density")
 ```
 
-If all H~0~ are true, you expect all bars to fall on the blue line.
+If all H~0~ are true, you expect all bars to fall on the dotted line.
 
 
 ## Estimation of $\pi_0$
 
-- True non-null *P* values will fall nearest 0 (in the first bin: 0 - 0.05).
-- Remaining *P* values will be uniformly distributed 0.05 - 1.00.
+- True non-null *P*-values will fall nearest 0 (in the first bin: 0 - 0.05).
+- Remaining *P*-values will be uniformly distributed 0.05 - 1.00.
 - Height of the uniform portion of the distribution estimates $\pi_0$
     - $\pi_0$ falls in the range 0 to 1, where 1 equal FDR.
     - Follow the math in Storey & Tibshirani [-@Storey2003-mz] if you wish
@@ -538,23 +584,24 @@ If all H~0~ are true, you expect all bars to fall on the blue line.
 
 $q$ is the the minimum FDR that can be attained when calling *that test significant*
 
-- Each *P* value is associated with a $q$ value
-- A *P* value associated with a $q$ value of 0.05 means that 5% of *P* values lower are expected to be false positives
-    - In other words, consider a *P* value with an associated $q$ value of 0.05. That *P* value and those lower than it should have a false positive rate of 0.05.
+- Each *P*-value is associated with a $q$ value
+- A *P*-value associated with a $q$ value of 0.05 means that 5% of *P*-values lower are expected to be false positives
+    - In other words, consider a *P*-value with an associated $q$ value of 0.05. That *P*-value and those lower than it should have a false positive rate of 0.05.
 
 
 ## pFDR in practice
 
-Look at the distribution of your *P* values.
+Look at the distribution of your *P*-values.
 
 - The first bin should be largest (you have positive results)
-- If the distribution is completely flat, you can't use pFDR
-- If the distribution looks like a normal curve, is skewed to the right, or has peaks near 0 and 1, then $\pi_0$ estimation will probably fail. Fall back to FDR or sequential Bonferroni.
+- If the distribution is completely flat, you can't use pFDR.
+- If the distribution looks like a normal curve, is skewed to the right, or has peaks near 0 and 1, then $\pi_0$ estimation will probably fail.
+    - Use FDR or sequential Bonferroni.
 
 
 ## pFDR in practice
 
-For large numbers of *P* values (hundreds?, thousands?), the default settings in the qvalue package work fine:
+For large numbers of *P*-values (hundreds?, thousands?), the default settings in the qvalue package work fine:
 
 - `lambda = seq(0, 0.90, 0.05)`
 - `pi0.method = "smoother"`
@@ -564,7 +611,7 @@ For large numbers of *P* values (hundreds?, thousands?), the default settings in
 
 ## pFDR in practice
 
-Just pass a vector of *P* values to `qvalue()`:
+Just pass a vector of *P*-values to `qvalue()`:
 
 ```{r}
 #| echo: true
@@ -594,10 +641,14 @@ summary(qobj)
 ## Visualizing $\pi_0 = `r round(qobj$pi0, 3)`$
 
 ```{r}
+#| echo: false
+#| fig-align: center
+
 ggplot(Ps, aes(P)) +
   geom_histogram(aes(y = ..density..), fill = "gray", bins = 20) +
-  geom_hline(yintercept = 1, color = "blue") +
-  geom_hline(yintercept = qobj$pi0, color = "red")
+  geom_hline(yintercept = 1, color = "navy", linewidth = 1.5) +
+  geom_hline(yintercept = qobj$pi0, color = "firebrick4", linewidth = 1.5) +
+  labs(x = "P-value", y = "Density")
 ```
 
 Blue: All H~0~ are true. Red: Only 32% of H~0~ are true.
@@ -611,17 +662,16 @@ Blue: All H~0~ are true. Red: Only 32% of H~0~ are true.
 max(qobj$pvalues[qobj$qvalues <= 0.05])
 ```
 
-- *Translation*: Find the largest *P* value in `qobj` which has an associated $q$ value less than or equal to 0.05.
-    - So, if you use 0.03957791 as the $\alpha$ level across all of your *P* values in this example, then you will be controlling the FDR at 0.05.
+*Translation*: Find the largest *P*-value in `qobj` which has an associated $q$ value less than or equal to 0.05.
 
-Include unadjusted *P* values and adjust $\alpha$. Discuss results with respect to adjusted $\alpha$.
+- So, if you use 0.03957791 as the $\alpha$ level across all of your *P*-values in this example, then you will be controlling the FDR at 0.05.
+
+Include unadjusted *P*-values and adjust $\alpha$. Discuss results with respect to adjusted $\alpha$.
 
 
 ## Positive false discovery rate
 
 ```{r}
-#| echo: true
-
 Ps$pFDR <- qobj$qvalues < 0.05
 sum(Ps$pFDR)
 ```
@@ -637,13 +687,14 @@ sum(Ps$pFDR)
 Ps |> slice(32:47)
 ```
 
-## A menu of MCPs {.smaller}
+
+## A menu of MCPs
 
 1. <s>Do nothing</s>
     - Not an option 
 2. Methods to control the Family-Wise Error Rate (FWER):
-    - MCs within a single linear model (e.g. Tukey, etc.; see 08-2)
-    - Bonferroni correction
+    - MCs within a single linear model (e.g., Tukey HSD)
+    - <s>Bonferroni correction</s>
       - Not recommended - overly conservative
     - Sequential Bonferroni procedure
     - Randomization procedures to empirically control FWER 
@@ -652,18 +703,433 @@ Ps |> slice(32:47)
     - _Positive_ False Discovery Rate Methods
 
 
-## Problems of Multiplicity
+# Questions {background-color="#f8c471"}
 
-A general failing to account for multiplicity of tests is one of the reasons experiments do not replicate
 
-- Philosophical issues
-    - Scale:
-      - What about multiple tests in one experiment? 
-      - What about multiple tests in one thesis?
-    - Bayesians don't need accounting: Gelman et al. [-@Gelman2012-xe]
-    
-- Mathematical issues
-    - Simultaneous corrections for thousands of tests
+# Principal components analysis {background-color="#40666e"}
+
+
+## Motivation: the curse of dimensionality
+
+You have too many variables:
+
+- Some are redundant in measuring essentially the same thing
+- Some are highly correlated with others (multicollinear)
+- Some are both
+- Your number of variables approaches your number of observations.
+
+
+## What is a composite variable?
+
+> A linear combination of variables
+
+Multiple regression makes a composite variable
+
+- Linear combination of predictor variables that is maximally correlated with outcome variable
+- $y = {\beta_1}x_1 + {\beta_2}x_2 + {\beta_3}x_3$
+- $\hat{y}$ is a composite variable
+
+
+## Multiple regression makes a composite variable
+
+```{r}
+#| echo: false
+
+Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+  dplyr::select(Species, Milk_Energy, Fat, Lactose) |> 
+  drop_na()
+
+ggscatmat(Milk[, 2:4])
+```
+
+
+## Milk investment
+
+```{r}
+#| echo: false
+
+fig <- plot_ly() |>
+  add_markers(data = Milk,
+              x = ~ Fat,
+              y = ~ Lactose,
+              z = ~ Milk_Energy,
+              size = 3,
+              showlegend = FALSE) |>
+  hide_colorbar() |>
+  layout(scene = list(xaxis = list(title = 'Fat'),
+                      yaxis = list(title = 'Lactose'),
+                      zaxis = list(title = 'Milk Energy')))
+
+fig
+```
+
+
+## Principal components analysis
+
+*Goals*:
+
+1. Create a set of composite variables that encompasses the shared variation among variables
+1. Reduce the dimensionality of a set of variables: from considering all variables separately to considering fewer composite variables, while
+1. Accounting for as much of the original variation as possible in the data set 
+
+No predictor or outcome variable: a *one sided equation*.
+
+
+## Principal components
+
+- Sequential linear combinations of the original variables 
+- The resulting composite variables *are uncorrelated with one another*
+- The first few usually account for *most* of the variation in the original data
+
+
+## Principal components
+
+For *n* variables, you get *n* PCs
+
+- First encompasses the maximum variance
+- Each in turn maximizes remaining variance *while remaining uncorrelated*
+
+
+## Milk investment 
+
+```{r}
+#| echo: false
+
+ggplot(Milk, aes(Fat, Lactose)) + 
+  geom_point(size = 3) +
+  coord_fixed()
+```
+
+
+## Milk investment 
+
+Find the indices of the minimum and maximum of `Fat`
+
+```{r}
+themin <- which.min(Milk$Fat)
+themax <- which.max(Milk$Fat)
+```
+
+Make a `data.frame` with the points for plotting
+
+```{r}
+minpt <- data.frame(x1 = Milk$Fat[themin], x2 = Milk$Lactose[themin])
+maxpt <- data.frame(x1 = Milk$Fat[themax], x2 = Milk$Lactose[themax])
+```
+
+
+## Milk investment 
+
+Orange = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+ma <- line.cis(Milk$Lactose, Milk$Fat,  method = "MA")
+
+p <- ggplot(Milk, aes(Fat, Lactose)) + geom_point() +
+  geom_point(data = minpt, aes(x1, x2), col = "orange", size = 4) +
+  geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 4) +
+  coord_fixed()
+print(p)
+```
+
+
+## Major axis == PC1
+
+Orange = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+MA_plot <- p +
+  geom_abline(slope = ma[2, 1], intercept = ma[1, 1],
+              color = "red",
+              linewidth = 1.5)
+print(MA_plot)
+```
+
+
+## Minor axis == PC2
+
+Orange = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+raw_plot <- MA_plot +
+  geom_abline(slope = -1/ma[2, 1],
+              intercept = mean(Milk$Lactose) - -1/ma[2, 1] * mean(Milk$Fat),
+              color = "red",
+              size = 1.5)
+print(raw_plot)
+```
+
+
+## Rotation of the axes about the means of $x$ and $y$
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+z <- prcomp(~ Fat + Lactose, data = Milk,
+            center = TRUE, scale. = TRUE)
+PC <- data.frame(pc1 = z$x[, 1],
+                 pc2 = -1 * z$x[, 2])
+
+minpt <- data.frame(x1 = PC$pc1[themin], x2 = PC$pc2[themin])
+maxpt <- data.frame(x1 = PC$pc1[themax], x2 = PC$pc2[themax])
+
+pc_plot <- ggplot(PC, aes(pc1, pc2)) +
+  geom_vline(xintercept = 0, color = "red", size = 1.5) +
+  geom_hline(yintercept = 0, color = "red", size = 1.5) +
+  geom_point() +
+  geom_point(data = minpt, aes(x1, x2), col = "orange", size = 4) +
+  geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 4) +
+  coord_fixed() +
+  labs(x = "PC1", y = "PC2")
+print(pc_plot)
+```
+
+
+## Comparing PCs
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+plot_grid(raw_plot, pc_plot, ncol = 2)
+```
+
+
+## Principal components in R
+
+`prcomp()` is the preferred function for PCA (*not* `princomp()`):
+
+```{r}
+z <- prcomp(~ Fat + Lactose, data = Milk,
+            center = TRUE,
+            scale. = TRUE)
+```
+
+- One sided formula: `~ Fat + Lactose`
+- PCA is scale-dependent
+    - Centered to a mean of 0
+    - Scaled to standard deviation of 1
+
+
+## `prcomp` objects
+
+```{r}
+#| echo: true
+
+str(z)
+```
+
+`x` is a matrix of the the principal components
+
+
+## Proportion of variance (eigenvalues)
+
+```{r}
+summary(z)
+```
+
+PC1 explains 97% of the variance in the data.
+
+
+## Loadings (eigenvectors)
+
+Correlations of scaled variables with composite variables
+
+```{r}
+print(z)
+```
+
+- `Lactose` loads negatively on PC1 and PC2
+- `Fat` loads positively on PC1 and negatively on PC2
+- Magnitudes are more informative with more than 2 variables
+
+
+## Extracting PC scores
+
+```{r}
+PC <- data.frame(pc1 = z$x[, 1],
+                 pc2 = z$x[, 2])
+PC
+```
+
+
+## Extracting PC scores
+
+Orange = Low Fat, High Lactose
+
+Blue = High Fat, Low Lactose
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+PC <- data.frame(pc1 = z$x[, 1],
+                 pc2 = z$x[, 2])
+PC[1,]
+
+pc_plot <- ggplot(PC, aes(pc1, pc2)) +
+  geom_vline(xintercept = 0, color = "red", size = 1.5) +
+  geom_hline(yintercept = 0, color = "red", size = 1.5) +
+  geom_point() +
+  geom_point(data = minpt, aes(x1, x2), col = "orange", size = 4) +
+  geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 4) +
+  geom_point(data = data.frame(x = -1.785, y = -0.0636),
+             aes(x, y), col = "purple", size = 4) +
+  geom_segment(x = -1.785, xend = -1.785,
+               y = -1, yend = -0.0636, col = 'purple', lty = 3,
+               linewidth = 1.2) +
+  geom_segment(x = -3, xend = -1.785,
+               y = -0.0636, yend = -0.0636, col = 'purple', lty = 3,
+               linewidth = 1.2) +
+  coord_fixed() +
+  labs(x = "PC1", y = "PC2")
+print(pc_plot)
+```
+
+
+## Milk investment: PCA approach
+
+Do fat and lactose *together* predict milk energy?
+
+```{r}
+Milk <- Milk |> 
+  mutate(PC1 = z$x[, 1])
+
+summary(lm(Milk_Energy ~ PC1, data = Milk))
+```
+
+
+## Milk investment: Multiple Regression
+
+Do fat and lactose together independently milk energy after accounting for the other variable?
+
+```{r}
+fm_Multi <- lm(Milk_Energy ~ Fat + Lactose, data = Milk)
+summary(fm_Multi)
+```
+
+
+## Mammal life history
+
+```{r}
+M <- read_excel("../data/mammals.xlsx", na = "NA") |>
+  dplyr::select(litter_size,
+                adult_body_mass_g,
+                neonate_body_mass_g,
+                max_longevity_m,
+                sexual_maturity_age_d) |> 
+  rename(Litter_Size = litter_size,
+         Adult_Mass = adult_body_mass_g,
+         Neonate_Mass = neonate_body_mass_g,
+         Longevity = max_longevity_m,
+         Maturity_Age = sexual_maturity_age_d) |> 
+  drop_na()
+```
+
+
+## Mammal life history
+
+`~ .` means all columns
+
+```{r}
+#| echo: true
+
+z <- prcomp(~ .,
+            data = M,
+            center = TRUE,
+            scale. = TRUE)
+```
+
+Centering and scaling are critical
+
+- Should be the default but are not.
+
+
+## Mammal life history
+
+```{r}
+print(z)
+```
+
+
+## Use `factoextra` for useful functions
+
+```{r}
+#| eval: false
+
+library(factoextra)
+```
+
+[factoextra](https://rpkgs.datanovia.com/factoextra/index.html) has several convenience functions for working with PCA.
+
+
+## Mammal life history
+
+```{r}
+fviz_eig(z, addlabels = TRUE)
+```
+
+
+## Mammal life history
+
+```{r}
+fviz_pca_var(z)
+```
+
+
+## Mammal life history
+
+```{r}
+fviz_pca_var(z, axes = c(2, 3))
+```
+
+## Sample size and other concerns
+
+Suggested sample sizes vary:
+
+- *n* = over 50
+- Think about the number of predictor variables
+
+All data:
+
+- Numeric (continuous)
+- No missing values
+
+
+## Best case
+
+- A small number of variables that can be used as surrogates for the larger set without too much loss of information
+- Lower dimensional summary of a larger set of variables
+
+PC1:
+
+- Variables that combined account for the most variance
+- For morphological data:
+    - Can often be a proxy for "size"
+    - Remaining PCs are "shape"
+
+
+## Drawbacks
+
+1. Lose the original variable identity
+    - Interpretation can be a challenge
+2. If centered and scaled (advised), you lose the original scale of the data
 
 
 ## References
