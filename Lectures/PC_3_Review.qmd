@@ -1,0 +1,57 @@
+---
+title: "Progress Check 3 Review"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: false
+    chalkboard: true
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+knitr:
+  opts_chunk: 
+    echo: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(readxl)
+library(qvalue)
+library(wesanderson)
+library(plotly)
+library(GGally)
+library(smatr)
+library(cowplot)
+library(factoextra)
+
+theme_set(theme_classic(base_size = 20))
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- Reminder
+    - Presentation day food
+
+
+# Questions {background-color="#f8c471"}
+
+
+# What next? {background-color="#40666e"}
+
+
+## References
+
+::: {#refs}
+:::
+
