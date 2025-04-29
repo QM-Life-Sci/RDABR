@@ -84,7 +84,6 @@ What are the contributions of the fat and lactose content of primate milk to tot
 #| echo: false
 
 tf <- tempfile()
-
 download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
 
 Milk <- read_excel(tf, na = "NA") |> 
