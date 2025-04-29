@@ -105,7 +105,7 @@ What is the probability of a false positive for `yy1`?
 ```{r}
 #| echo: true
 
-mean(ps[, 'p1'] < 0.05)
+mean(ps[, 'p1'] <= 0.05)
 ```
 
 . . .
@@ -117,7 +117,7 @@ What is the probability of a false positive for `yy2`?
 ```{r}
 #| echo: true
 
-mean(ps[, 'p2'] < 0.05)
+mean(ps[, 'p2'] <= 0.05)
 ```
 
 
@@ -127,11 +127,17 @@ What is the probability of a false positive for `yy1` **or** `yy2`?
 
 . . .
 
+1. $\approx 0.05$
+2. $\gt 0.05$
+3. $\lt 0.05$
+
+. . .
+
 ```{r}
 sm.set <- ps[c(8, 12, 13), ]
-sm.set$FP <- ifelse((sm.set[, 'p1'] < 0.05 | sm.set[, 'p2'] < 0.05),"Yes","No")
+sm.set$FP <- ifelse((sm.set[, 'p1'] <= 0.05 | sm.set[, 'p2'] <= 0.05),"Yes","No")
 
-length(which(ps[, 'p1'] < 0.05 | ps[, 'p2'] < 0.05)) / niter
+length(which(ps[, 'p1'] <= 0.05 | ps[, 'p2'] <= 0.05)) / niter
 ```
 
 The overall error rate = the family-wise error rate (FWER).
@@ -563,8 +569,8 @@ BiocManager::install("qvalue")
 ggplot(Ps, aes(P)) +
   geom_histogram(aes(y = after_stat(density)),
                  fill = "gray", bins = 20) +
-  geom_hline(yintercept = 1, color = "firebrick4",
-             linewidth = 1.5, linetype = "dotted") +
+  geom_hline(yintercept = 1, color = "navy",
+             linewidth = 1.5) +
   labs(x = "P-value", y = "Density")
 ```
 
@@ -638,7 +644,7 @@ summary(qobj)
 ```
 
 
-## Visualizing $\pi_0 = `r round(qobj$pi0, 3)`$
+## Visualizing $\pi_0 = `r round(qobj$pi0, 2)`$
 
 ```{r}
 #| echo: false
@@ -651,7 +657,7 @@ ggplot(Ps, aes(P)) +
   labs(x = "P-value", y = "Density")
 ```
 
-Blue: All H~0~ are true. Red: Only 32% of H~0~ are true.
+Blue: All H~0~ are true. Red: Only 33% of H~0~ are true.
 
 
 ## Calculating an adjusted $\alpha$ level
@@ -706,7 +712,7 @@ Ps |> slice(32:47)
 # Questions {background-color="#f8c471"}
 
 
-# Principal components analysis {background-color="#40666e"}
+# Principal Components Analysis {background-color="#40666e"}
 
 
 ## Motivation: the curse of dimensionality
