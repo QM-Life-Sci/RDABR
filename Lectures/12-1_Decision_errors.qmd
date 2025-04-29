@@ -374,7 +374,10 @@ ggplot(Pp, aes(x = X, y = P)) +
 Turning kinematics in hummingbirds
 
 ```{r}
-Ps <- read_excel("../data/P_values.xlsx")
+tf <- tempfile()
+download.file("https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/P_values.xlsx", destfile = tf)
+
+Ps <- read_excel(tf)
 glimpse(Ps)
 range(Ps$P)
 ```
@@ -741,7 +744,10 @@ Multiple regression makes a composite variable
 ```{r}
 #| echo: false
 
-Milk <- read_excel("../data/Milk.xlsx", na = "NA") |> 
+tf <- tempfile()
+download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+
+Milk <- read_excel(tf, na = "NA") |> 
   dplyr::select(Species, Milk_Energy, Fat, Lactose) |> 
   drop_na()
 
@@ -1034,7 +1040,10 @@ summary(fm_Multi)
 ## Mammal life history
 
 ```{r}
-M <- read_excel("../data/mammals.xlsx", na = "NA") |>
+tf <- tempfile()
+download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/mammals.xlsx", destfile = tf)
+
+M <- read_excel(tf, na = "NA") |>
   dplyr::select(litter_size,
                 adult_body_mass_g,
                 neonate_body_mass_g,
