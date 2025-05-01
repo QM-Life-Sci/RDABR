@@ -40,11 +40,11 @@ theme_set(theme_classic(base_size = 20))
 
 # Housekeeping {background-color="#40666e"}
 
-- Reminder
-    - Presentation day food
-
 
 # Questions {background-color="#f8c471"}
+
+
+# Micropublication guidelines {background-color="#40666e"}
 
 
 # What next? {background-color="#40666e"}
