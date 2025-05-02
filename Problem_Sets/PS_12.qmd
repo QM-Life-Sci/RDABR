@@ -17,8 +17,6 @@ format:
 #| warning: false
 
 library(tidyverse)
-library(readxl)
-library(factoextra)
 
 theme_set(theme_classic())
 ```
@@ -47,8 +45,7 @@ Note this method produces a list of `lm()` results. I have written a function (`
 Change `eval: false` to `eval: true` and run the chunk below. You can either change the path to `Butterfly_Gene_Expression.csv` or just load it directly from the web, which is set up for you below.
 
 ```{r}
-#| eval: true
-# FIXME true -> false
+#| eval: false
 
 getP <- function(fm) {
   sum.set <- summary(fm)
@@ -69,26 +66,21 @@ obsP <- tibble('P' = getP(fm))
 What is the range of P-values?
 
 ```{r}
-# FIXME
 
-range(obsP$P)
+
 ```
 
 
 We will visualize the *P*-values by plotting a histogram and a q-q plot. First plot a histogram with 20 `bins`. This will conveniently make bins that have a width of 0.05.
 
 ```{r}
-# FIXME 
 
-ggplot(obsP, aes(P)) +
-  geom_histogram(bins = 20, fill = "navy") +
-  labs(x = "P-value", y = "Count")
 
 ```
 
 Does it look like there is a signal in the data? I.e., are there more observations in the 0 - 0.05 bin than in the other bins? Or does the distribution look uniform across the range 0 to 1?
 
-> Yes, the first bin is about 2x as large as the next largest. There are more values near 0 than elsewhere.
+> 
 
 
 We will now make a q-q plot, which shows the observed P-values plotted against expected P-values *if the P-values were drawn from a Uniform distribution*.
@@ -103,21 +95,13 @@ This object now has values for observed and expected P-values.
 Finally, plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
 
 ```{r}
-# FIXME
-set.seed(273645)
 
-qqP <- tibble('observed' = sort(-log10(obsP$P)),
-              'expected' = sort(-log10(runif(length(obsP$P), 0, 1))))
-
-ggplot(qqP, aes(x = expected, y = observed)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
 
 ```
 
 If there is no "signal" in the data, then the points (observed vs. predicted) will all fall on the 1:1 line. Based on this visualization, do you think there are *true positives* in this data set?
 
-> Probably. The P-values deviate pretty strongly from the expected line.
+> 
 
 
 - Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction ("Holm" procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant.
@@ -127,43 +111,35 @@ If there is no "signal" in the data, then the points (observed vs. predicted) wi
 Look at the help for `p.adjust()` for the appropriate syntax.
 
 ```{r}
-# FIXME
-seq_bonf <- p.adjust(obsP$P, method = "holm")
-tibble(P = obsP$P,
-       seq_bonf) |>
-  arrange(P) |>
-  filter(seq_bonf <= 0.05)
-sum(seq_bonf < 0.05)
+
+
 ```
 
 There were 28 significant P-value in the original data set ($\alpha = 0.05$). How many remain after this procedure?
 
-> 15 remain
+> 
+
 
 What is the probability that there is one type I error in this set?
 
-> 5%
+> 
 
 
 Repeat the procedure above, but now use the false discovery rate procedure of Benjamini and Hochberg with the default FDR level 5%.
 
 ```{r}
-# FIXME
-fdr <- p.adjust(obsP$P, method = "fdr")
-tibble(P = obsP$P,
-       fdr) |>
-  arrange(P) |>
-  filter(fdr <= 0.05)
-sum(fdr < 0.05)
+
+
 ```
 
 How many significant tests remain?
 
-> 19
+> 
+
 
 How many of these could be *false positives*?
 
-> 19 * 0.05 = 0.95 = 1
+> 
 
 
 ## Sole
@@ -177,11 +153,8 @@ These data were collected to help determine the seasonal patterns of sole moveme
 Load the data and look at the structure of the data using `str()` or `glimpse()`.
 
 ```{r}
-tf <- tempfile()
-download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Sole.xlsx", destfile = tf)
 
-Sole <- read_excel(tf)
-str(Sole)
+
 ```
 
 The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent the percentages of these four types of substrate of the sea floor for each sample (they sum to 100).
@@ -189,39 +162,33 @@ The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent the per
 Use `prcomp()` to carry out a PCA of these four columns. This procedure will calculate a composite score for "substrate".
 
 ```{r}
-# FIXME
 
-z <- prcomp(~ gravel + large_sand + med_fine_sand + mud,
-              data = Sole,
-              scale. = TRUE,
-              center = TRUE)
+
 ```
 
 Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
 
 ```{r}
-# FIXME
 
-summary(z)
-print(z)
+
 ```
 
 Use the `fviz_pca_var()` function from the `factoextra` package to make a plot of the PCs.
 
 ```{r}
-# FIXME
 
-fviz_pca_var(z)
+
 ```
 
 
 What is your interpretation of the PCA?
 
-> PC 1 accounts for 62% of the variation, which is fairly high. Mud loads positively, whereas two kinds of sand load negatively. Gravel doesn't load at all really on PC 1. So PC 1 represents a mud vs. sand axis. PC 2 represents gravel.
+> 
 
 
 A regression model predicting the presence of sole by PC 1 showed a significantly *negative* coefficient. This means that as PC 1 increases, sole are *less* likely to be present.
 
 What type of substrate do sole appear to prefer? Sandy or muddy? Briefly explain your reasoning.
 
-> PC 1 is basically as axis of sand with values in negative PC 1 scores to mud in positive PC 1 scores. Gravel doesn't load appreciably on PC 1. Logistic regression shows that as PC 1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy and are more likely to be present as the substrate gets more sandy.
+> 
+
