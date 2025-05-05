@@ -30,23 +30,81 @@ theme_set(theme_classic(base_size = 20))
 ```
 
 
-# Housekeeping {background-color="#40666e"}
+## Presentations
+
+- **Monday 5/12**: 12:30 - 2:30
+- 2-3 slides
+    - Background
+    - Plot(s)
+    - Findings / Discussion
 
 
-# Questions {background-color="#f8c471"}
+## Micropublication guidelines
+
+- Template files
+- 
 
 
-# Presentation information {background-color="#40666e"}
 
 
-# Micropublication guidelines {background-color="#40666e"}
+
+## Goals of Statistical Inference
+
+::: {.incremental}
+
+1. Parameter (i.e., "effect") estimation
+    - Given a model, with unknown parameters ($\theta_0$, $\theta_1$, ..., $\theta_k$), how to estimate values of those parameters?
+2. Interval estimation
+    - How to quantify the uncertainty associated with parameter estimates?
+3. Making decisions (i.e., Hypothesis testing)
+    - How to test hypotheses about parameter estimates?
+    - What conclusions can we make from our analysis?
+
+:::
+
+
+## Decision errors
+
+|                 | Reject H~0~    | Fail to reject H~0~   |
+|----------------:|:--------------:|:---------------------:|
+|H~0~ is *true*   | Type I error   | *Correct*             |
+|H~0~ is *false*  | *Correct*      | Type II error         |
+
+. . .
+
+Type I error occurs when:
+
+- You decide there is a meaningful effect when in reality there isn't one.
+
+. . .
+
+Type II error occurs when:
+
+- You decide there is not a meaningful effect when in reality there is one.
+
+
+## Power
+
+- Probability that a *random sample* will lead to a rejection of H~0~
+- Dependent on how different the truth is from the null hypothesis
+- Inversely related to type II errors
+    - High power $\rightarrow$ low type II errors
+    - Low power $\rightarrow$ high type II errors
+    
+
+## Multiple comparisons procedures
+
+Familywise Error Rate
+
+- Rate of false positives among *all the tests*
+- Sequential Bonferroni ("Holm")
+
+. . .
+
+False Discovery Rate
+
+- Rate of false positives *among the tests called "significant"*
+- FDR and pFDR
 
 
 # What next? {background-color="#40666e"}
-
-
-## References
-
-::: {#refs}
-:::
-
