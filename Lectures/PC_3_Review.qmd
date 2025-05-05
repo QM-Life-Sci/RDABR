@@ -25,14 +25,6 @@ knitr:
 #| warning: false
 
 library(tidyverse)
-library(readxl)
-library(qvalue)
-library(wesanderson)
-library(plotly)
-library(GGally)
-library(smatr)
-library(cowplot)
-library(factoextra)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -42,6 +34,9 @@ theme_set(theme_classic(base_size = 20))
 
 
 # Questions {background-color="#f8c471"}
+
+
+# Presentation information {background-color="#40666e"}
 
 
 # Micropublication guidelines {background-color="#40666e"}
