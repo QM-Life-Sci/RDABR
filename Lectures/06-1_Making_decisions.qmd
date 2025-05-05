@@ -935,7 +935,7 @@ is a general equation that can be used to test any null hypothesized parameter e
     - often and by default $\theta_{null} = 0$
 
 
-## Decision errors {.smaller}
+## Decision errors
 
 |               | Reject H~0~    | Fail to reject H~0~   |
 |--------------:|:--------------:|:---------------------:|
