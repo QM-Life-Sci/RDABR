@@ -41,6 +41,9 @@ theme_set(theme_classic(base_size = 20))
     - Findings / Discussion
 
 
+## Pizza plan
+
+
 ## Micropublication guidelines
 
 - Template files
@@ -72,25 +75,31 @@ theme_set(theme_classic(base_size = 20))
 
 . . .
 
-Type I error occurs when:
+**Type I error**:
 
-- You decide there is a meaningful effect when in reality there isn't one.
+- You decide there *is* a meaningful effect when in reality there isn't one.
 
 . . .
 
-Type II error occurs when:
+**Type II error**:
 
-- You decide there is not a meaningful effect when in reality there is one.
+- You decide there *is not* a meaningful effect when in reality there is one.
 
 
 ## Power
 
-- Probability that a *random sample* will lead to a rejection of H~0~
+::: {.incremental}
+
+- Probability that a *random sample* of data with some known effect size (e.g., difference) will lead to a rejection of H~0~
 - Dependent on how different the truth is from the null hypothesis
+    - High power to detect large effects (for some sample size)
+    - Low power to detect small effects (for some sample size)
 - Inversely related to type II errors
     - High power $\rightarrow$ low type II errors
     - Low power $\rightarrow$ high type II errors
-    
+
+:::
+
 
 ## Multiple comparisons procedures
 
@@ -109,6 +118,9 @@ False Discovery Rate
 
 ## Let's simulate P-values
 
+1. No effects
+2. Real effects
+
 
 ## Model comparison: When to use what method
 
@@ -116,13 +128,19 @@ False Discovery Rate
 2. AIC(c) / Model weights
 3. Cross-validation
 
+All will generally agree.
+
 
 ## Model comparison: Possible goals
 
+::: {.incremental}
+
 - Explicit P-value comparisons between models
 - Relative model support
-- Out-of-sample predictive ability (broad)
-- Out-of-sample predictive ability (quantitative or numerical)
+- Out-of-sample predictive ability (qualitative)
+- Out-of-sample predictive ability (quantitative)
+
+:::
 
 
 ## Likelihood ratio tests
@@ -131,7 +149,7 @@ False Discovery Rate
     - `y ~ x1`
     - `y ~ x1 + x2`
     - `y ~ x1 + x2 + X1:x2`
-- Twice the difference in log-likelihood follows a $\chi^2$ distribution with df = difference in number of parameters
+- Twice the difference in log-likelihood follows a $\chi^2$ distribution with df = difference in number of estimated parameters
 - Yields a P-value for each comparison
 
 
@@ -141,7 +159,7 @@ False Discovery Rate
 - Lowest AIC $\rightarrow$ Best *predicted* out-of-sample predictive ability 
 - Fast and easy to calculate
 - "Vague" interpretation guidelines
-    - Models within 4 AIC units are equally supported
+    - Models within 4 AIC units are "equally supported"
 
 
 ## Model weights
@@ -149,7 +167,7 @@ False Discovery Rate
 - Normalize AIC for a set of model into a proportion of 0 to 1
 - *Probability* of a model actually being the best
 - "Vague" interpretation
-    - What does 0.65 vs. 0.25 vs. 0.10 mean?
+    - What does 65% vs. 25% vs. 10% model weight mean?
 
 
 ## Cross-validation
