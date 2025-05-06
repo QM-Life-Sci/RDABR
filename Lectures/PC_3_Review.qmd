@@ -25,6 +25,8 @@ knitr:
 #| warning: false
 
 library(tidyverse)
+library(wesanderson)
+library(AICcmodavg)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -42,10 +44,8 @@ theme_set(theme_classic(base_size = 20))
 ## Micropublication guidelines
 
 - Template files
-- 
-
-
-
+- Use figures / tables
+- BibTeX references optional
 
 
 ## Goals of Statistical Inference
@@ -107,4 +107,193 @@ False Discovery Rate
 - FDR and pFDR
 
 
+## Let's simulate P-values
+
+
+## Model comparison: When to use what method
+
+1. Likelihood ratio tests
+2. AIC(c) / Model weights
+3. Cross-validation
+
+
+## Model comparison: Possible goals
+
+- Explicit P-value comparisons between models
+- Relative model support
+- Out-of-sample predictive ability (broad)
+- Out-of-sample predictive ability (quantitative or numerical)
+
+
+## Likelihood ratio tests
+
+- Restricted to nested sets of predictors
+    - `y ~ x1`
+    - `y ~ x1 + x2`
+    - `y ~ x1 + x2 + X1:x2`
+- Twice the difference in log-likelihood follows a $\chi^2$ distribution with df = difference in number of parameters
+- Yields a P-value for each comparison
+
+
+## AIC(c)
+
+- Lower AIC $\rightarrow$ Better fit to the data
+- Lowest AIC $\rightarrow$ Best *predicted* out-of-sample predictive ability 
+- Fast and easy to calculate
+- "Vague" interpretation guidelines
+    - Models within 4 AIC units are equally supported
+
+
+## Model weights
+
+- Normalize AIC for a set of model into a proportion of 0 to 1
+- *Probability* of a model actually being the best
+- "Vague" interpretation
+    - What does 0.65 vs. 0.25 vs. 0.10 mean?
+
+
+## Cross-validation
+
+- Directly measures out-of-sample predictive ability
+    - Quantifiable
+    - But how do you interpret a mean predictive error of 0.31 vs. 0.33 vs. 0.38?
+- Challenges
+    - Small sample size
+    - Bias in $k$-fold approximations
+    - Can be very slow (leave-one-out)
+
+
+## Model averaging: the middle ground
+
+- Use AIC (or other information criteria) weights to make new predictions
+    - Parameter estimates in proportion to the model weights
+    - Weight the predictions by the model weights
+- Implemented in `AICcmodavg` (and a few other packages)
+
+
+## Model averaging
+
+```{r}
+#| echo: false
+
+NMR <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
+              col_types = c("cdd")) |> 
+  rename(Caste = caste,
+         Mass = ln.mass,
+         Energy= ln.energy) |> 
+  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+         Caste = factor(Caste))
+
+ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.15, 0.85)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Model weights
+
+```{r}
+fm4 <- lm(Energy ~ Mass + Caste, data = NMR)
+fm5 <- lm(Energy ~ Mass * Caste, data = NMR)
+
+fms <- list("~ Mass + Caste" = fm4,
+            "~ Mass * Caste" = fm5)
+
+aictab(cand.set = fms)
+```
+
+
+## Model averaging
+
+```{r}
+modavg(cand.set = fms, parm = "Mass", exclude = list("Mass:CasteWorker")) |> 
+  print(digits = 4)
+```
+
+. . .
+
+```{r}
+coef(fm4)
+coef(fm5)
+```
+
+
+## Model averaging
+
+```{r}
+modavg(cand.set = fms, parm = "CasteWorker", exclude = list("Mass:CasteWorker"))
+```
+
+
+## Predictions
+
+```{r}
+new_data <- crossing(Caste = levels(NMR$Caste),
+                     Mass = seq(3.8, 5.3, length.out = 2))
+preds <- modavgPred(cand.set = fms, newdata = new_data)
+new_data <- new_data |> 
+  mutate(y_hat = preds$mod.avg.pred)
+new_data
+```
+
+
+## Predictions
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+ggplot() +
+  geom_point(data = NMR,
+             aes(x = Mass, y = Energy, color = Caste),
+             size = 4) +
+  geom_line(data = new_data,
+            aes(x = Mass, y = y_hat, color = Caste),
+            linewidth = 1.5) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.15, 0.85)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Comparison
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+NMR <- NMR |> 
+  mutate(pred4 = predict(fm4),
+         pred5 = predict(fm5))
+
+ggplot() +
+  geom_point(data = NMR,
+             aes(x = Mass, y = Energy, color = Caste),
+             size = 4, alpha = 0.5) +
+  geom_line(data = new_data,
+            aes(x = Mass, y = y_hat, color = Caste),
+            linewidth = 1.5, alpha = 0.5) +
+  geom_line(data = NMR,
+            aes(x = Mass, y = pred4, color = Caste),
+            linewidth = 1.5, linetype = "dotted") +
+  geom_line(data = NMR,
+            aes(x = Mass, y = pred5, color = Caste),
+            linewidth = 1.5, linetype = "dashed") +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.15, 0.85)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
 # What next? {background-color="#40666e"}
+
+- This course is a reference
+    - [Materials on Github](https://github.com/QM-Life-Sci/RDABR)
+    - Download the lectures if you want them
+- Practice
+- I will always help you
