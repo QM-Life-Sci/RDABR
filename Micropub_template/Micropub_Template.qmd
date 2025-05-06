@@ -6,6 +6,8 @@ format:
     toc: false
     number-sections: true
     colorlinks: true
+    standalone: true
+    self-contained: true
 documentclass: article
 fontsize: 12pt
 geometry: margin=1in
