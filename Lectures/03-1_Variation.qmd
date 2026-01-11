@@ -1,6 +1,6 @@
 ---
-title: "Unit 3: Variation"
-subtitle: "Data Visualization"
+title: "Unit 3: Variation and Data Visualization"
+subtitle: "Univariate Summaries"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -38,8 +38,7 @@ theme_set(theme_classic(base_size = 20))
 ## Week three check in
 
 - Qualtrics survey that will be linked from Canvas (no assignment)
-- Optional, but I hope you will complete it
-- I will not see your individual responses -- only a summary (Dr. King)
+- Optional, but we hope you will complete it
 
 
 ## Questions
@@ -54,30 +53,17 @@ theme_set(theme_classic(base_size = 20))
 8. What’s something you’ve learned that has surprised you?
 
 
-## Hellbender
-
-- Connection problems
-- Tidyverse won't load
-- RCSS won't answer my emails
-
-:::{.alert}
-How do you feel about local installation on your laptop?
-:::
-
-- 1-2 GB free space
-- Simplifies your workflow
-    - All files local
-
-
 # Introduction to Data Visualization {background-color="#40666e"}
 
 
 ## Why visualize data? {.scrollable}
 
 ```{r}
-ds <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Datasaurus_data.csv",
-               col_names = c("x1","x2"),
-               show_col_types = FALSE)
+ds <- read_csv(
+    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Datasaurus_data.csv",
+    col_names = c("x1", "x2"),
+    show_col_types = FALSE
+)
 knitr::kable(ds)
 ```
 
@@ -85,11 +71,13 @@ knitr::kable(ds)
 ## Why visualize data? {.scrollable}
 
 ```{r}
-ds |> 
-  summarize(across(.cols = everything(),
-                   .fns = list(Mean = mean, `Std. Dev.` = sd))) |> 
-  mutate(across(.fns = round, digits = 2)) |> 
-  knitr::kable()
+ds |>
+    summarize(across(
+        .cols = everything(),
+        .fns = list(Mean = mean, `Std. Dev.` = sd)
+    )) |>
+    mutate(across(.fns = round, digits = 2)) |>
+    knitr::kable()
 ```
 
 . . .
@@ -105,13 +93,14 @@ with(ds, cor.test(x1, x2))
 ## Visualization reveals patterns
 
 ```{r}
+#| fig-alt: "Scatterplot that looks like a dinosaur."
+
 ggplot(ds, aes(x = x1, y = x2)) +
-  geom_point(color = "navy") +
-  scale_x_continuous(limits = c(0, 100)) +
-  scale_y_continuous(limits = c(0, 100)) +
-  coord_fixed() +
-  labs(caption = expression(paste("Alberto Cairo's ", 
-                                  italic("Datasaurus"))))
+    geom_point(color = "navy") +
+    scale_x_continuous(limits = c(0, 100)) +
+    scale_y_continuous(limits = c(0, 100)) +
+    coord_fixed() +
+    labs(caption = expression(paste("Alberto Cairo's ", italic("Datasaurus"))))
 ```
 
 
@@ -125,12 +114,12 @@ ggplot(ds, aes(x = x1, y = x2)) +
 
 set.seed(38479238)
 
-DD <- tibble(weight = c(rnorm(50, 5, 1),
-                        rnorm(40, 5.5, 1), 
-                        rnorm(10, 15, 2)),
-             group = rep(c("Control", "Treatment"), each = 50),
-             year = rep(c(1, 2, 3, 5, 4),each = 10, times = 2)) |> 
-  mutate(year = factor(year))
+DD <- tibble(
+    weight = c(rnorm(50, 5, 1), rnorm(40, 5.5, 1), rnorm(10, 15, 2)),
+    group = rep(c("Control", "Treatment"), each = 50),
+    year = rep(c(1, 2, 3, 5, 4), each = 10, times = 2)
+) |>
+    mutate(year = factor(year))
 ```
 
 ```{r}
@@ -152,9 +141,9 @@ DD |> knitr::kable(digits = 2)
 #| echo: true
 DD |> count(group)
 
-DD |> 
-  group_by(group) |>
-  summarize(mean = mean(weight))
+DD |>
+    group_by(group) |>
+    summarize(mean = mean(weight))
 ```
 
 . . .
@@ -169,17 +158,24 @@ t.test(weight ~ group, data = DD)
 ## Visualization is an important part of analysis
 
 ```{r}
-#| echo: false
+#| fig-alt: "Two-column plot of Weight by Group. The control group is a single cluster. The Treatment group has two clusters."
 
 DD |>
-  ggplot(aes(group, weight)) +
-  geom_point(position = position_jitter(width = 0.2), size = 3,
-             alpha = 0.75) +
-  stat_summary(fun = mean, geom = "point", size = 5, color = "steelblue") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "steelblue", linewidth = 1) +
-  labs(x = "Group",
-       y = "Weight (g)")
+    ggplot(aes(group, weight)) +
+    geom_point(
+        position = position_jitter(width = 0.2),
+        size = 3,
+        alpha = 0.75
+    ) +
+    stat_summary(fun = mean, geom = "point", size = 5, color = "steelblue") +
+    stat_summary(
+        fun.data = mean_se,
+        geom = "errorbar",
+        width = 0.1,
+        color = "steelblue",
+        linewidth = 1
+    ) +
+    labs(x = "Group", y = "Weight (g)")
 ```
 
 
@@ -187,17 +183,25 @@ DD |>
 
 ```{r}
 #| echo: false
+#| fig-alt: "Two-column plot of Weight by Group. The control group is a single cluster. The Treatment group has two clusters where all the points in oue group are from the same year."
 
 DD |>
-  ggplot(aes(group, weight, color = year)) +
-  geom_point(position = position_jitter(width = 0.2), size = 3,
-             alpha = 0.75) +
-  stat_summary(fun = mean, geom = "point", size = 5, color = "black") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "black", linewidth = 1)  +
-  scale_color_brewer(type = "qual", name = "Year", palette = "Set1") +
-  labs(x = "Group",
-       y = "Weight (g)")
+    ggplot(aes(group, weight, color = year)) +
+    geom_point(
+        position = position_jitter(width = 0.2),
+        size = 3,
+        alpha = 0.75
+    ) +
+    stat_summary(fun = mean, geom = "point", size = 5, color = "black") +
+    stat_summary(
+        fun.data = mean_se,
+        geom = "errorbar",
+        width = 0.1,
+        color = "black",
+        linewidth = 1
+    ) +
+    scale_color_brewer(type = "qual", name = "Year", palette = "Set1") +
+    labs(x = "Group", y = "Weight (g)")
 
 ```
 
@@ -241,9 +245,8 @@ str(iris)
 #| eval: false
 
 library(tidyverse)
-ggplot(data = iris,
-       aes(x = Petal.Length, y = Petal.Width)) + 
-  geom_point() 
+ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
+    geom_point()
 ```
 
 - `ggplot()` sets up the plot using `iris` data.
@@ -272,9 +275,8 @@ ggplot(data = iris,
 library(tidyverse)
 theme_set(theme_classic(base_size = 20)) # Preferred ggplot theme
 
-ggplot(data = iris,
-       aes(x = Petal.Length, y = Petal.Width)) +
-  geom_point() 
+ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
+    geom_point()
 ```
 
 - `data =` is optional and often omitted if the data is the first argument to the function
@@ -283,9 +285,10 @@ ggplot(data = iris,
 ## What patterns do you observe?
 
 ```{r}
-ggplot(data = iris,
-       aes(x = Petal.Length, y = Petal.Width)) +
-  geom_point() 
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length showing a positive relationship."
+
+ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
+    geom_point()
 ```
 
 
@@ -296,9 +299,10 @@ ggplot(data = iris,
 #| warning: false
 #| message: false
 #| output-location: slide
+#| fig-alt: "Histogram of Petal Length showing two clusters of bars."
 
-ggplot(iris, aes(x = Petal.Length)) + 
-  geom_histogram() 
+ggplot(iris, aes(x = Petal.Length)) +
+    geom_histogram()
 ```
 
 - Using `geom_histogram()` instead of `geom_point()`
@@ -309,10 +313,10 @@ ggplot(iris, aes(x = Petal.Length)) +
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length colored by Species. The species appear to cluster."
 
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
-                 color = Species)) + 
-  geom_point(size = 3)
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+    geom_point(size = 3)
 ```
 
 - `color = Species` colors points by the `Species` column (a factor)
@@ -323,11 +327,10 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length with point shape by Species. The species appear to cluster."
 
-ggplot(iris, aes(x = Petal.Length,
-                 y = Petal.Width,
-                 shape = Species)) + 
-  geom_point(size = 3)
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, shape = Species)) +
+    geom_point(size = 3)
 ```
 
 - `shape = Species` encodes _Species_ by the point shape
@@ -338,10 +341,10 @@ ggplot(iris, aes(x = Petal.Length,
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length colored by Species. The species appear to cluster. The point size is larger."
 
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
-                 shape = Species)) + 
-  geom_point(size = 5)
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, shape = Species)) +
+    geom_point(size = 5)
 
 ```
 
@@ -353,12 +356,12 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length with point color by Species. The species appear to cluster."
 
 library(wesanderson)
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
-                 color = Species)) + 
-  geom_point(size = 3) + 
-  scale_color_manual(values = wes_palette("Moonrise2"))
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+    geom_point(size = 3) +
+    scale_color_manual(values = wes_palette("Moonrise2"))
 ```
 
 - Add an interesting color palette
@@ -371,12 +374,12 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length with point color by Species. The species appear to cluster."
 
 library(viridis)
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width,
-                 color = Species)) + 
-  geom_point(size = 3) + 
-  scale_color_viridis(discrete = TRUE, option = "viridis")
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+    geom_point(size = 3) +
+    scale_color_viridis(discrete = TRUE, option = "viridis")
 ```
 
 - `library(viridis)` works for colorblind and grayscale friendly images.
@@ -403,7 +406,7 @@ Accessible palettes
 
 ::::
 
-![](http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/colorblind_palette.jpg)
+![](http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/colorblind_palette.jpg){fig-alt="Image of the effects of different types of color blindness on perceived differences in color."}
 
 
 
@@ -412,16 +415,17 @@ Accessible palettes
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length with point color by Species and additional custom axis labels and caption."
 
-ggplot(iris, aes(x = Petal.Length,
-                 y = Petal.Width,
-                 color = Species)) + 
-  geom_point(size = 3) + 
-  scale_color_viridis(discrete = TRUE, option = "viridis") +
-  labs(x = "Petal Length (cm)",
-       y = "Petal Width (cm)",
-       title = "Irises",
-       caption = "Anderson (1935)")
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+    geom_point(size = 3) +
+    scale_color_viridis(discrete = TRUE, option = "viridis") +
+    labs(
+        x = "Petal Length (cm)",
+        y = "Petal Width (cm)",
+        title = "Irises",
+        caption = "Anderson (1935)"
+    )
 ```
 
 - Add a main title and better axis titles
@@ -432,17 +436,18 @@ ggplot(iris, aes(x = Petal.Length,
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of Petal Width vs. Petal length with point color by Species and additional custom axis labels and ticks and a caption."
 
-ggplot(iris, aes(x = Petal.Length,
-                 y = Petal.Width,
-                 color = Species)) + 
-  geom_point(size = 3) +
-  scale_color_viridis(discrete = TRUE, option = "viridis") +
-  scale_x_continuous(breaks = seq(1, 7, by = 0.5)) +
-  labs(x = "Petal Length (cm)",
-       y = "Petal Width (cm)",
-       title = "Irises",
-       caption = "Anderson (1935)")
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+    geom_point(size = 3) +
+    scale_color_viridis(discrete = TRUE, option = "viridis") +
+    scale_x_continuous(breaks = seq(1, 7, by = 0.5)) +
+    labs(
+        x = "Petal Length (cm)",
+        y = "Petal Width (cm)",
+        title = "Irises",
+        caption = "Anderson (1935)"
+    )
 ```
 
 - `scale_x_continuous()` controls the axis ticks and tick labels
@@ -457,31 +462,40 @@ ggplot(iris, aes(x = Petal.Length,
 ## Variation in height for 6,465 individuals
 
 ```{r}
-NHANES <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/NHANES.csv",
-                   show_col_types = FALSE) |> 
-  filter(Sex == "Male") |> 
-  select(-Sex) |> 
-  arrange(Height)
+#| fig-alt: "Plot of height vs. age for 6465 individuals from the NHANES dataset."
+
+NHANES <- read_csv(
+    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/NHANES.csv",
+    show_col_types = FALSE
+) |>
+    filter(Sex == "Male") |>
+    select(-Sex) |>
+    arrange(Height)
 
 ggplot(NHANES, aes(x = Age, y = Height)) +
-  geom_point(size = 1, show.legend = FALSE, alpha = 0.25,
-             position = position_jitter(width = 0.25, seed = 3847293),
-             color = "firebrick4") +
-  scale_x_continuous(breaks = seq(0, 80, by = 5)) +
-  labs(x = "Age (y)", y = "Height (cm)")
+    geom_point(
+        size = 1,
+        show.legend = FALSE,
+        alpha = 0.25,
+        position = position_jitter(width = 0.25, seed = 3847293),
+        color = "firebrick4"
+    ) +
+    scale_x_continuous(breaks = seq(0, 80, by = 5)) +
+    labs(x = "Age (y)", y = "Height (cm)")
 ```
 
 
 ## Distribution of heights (age > 20)
 
 ```{r}
+#| fig-alt: "Histogram of height for individuals over age 20 from the NHANES dataset."
+
 NHANES_20 <- NHANES |> filter(Age > 20)
 
 ggplot(NHANES_20, aes(Height)) +
-  geom_histogram(bins = 30, show.legend = FALSE,
-                 fill = "firebrick4") +
-  labs(x = "Height (cm)", y = "Count") +
-  scale_x_continuous(breaks = seq(140, 200, by = 10))
+    geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
+    labs(x = "Height (cm)", y = "Count") +
+    scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -492,19 +506,20 @@ What do you think the distribution will look like?
 . . .
 
 ```{r}
+#| fig-alt: "Histogram of height for individuals over age 40 from the NHANES dataset."
+
 NHANES_40 <- NHANES |> filter(Age > 35.5 & Age < 40.5)
 
 ggplot(NHANES_40, aes(Height)) +
-  geom_histogram(bins = 30, show.legend = FALSE,
-                 fill = "firebrick4") +
-  labs(x = "Height (cm)", y = "Count") +
-  scale_x_continuous(breaks = seq(140, 200, by = 10))
+    geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
+    labs(x = "Height (cm)", y = "Count") +
+    scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
 ## Most biological variables are normally distributed
 
-![](images/Heights.png){fig-align="center"}
+![](images/Heights.png){fig-align="center" fig-alt="Photograph of a group of people organized by their height showing that their heights are approximately normally distributed."}
 
 :::{.center}
 What are your ideas why?
@@ -518,16 +533,19 @@ Schilling et al. [-@Schilling2002-mm]
 ## We have seen this distribution before
 
 ```{r}
+#| fig-alt: "Histogram of counts for a binomial distribution with p = 0.5 and trials = 10, which looks roughly normal."
+
 set.seed(234627)
 x <- rbinom(n = 10000, size = 10, prob = 0.5)
 x_tab <- table(x)
 
-ggplot(data = tibble(Count = as.numeric(x_tab),
-                     Successes = 0:10),
-       aes(x = Successes, y = Count)) +
-  geom_bar(stat = "identity", fill = "navy") +
-  scale_x_continuous(breaks = 0:10) +
-  labs(x = "n Successes in 10 Trials")
+ggplot(
+    data = tibble(Count = as.numeric(x_tab), Successes = 0:10),
+    aes(x = Successes, y = Count)
+) +
+    geom_bar(stat = "identity", fill = "navy") +
+    scale_x_continuous(breaks = 0:10) +
+    labs(x = "n Successes in 10 Trials")
 ```
 
 
@@ -558,7 +576,7 @@ sum(x)
 
 ## Genes are analogous to coin flips
 
-![](images/Trihybrid_cross.jpg){fig-align="center"}
+![](images/Trihybrid_cross.jpg){fig-align="center" fig-alt="Image showing the possible combinations from a trinomial cross of R, Y, and S."}
 
 Each R, Y, or S contributes a 0 or 1
 
@@ -583,7 +601,7 @@ Empirical sampling (10000 samples standardized to 1024):
 
 ```{r}
 #| echo: true
-as.numeric(x_tab / (10000/1024)) |> round(digits = 2)
+as.numeric(x_tab / (10000 / 1024)) |> round(digits = 2)
 ```
 
 
@@ -654,7 +672,7 @@ x <- rbinom(n = 10000, size = SNPs, prob = 0.5)
 ```
 
 
-## Counts of "Taller" SNPs 
+## Counts of "Taller" SNPs
 
 ```{r}
 x[1:100]
@@ -662,20 +680,21 @@ x[1:100]
 
 :::{.alert}
 What do these numbers represent?
+
+What do you think the histogram will look like?
 :::
 
 
-## Distribution of "Taller" SNPs 
+## Distribution of "Taller" SNPs
 
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Histogram of Taller SNPs showing an approximate normal distribution centered on about 1650 SNPs."
 
-ggplot(data = tibble(x),
-       aes(x)) +
-  geom_histogram(bins = 30, fill = "skyblue") +
-  labs(x = "Number of Taller SNPs",
-       y = "Count")
+ggplot(data = tibble(x), aes(x)) +
+    geom_histogram(bins = 30, fill = "skyblue") +
+    labs(x = "Number of Taller SNPs", y = "Count")
 ```
 
 
@@ -695,46 +714,526 @@ What are your ideas?
 ## Exact probabilities
 
 ```{r}
-exact_prob <- tibble(x = 0:SNPs,
-                     y = dbinom(x, SNPs, prob = 0.5))
+#| fig-alt: "Probability density plot for the exact probability of 0 to 3290 Taller SNPs. There is a narrow peak centered of 1645."
 
-ggplot(exact_prob,
-       aes(x, y)) +
-  geom_bar(stat = "identity", color = "navy") +
-  scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
-  labs(x = "Number of Taller SNPs",
-       y = "Probability")
+exact_prob <- tibble(x = 0:SNPs, y = dbinom(x, SNPs, prob = 0.5))
+
+ggplot(exact_prob, aes(x, y)) +
+    geom_bar(stat = "identity", color = "navy") +
+    scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
+    labs(x = "Number of Taller SNPs", y = "Probability")
 ```
 
 
 ## Exact probabilities
 
 ```{r}
-exact_prob <- tibble(x = 0:SNPs,
-                     y = dbinom(x, SNPs, prob = 0.5))
+#| fig-alt: "Probability density plot for the exact probability of 0 to 3290 Taller SNPs. There is a narrow peak centered of 1645 with almost zero probability less than 1550 or above 1750."
 
-ggplot(exact_prob,
-       aes(x, y)) +
-  geom_bar(stat = "identity", color = "navy") +
-  scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
-  labs(x = "Number of Taller SNPs",
-       y = "Probability")
+exact_prob <- tibble(x = 0:SNPs, y = dbinom(x, SNPs, prob = 0.5))
+
+ggplot(exact_prob, aes(x, y)) +
+    geom_bar(stat = "identity", color = "navy") +
+    scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
+    labs(x = "Number of Taller SNPs", y = "Probability")
 ```
 
 
 ## Exact probabilities
 
 ```{r}
-exact_prob <- tibble(x = 1550:1750,
-                     y = dbinom(x, SNPs, prob = 0.5))
+exact_prob <- tibble(x = 1550:1750, y = dbinom(x, SNPs, prob = 0.5))
 
-ggplot(exact_prob,
-       aes(x, y)) +
-  geom_bar(stat = "identity", color = "navy") +
-  scale_x_continuous(breaks = seq(1550, 1750, by = 50)) +
-  labs(x = "Number of Taller SNPs",
-       y = "Probability")
+ggplot(exact_prob, aes(x, y)) +
+    geom_bar(stat = "identity", color = "navy") +
+    scale_x_continuous(breaks = seq(1550, 1750, by = 50)) +
+    labs(x = "Number of Taller SNPs", y = "Probability")
 ```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Distributions {background-color="#40666e"}
+
+
+## Distributions
+
+- All observations can be thought of as coming from a population that can be represented as a distribution
+- Flip a coin 6 times and get HHTTHT: one observation in a distribution of possible outcomes (THTHTH, HHHTTT, etc.)
+- Catch a rodent in my swimming pool and test its endurance: that data point is one value in the larger distribution of all endurance measures for all rodents
+
+
+## Distributions most commonly encountered
+
+1. Frequency distribution
+    - Shows the number of times each measurement occurs in a sample (possibly "binned")
+    - Counts of Heads, Water, Taller SNPs, etc.
+1. Probability distribution:
+    - A probability distribution shows the probability that measurement occurs in a sample.
+
+
+## Probability distributions
+
+Mathematical function for *probabilities* of *possible outcomes*
+
+- *Probabilities*: between 0 and 1
+- *Possible outcomes*: real number, integer, binomial (0/1), etc.
+
+Normal distribution ($x$, $\mu$, $\sigma$):
+
+$$
+Pr\left[x\right] = \frac{1}{\sqrt{2\pi\sigma^{2}}}e^{\frac{-\left(x-\mu\right)^{2}}{2\sigma^{2}}}
+$$
+
+
+## Normal distribution
+
+$$
+Pr\left[x\right] = \frac{1}{\sqrt{2\pi\sigma^{2}}}e^{\frac{-\left(x-\mu\right)^{2}}{2\sigma^{2}}}
+$$
+
+```{r}
+#| echo: true
+
+Normal <- function(x, mu, sigma) {
+    (1 / (sqrt(2 * pi * sigma^2))) * exp((-1 * (x - mu)^2) / (2 * sigma^2))
+}
+
+Normal(x = 1, mu = 0, sigma = 1)
+```
+
+. . .
+
+R has built-in functions for probability distributions ("densities").
+
+`dnorm()` is the normal distribution probability density:
+
+```{r}
+#| echo: true
+
+dnorm(x = 1, mean = 0, sd = 1)
+```
+
+
+## Normal distribution
+
+Calculate the probability across the range $-3$ to $3$ for $\mu = 0$ and $\sigma = 1$:
+
+```{r}
+#| echo: true
+Std_Normal <- tibble(
+    x = seq(-3, 3, length.out = 100),
+    Probability = dnorm(x, mean = 0, sd = 1)
+)
+```
+
+Plot the probability as a line:
+
+```{r}
+#| echo: true
+#| eval: false
+
+ggplot() +
+    geom_line(
+        data = Std_Normal,
+        aes(x, Probability),
+        color = "salmon",
+        linewidth = 1.5
+    ) +
+    geom_point(
+        aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
+        size = 4,
+        color = "darkgreen"
+    ) +
+    scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+    scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+```
+
+
+## Normal distribution
+
+```{r}
+#| fig-alt: "Plot of the probability density distribution of a standard normal distribution with a point at x = 1 lying on the line."
+
+ggplot() +
+    geom_line(
+        data = Std_Normal,
+        aes(x, Probability),
+        color = "salmon",
+        linewidth = 1.5
+    ) +
+    geom_point(
+        aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
+        size = 5,
+        color = "darkgreen"
+    ) +
+    scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+    scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+```
+
+Area under the curve = 1 integrating $Pr[x]$ for $-\infty < x < \infty$
+
+
+## Test out `dnorm()`
+
+- Pick a value for $x$
+- Choose `mean` and `sd` (not 0 and 1)
+
+```{r}
+#| echo: true
+
+rnorm(10, mean = 2, sd = 5)
+```
+
+See what probabilities you find.
+
+What sum do you predict:
+
+```{r}
+#| echo: true
+#| eval: false
+
+x <- seq(-100, 100)
+sum(dnorm(x, mean = 0, sd = 1))
+```
+
+
+## Many distributions
+
+![](images/distributions.png){fig-align="center" width="80%" fig-alt="A figure showing the relationships between different distributions, including Uniform, Binomial, Poisson, Normal, and Chi-squared."}
+
+
+# Exploring Variation {background-color="#40666e"}
+
+:::{.center}
+Normal distribution
+:::
+
+
+## Describing a normal distribution
+
+Central tendency
+
+- Mean
+- Median
+- Mode (most common value)
+
+Spread
+
+- Standard deviation
+- Interquartile range
+
+
+## Sample (arithmetic) mean
+
+$$\bar{x} = \frac{1}{n}~\sum^n_{i=1}x_i = \frac{\sum^n_{i=1}x_i}{n}$$
+
+. . .
+
+"From $i = 1$ to $i = n$, sum ($\Sigma$) each observation ($x_i$) and divide the sum by $n$, where $n$ is the count of observations."
+
+:::{.callout-note}
+"Mean" is preferred to "average". Most of the time they are synonymous.
+:::
+
+## Median
+
+- The central observations of a sample
+- The 50th percentile
+- The 0.50 quantile.
+- If $n$ is even, then the median is the mean of the two middle observations.
+
+```{r}
+#| echo: true
+
+1:10
+median(1:10)
+quantile(1:10, prob = 0.5)
+```
+
+
+## Mean vs. Median
+
+Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus aculeatus*) with three different *Ectodysplasin* genotypes (*mm*, *Mm*, and *MM*).
+
+![](https://i.imgur.com/Xr68AKa.jpg){fig-align="center" fig-alt="Photograph of a threespine stickleback."}
+
+
+## Mean vs. Median
+
+```{r}
+SticklebackPlates <- read_csv(
+    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
+    show_col_types = FALSE
+)
+```
+
+```{r}
+knitr::kable(SticklebackPlates)
+```
+
+
+## Mean vs. Median
+
+```{r}
+#| fig-alt: "Histogram of number of plates in each of three genotypes: mm, Mm, and MM. Each genotype has a different shape of distribution."
+
+ggplot(SticklebackPlates, aes(x = plates)) +
+    geom_histogram(bins = 30, fill = "gray75") +
+    facet_grid(genotype ~ .) +
+    labs(x = "Number of Lateral Body Plates", y = "Count") +
+    theme(strip.text = element_text(face = "italic"))
+```
+
+
+## Mean vs. Median
+
+```{r}
+#| echo: true
+
+SticklebackPlates |>
+    group_by(genotype) |>
+    summarize(mean_plate = mean(plates), median_plate = median(plates))
+```
+
+How do the mean and median compare?
+
+
+## Mean is sensitive to extreme values
+
+```{r}
+#| fig-alt: "Histogram of number of plates in each of three genotypes: mm, Mm, and MM. Each genotype has a different shape of distribution which is summaried by different values for the mean and median."
+
+M <- SticklebackPlates |>
+    group_by(genotype) |>
+    summarize(Mean = mean(plates), Median = median(plates), .groups = "drop") |>
+    gather(Value, x, -genotype)
+
+ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
+    geom_histogram(bins = 30, fill = "gray75") +
+    geom_vline(data = M, aes(xintercept = x, color = Value), linewidth = 2) +
+    scale_color_manual(values = c("firebrick4", "navyblue")) +
+    facet_grid(genotype ~ .) +
+    labs(x = "Number of Lateral Body Plates", y = "Count") +
+    theme(strip.text = element_text(face = "italic"))
+```
+
+
+# Questions {background-color="#f8c471"}
+
+# Measures of Spread {background-color="#40666e"}
+
+1. Standard deviation (and variance)
+2. Interquartile range
+
+
+## Standard deviation
+
+$$\sigma = \sqrt{\frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}}$$
+
+- What is $\bar{x}$?
+- What does $\left( x_i - \bar{x} \right)^2$ represent? Why squared? What does this imply for standard deviations?
+- What is the function of $n$?
+- What is the function of the square root in the equation?
+
+
+## Standard deviation: Rules of thumb
+
+- ~68% of points between -1 sd and +1 sd (±1 sd)
+- ~95% of points between -2 sd and +2 sd (±2 sd)
+- ~99.7% of points between -3 sd and +3 sd (±3 sd)
+
+```{r}
+#| label: sd-rules
+#| fig-align: center
+#| fig-alt: "Probability density plot of the standard normal distribution with vertical bars for 1, 2, and 3 standard deviations."
+
+ggplot() +
+    geom_line(
+        data = Std_Normal,
+        aes(x, Probability),
+        color = "gray75",
+        linewidth = 1
+    ) +
+    geom_segment(
+        aes(x = c(-1, 1), xend = c(-1, 1), y = 0, yend = dnorm(x = c(-1, 1))),
+        color = "orange",
+        linewidth = 1.5
+    ) +
+    geom_segment(
+        aes(x = c(-2, 2), xend = c(-2, 2), y = 0, yend = dnorm(x = c(-2, 2))),
+        color = "darkgreen",
+        linewidth = 1.5
+    ) +
+    geom_segment(
+        aes(x = c(-3, 3), xend = c(-3, 3), y = 0, yend = dnorm(x = c(-3, 3))),
+        color = "navy",
+        linewidth = 1.5
+    ) +
+    scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+    scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+```
+
+
+## Variance
+
+$$\sigma^2 = \frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}$$
+
+- Some equations will use the variance (e.g., normal distribution probability density)
+- Most people think in standard deviations
+    - Same units as $x$
+
+
+## Interquartile range (IQR)
+
+- Remember that the median is the 0.5 quantile (and 50th percentile)
+- IQR is the range between the 0.25 and 0.75 quantiles ("quartiles")
+
+```{r}
+#| echo: true
+
+quantile(iris$Sepal.Length, probs = 0.75) -
+    quantile(iris$Sepal.Length, probs = 0.25)
+
+IQR(iris$Sepal.Length)
+```
+
+Call `summary()` on a vector:
+
+```{r}
+#| echo: true
+
+summary(iris$Sepal.Length)
+```
+
+
+## Why does all this matter?
+
+- Your confidence in an estimate depends on the spread of the observed data
+- Coming soon:
+    - Relationships between variables
+    - Differences in means between groups
+
+All depend on the means and spread of the data
+
+
+# Sampling from Distributions {background-color="#40666e"}
+
+[Kingfisher fish-sampling demo](https://www.zoology.ubc.ca/~whitlock/Kingfisher/SamplingNormal.htm){target="_blank"}
+
+
+## Means of samples
+
+Law of Large Numbers
+
+- The mean of repeated samples from a population will converge on the true value
+- Long-run means are very predictable
+- Water/land sampling from inflatable globes
+
+
+## Programming Loops
+
+- R is a (moderately) general purpose programming language
+- "Flow control" syntax
+
+```{r}
+#| label: for-loops
+#| echo: true
+
+# for loops
+n <- 100 # <1>
+squares <- numeric(length = 100) # <2>
+
+for (ii in 1:n) {
+    # <3>
+    squares[ii] <- ii^2 # <4>
+}
+
+squares
+```
+
+1. Set the number of iterations `n`.
+2. Create an empty numeric vector to hold the `squares`.
+3. Set up the for loop. The variable `ii` is created here. Iterate from 1 to n.
+4. Assign the square of `ii` to the `ii`th element of the vector `squares`.
+
+
+## Means of samples
+
+```{r}
+#| echo: true
+#| fig-align: center
+#| fig-alt: "Histogram of 1000 draws from a normal distribution with a mean of 10 and standard deviation of 4. The distribution is roughly normally distributed."
+
+set.seed(423766)
+
+x <- rnorm(n = 1000, mean = 10, sd = 4)
+mean(x)
+
+ggplot(tibble(x), aes(x)) +
+    geom_histogram(bins = 30, fill = "coral") +
+    labs(y = "Count")
+```
+
+
+## Resampling to estimate a mean
+
+```{r}
+#| echo: true
+
+set.seed(12366)
+
+sample_size <- 20
+
+n_means <- 100
+sample_means <- numeric(n_means)
+
+for (ii in 1:n_means) {
+    s <- sample(x, size = sample_size, replace = FALSE) # <1>
+    sample_means[ii] <- mean(s)
+}
+```
+
+1. Randomly sample from x, being sure to not sample the same value twice (`replace = FALSE`).
+
+. . .
+
+```{r}
+#| echo: true
+
+sample_means[1:10]
+```
+
+What will the distribution of sample *means* look like? What will the range be?
+
+
+## Sample means
+
+```{r}
+#| echo: true
+#| fig-align: center
+#| output-location: slide
+#| fig-alt: "Distribution of the resampled means. The values are roughly normally distributed but narrower than the raw data."
+
+ggplot(tibble(sample_means), aes(sample_means)) +
+    geom_histogram(bins = 30, fill = "gold") +
+    labs(x = "Sample Mean", y = "Count")
+```
+
+
+## Mean of means
+
+```{r}
+#| echo: true
+
+mean(x)
+
+mean(sample_means)
+```
+
+- What would change with larger sample sizes (> 20)?
+- What would change with more means (> 100)?
 
 
 # Questions {background-color="#f8c471"}
@@ -744,4 +1243,3 @@ ggplot(exact_prob,
 
 ::: {#refs}
 :::
-
