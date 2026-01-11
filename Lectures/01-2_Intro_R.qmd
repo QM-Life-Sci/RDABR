@@ -228,24 +228,7 @@ You will develop skills for adapting code from a problem you have solved before.
 - `cowplot`
 
 
-## Swirl
-
-[Swirl](https://swirlstats.com/) is an interactive R package for learning R basics
-
-```{r}
-#| eval: false
-#| echo: true
-
-# Install swirl
-install.packages("swirl") # <1>
-
-library("swirl")
-swirl()
-```
-1. Only run this line once.
-
-
-![](images/Swirl.png){fig-align="center"}
+## Let's install packages together
 
 
 # File systems {background-color="#40666e"}
@@ -286,6 +269,26 @@ Possible directory structure:
 ```
 
 Some examples...
+
+
+## Swirl
+
+[Swirl](https://swirlstats.com/) is an interactive R package for learning R basics
+
+```{r}
+#| eval: false
+#| echo: true
+
+# Install swirl
+install.packages("swirl") # <1>
+
+library("swirl")
+swirl()
+```
+1. Only run this line once.
+
+
+![](images/Swirl.png){fig-align="center"}
 
 
 ## References
