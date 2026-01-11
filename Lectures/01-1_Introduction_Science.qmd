@@ -1,9 +1,7 @@
 ---
 title: "Reproducible Data Analysis for Biomedical Research"
-subtitle: "Or: How to use computers to make your scientific life easier"
 author:
-  - name: Kevin Middleton
-    email: middletonk@missouri.edu
+  - name: Elizabeth King and Kevin Middleton
     affiliations: Division of Biological Sciences
 html-math-method:
   method: mathjax
@@ -41,9 +39,14 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 - Tucker Hall 322
 
 
-## Who am I?
+## Who are we?
 
-Kevin Middleton (he/him)
+Dr. Elizabeth King (she/her)
+
+
+## Who are we?
+
+Dr. Kevin Middleton (he/him)
 
 - Grew up in Florida
 - North Carolina $\rightarrow$ Rhode Island (10 years) $\rightarrow$ California (1 year) $\rightarrow$ Rhode Island (1 year) $\rightarrow$ California (5 years) $\rightarrow$ Missouri
@@ -61,7 +64,7 @@ Kevin Middleton (he/him)
 - Taught undergraduates, post-bacs, and graduate students for 15+ years
 
 :::{.callout-note}
-## Why am I teaching this class?
+## Why are we teaching this class?
 
 - These skills are increasingly important for you as scientists
 - A basic understanding of statistics will make you a more informed consumer
@@ -176,14 +179,16 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 
 - Class
 - Canvas
-- Email: (middletonk@missouri.edu)
-- Office: Tucker Hall Room 224 (or 222)
+- Emails: (kingeg@missouri.edu and middletonk@missouri.edu)
+- Offices:
+    - King: Tucker 401
+    - Middleton: Tucker Hall Room 224 (or 222)
 - [Anonymously](https://forms.office.com/r/k27q3HWQwa) via web
 
-![](images/Anonymous_Question.png){fig-align="center"}
+![](images/Anonymous_Question.png){fig-align="center" fig-alt="Image showing the location in Canvas to post an anonymous question."}
 
 
-## Course communications from me
+## Course communications from us
 
 - Canvas announcements and messages
     - Sign up for email notifications
@@ -201,15 +206,15 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 Maybe again later in the semester
 
 
-# Let's look at canvas {background-color="#40666e"}
+# Let's look at Canvas {background-color="#40666e"}
+
+- General information
+- Planned schedule
 
 
-# Planned schedule {background-color="#40666e"}
+## Working together
 
-
-## Your coding partner
-
-- Work together
+- Your coding partner
 - Help each other problem solve
 - Rotates every two weeks
 - Self- and Peer-evaluations
@@ -228,7 +233,6 @@ Thursday
 - Finish up Tuesday material
 - Review / questions
 - Start problem set in pairs
-- Discuss questions you have
 
 
 # Wellbeing and Communications {background-color="#40666e"}
@@ -311,62 +315,66 @@ If you use AI, please acknowledge it with some variation of this statement:
 ## Effects of selection
 
 ```{r}
+#| fig-alt: "Line plot showing the number of revolutions per day across 10 generations in 4 lines of control mice and 4 lines of selected mice."
+
 C <- readr::read_csv(
-  "../data/Mice/Mouse_Control.csv",
-  show_col_types = FALSE
+    "../data/Mice/Mouse_Control.csv",
+    show_col_types = FALSE
 ) |>
-  mutate(
-    Generation = rep(0:10, times = 4),
-    Line = rep(1:4, each = 11),
-    LineType = "Control Lines"
-  ) |>
-  rename(Revolutions = y)
+    mutate(
+        Generation = rep(0:10, times = 4),
+        Line = rep(1:4, each = 11),
+        LineType = "Control Lines"
+    ) |>
+    rename(Revolutions = y)
 HR <- readr::read_csv("../data/Mice/Mouse_HR.csv", show_col_types = FALSE) |>
-  mutate(
-    Generation = rep(0:10, times = 4),
-    Line = rep(5:8, each = 11),
-    LineType = "Selected Lines"
-  ) |>
-  rename(Revolutions = y)
+    mutate(
+        Generation = rep(0:10, times = 4),
+        Line = rep(5:8, each = 11),
+        LineType = "Selected Lines"
+    ) |>
+    rename(Revolutions = y)
 
 DD <- bind_rows(C, HR)
 
 ggplot(
-  DD,
-  aes(x = Generation, y = Revolutions, group = Line, color = LineType)
+    DD,
+    aes(x = Generation, y = Revolutions, group = Line, color = LineType)
 ) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 3) +
-  scale_color_manual(values = c("navy", "firebrick"), name = NULL) +
-  scale_x_continuous(breaks = 0:10) +
-  scale_y_continuous(limits = c(0, 12000), labels = scales::comma) +
-  theme(
-    legend.position = "inside",
-    legend.position.inside = c(0.1, 0.9),
-    axis.title = element_text(face = "bold")
-  ) +
-  labs(y = "Revolutions / Day")
+    geom_line(linewidth = 1) +
+    geom_point(size = 3) +
+    scale_color_manual(values = c("navy", "firebrick"), name = NULL) +
+    scale_x_continuous(breaks = 0:10) +
+    scale_y_continuous(limits = c(0, 12000), labels = scales::comma) +
+    theme(
+        legend.position = "inside",
+        legend.position.inside = c(0.1, 0.9),
+        axis.title = element_text(face = "bold")
+    ) +
+    labs(y = "Revolutions / Day")
 ```
 
 
 ## What patterns do you see?
 
 ```{r}
+#| fig-alt: "Scatter plot of muscle mass plotted against body mass for 3 groups of mice."
+
 MM <- readr::read_rds("../data/Mice/MouseMuscle.rds") |>
-  mutate(Line = factor(Line)) |>
-  drop_na() |>
-  filter(Sex == "Female")
+    mutate(Line = factor(Line)) |>
+    drop_na() |>
+    filter(Sex == "Female")
 
 ggplot(MM, aes(x = Body_Mass, y = Muscle_Mass, color = Line)) +
-  geom_point(size = 3) +
-  scale_color_manual(values = c("navy", "firebrick", "lightblue")) +
-  labs(x = "**Body Mass (g)**", y = "**Muscle Mass (g)**") +
-  theme(
-    strip.background = NULL,
-    strip.text = element_text(color = "black", face = "bold", size = 12),
-    axis.title.x = element_markdown(),
-    axis.title.y = element_markdown()
-  )
+    geom_point(size = 3) +
+    scale_color_manual(values = c("navy", "firebrick", "lightblue")) +
+    labs(x = "**Body Mass (g)**", y = "**Muscle Mass (g)**") +
+    theme(
+        strip.background = NULL,
+        strip.text = element_text(color = "black", face = "bold", size = 12),
+        axis.title.x = element_markdown(),
+        axis.title.y = element_markdown()
+    )
 ```
 
 
@@ -439,7 +447,7 @@ A **sample** is a representative subset of a population, ideally randomly chosen
 
 ## Goals of data collection: Low sampling error and low bias {#myImagePage}
 
-![](https://i.imgur.com/eP5dSny.png){fig-align="center"}
+![](https://i.imgur.com/eP5dSny.png){fig-align="center" fig-alt="Figure showing four dart boards with clusters of points in all combinations of Accurate-Inaccurate and Precise-Imprecise."}
 
 
 ## Thinking about sampling error and bias
@@ -513,7 +521,7 @@ Standard assumptions of most statistical tests.
 
 Randomly select 20 trees (left) or randomly select 20 square areas with 0 or more trees (right).
 
-![](https://i.imgur.com/KcKmZYi.png){fig-align="center" width=80%}
+![](https://i.imgur.com/KcKmZYi.png){fig-align="center" width=80% fig-alt="Pair of figures of an experimental forest. On the left, individual trees are selected. On the right random plots are selected."}
 
 :::: {.columns}
 
