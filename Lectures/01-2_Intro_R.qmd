@@ -1,6 +1,6 @@
 ---
 title: "Unit 1: Tools for Reproducible Data Analysis"
-subtitle: "Introduction to R, RStudio, and Hellbender"
+subtitle: "Introduction to R and RStudio"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -30,7 +30,6 @@ csl: evolution.csl
 - R: statistical programming language
 - RStudio: Interface for R ([Introduction to RStudio Server](https://book.cds101.com/rstudio-server.html){target="_blank"})
 - [RMarkdown](https://rmarkdown.rstudio.com/){target="_blank"}
-- Hellbender computer cluster
 
 
 ## R
@@ -50,7 +49,7 @@ csl: evolution.csl
 - R runs within RStudio
 - R can run outside of RStudio
 
-![](images/RStudio.png){fig-align="center"}
+![](images/RStudio.png){fig-align="center" fig-alt="Image of the main RStudio window."}
 
 
 ## RMarkdown
@@ -64,31 +63,6 @@ Many uses for plain text files
 - Compact
 - "Portable": work on all different kinds of computer systems
 - Good for version tracking
-
-
-## Hellbender
-
-[Hellbender](https://docs.itrss.umsystem.edu/pub/hpc/hellbender){target="_blank"}:
-
-> "Hellbender is the latest High Performance Computing (HPC) resource available to researchers and students (with sponsorship by a PI) within the UM-System."
-
-> "Hellbender consists of 208 mixed x86-64 CPU nodes (112 AMD, 96 Intel) providing 18,688 cores as well as 28 GPU nodes consisting of a mix of Nvidia GPU's (see hardware section for more details). Hellbender is attached to our Research Data Ecosystem ('RDE') that consists of 8PB of high performance and general purpose research storage. RDE can be accessible from other devices outside of Hellbender to create a single research data location across different computational environments."
-
-
-## {background-image="https://mdc.mo.gov/sites/default/files/styles/species_banner/public/mo_nature/media/images/2011/09/easternhellbender_09-26-11.jpg" background-size="100%"}
-
-
-## {background-image="https://hvacrschool.com/wp-content/webp-express/webp-images/uploads/2022/12/server_room-1536x1024.jpg.webp" background-size="100%"}
-
-
-## Hellbender
-
-- OnDemand
-    - [https://ondemand.rnet.missouri.edu/pun/sys/dashboard](https://ondemand.rnet.missouri.edu/pun/sys/dashboard)
-    - Also linked from Canvas
-- Log in with your PawPrint / 2-factor authentication
-
-![](images/OnDemand.png){fig-align="center"}
 
 
 # Programming {background-color="#40666e"}
@@ -154,24 +128,9 @@ You will develop skills for adapting code from a problem you have solved before.
 # Introduction to RStudio {background-color="#40666e"}
 
 
-## Starting RStudio through OnDemand
-
-![](images/OnDemand_RStudio.png){fig-align="center"}
-
-
 ## Starting RStudio
 
-![](images/RStudio_Login.png){fig-align="center"}
-
-
-## Starting RStudio
-
-![](images/RStudio_Connect.png){fig-align="center"}
-
-
-## Starting RStudio
-
-![](images/RStudio_Bare.png){fig-align="center"}
+![](images/RStudio_Bare.png){fig-align="center" fig-alt="Image of RStudio application on launch."}
 
 
 ## Panes and tabs of an RStudio window
@@ -241,14 +200,14 @@ You will develop skills for adapting code from a problem you have solved before.
 
 ## Working directory
 
-![](images/RStudio_Working_Directory.png){fig-align="center"}
+![](images/RStudio_Working_Directory.png){fig-align="center" fig-alt="Image of the RStudio window with an arrow pointing to the Working Directory."}
 
 - All file system operations work relative to the working directory
 
 
 ## RStudio Projects
 
-![](images/RStudio_Project.png){fig-align="center"}
+![](images/RStudio_Project.png){fig-align="center" fig-alt="Image of the RStudio window with an arrow pointing to the Current Project."}
 
 - Organize files (data, code, output, figures, etc.) for a single project
 - Working within projects will always set the working directory correctly
@@ -288,7 +247,7 @@ swirl()
 1. Only run this line once.
 
 
-![](images/Swirl.png){fig-align="center"}
+![](images/Swirl.png){fig-align="center" fig-alt="Image of the main Swirl webpage."}
 
 
 ## References
