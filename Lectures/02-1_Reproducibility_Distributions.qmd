@@ -1,6 +1,6 @@
 ---
 title: "Unit 2: Reproducibility and Distributions"
-subtitle: "Data analysis workflow"
+subtitle: "Data analysis workflow and R basics"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -29,27 +29,27 @@ theme_set(theme_classic(base_size = 20))
 
 ## October 14, 2020
 
-![](images/BCS_1.png)
+![](images/BCS_1.png){fig-alt="Image showing the announcement of room temperature superconductivity."}
 
 
 ## September 26, 2022
 
-![](images/BCS_2.png)
+![](images/BCS_2.png){fig-alt="Image showing the retraction of the paper about room temperature superconductivity."}
 
 
 ## 12 years to retraction
 
-![](images/MMR_Lancet.png)
+![](images/MMR_Lancet.png){fig-alt="Image showing the retraction of the article implicating vaccines in causing autism."}
 
 
 ## CRISPR-Cas9 (2012)
 
-![](images/CRISPR.png)
+![](images/CRISPR.png){fig-alt="Image showing the announcement of CRISPR."}
 
 
 ## Nobel Prize (2020)
 
-![](images/CRISPR_Nobel.png)
+![](images/CRISPR_Nobel.png){fig-alt="Image showing the announcement of the 2020 nobel prize for CRISPR."}
 
 
 ## What information would you need to follow an experiments?
@@ -67,12 +67,12 @@ In what context have you tried to do this before?
 1. *Reproducible* - Given only 1) the raw data and 2) the scripts (i.e., code), one can produce the same set of results and figures. Not almost the same set, the **SAME SET**.
 1. *Replicable* - Can one repeat the same experiment and reach the same conclusion?
 
-Often these terms are often used more generally or interchangeably. 
+Often these terms are often used more generally or interchangeably.
 
 
 ## "Replication crisis" in science
 
-![](images/Replication_crisis.png)
+![](images/Replication_crisis.png){fig-alt="Image showing the replication crisis in science."}
 
 - [New Scientist](https://www.newscientist.com/article/mg25433810-400-the-replication-crisis-has-spread-through-science-can-it-be-fixed/)
 - Korbmacher et al. [-@Korbmacher2023-de] - Psychology
@@ -80,7 +80,7 @@ Often these terms are often used more generally or interchangeably.
 
 ## "Replication crisis" in cancer biology
 
-![](images/Cancer_Replicability_1.png)
+![](images/Cancer_Replicability_1.png){fig-alt="Image showing that most cancer studies can't be reproduced."}
 
 - 1/4 of 193 experiments could be replicated
 - Effect sizes in those that were replicated were 85% smaller than reported
@@ -92,9 +92,9 @@ Errington et al. [-@Errington2021-as]
 
 ## "Replication crisis" in science
 
-![](images/Cancer_Replicability_2.png){fig-align="center" width="50%"}
+![](images/Cancer_Replicability_2.png){fig-align="center" width="50%" fig-alt="Reproducibility project for cancer biology"}
 
-![](images/Cancer_Replicability_3.png){fig-align="center" width="80%"}
+![](images/Cancer_Replicability_3.png){fig-align="center" width="80%" fig-alt="Results of the Reproducibility project for cancer biology"}
 
 :::{.right}
 Errington et al. [-@Errington2021-as]
@@ -103,7 +103,7 @@ Errington et al. [-@Errington2021-as]
 
 ## What is reproducible research?
 
-> "By reproducible, I mean that your work can be repeated by other researchers and they can arrive at the same results. For this to be the case, your work must be well documented, and your methods, code, and data all need to be available so that other researchers have the materials to reproduce everything." 
+> "By reproducible, I mean that your work can be repeated by other researchers and they can arrive at the same results. For this to be the case, your work must be well documented, and your methods, code, and data all need to be available so that other researchers have the materials to reproduce everything."
 
 :::{.right}
 Buffalo [-@Buffalo2015-ah]
@@ -124,7 +124,7 @@ Reproducible data analysis is a step toward reproducible research.
 - Resources
     - Markdown information
     - Guides and Tutorials
-    
+
 
 ## Markdown-based analyses
 
@@ -158,7 +158,7 @@ Essential for long term data use, sharing, and curation.
 
 ## FAIR principles for image data
 
-![](images/Prigent.png){fig-align="center"}
+![](images/Prigent.png){fig-align="center" fig-alt="Image of FAIR principles for image data."}
 
 
 :::{.right}
@@ -185,7 +185,7 @@ Prigent et al. [-@Prigent2022-iq]
 
 ## Analysis workflow
 
-![](images/Workflow.drawio.png){fig-align="center" width="80%"}
+![](images/Workflow.drawio.png){fig-align="center" width="80%" fig-alt="Flowchart showing ways to use the tidyverse for data analysis."}
 
 
 # Clean coding practices {background-color="#40666e"}
@@ -210,12 +210,19 @@ Difficult to read:
 #| eval: false
 #| echo: true
 
-tvtest<-lmer(sqrt(tv)~Region*log(DD5_TOT)+(1|Population/Sample_ID)+
-(1|Year),data=tvdat)
+tvtest <- lmer(
+    sqrt(tv) ~ Region *
+        log(DD5_TOT) +
+        (1 | Population / Sample_ID) +
+        (1 | Year),
+    data = tvdat
+)
 summary(tvtest)
-ggplot(tvdat,aes(x=log(DD5_TOT),y=sqrt(tv),col=Region))+
-geom_point(shape=1,size=3,alpha=1/3)+ geom_smooth(aes(col=Region),method='lm')+
-xlab(bquote('log(Degree Days above' ~5^o~C*')'))+ylab('sqrt(Terminal Velocity (m/s))')
+ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
+    geom_point(shape = 1, size = 3, alpha = 1 / 3) +
+    geom_smooth(aes(col = Region), method = 'lm') +
+    xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
+    ylab('sqrt(Terminal Velocity (m/s))')
 ```
 
 
@@ -227,18 +234,21 @@ Easier to read:
 #| echo: true
 #| eval: false
 
-tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
-                          (1 | Population/Sample_ID) + 
-                          (1 | Year),
-               data = tvdat)
+tvtest <- lmer(
+    sqrt(tv) ~ Region *
+        log(DD5_TOT) +
+        (1 | Population / Sample_ID) +
+        (1 | Year),
+    data = tvdat
+)
 
 summary(tvtest)
 
 ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-  geom_point(shape = 1, size = 3, alpha = 1/3) +
-  geom_smooth(aes(col = Region), method = 'lm') + 
-  xlab(bquote('log(Degree Days above' ~5^o~C*')')) +
-  ylab('sqrt(Terminal Velocity (m/s))')
+    geom_point(shape = 1, size = 3, alpha = 1 / 3) +
+    geom_smooth(aes(col = Region), method = 'lm') +
+    xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
+    ylab('sqrt(Terminal Velocity (m/s))')
 ```
 
 
@@ -246,7 +256,7 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 
 - Separate elements and processes with spaces and line breaks
 - Limit line length
-- Use indenting to group code 
+- Use indenting to group code
     - Ctrl/Cmd - I to auto-correct indent in RStudio
 
 
@@ -261,10 +271,13 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 
 # Fit a hierarchical linear model
 # Random effects: Sample nested in Population and Year
-tvtest <- lmer(sqrt(tv) ~ Region * log(DD5_TOT) +
-                 (1 | Population / Sample_ID) + 
-                 (1 | Year),
-               data = tvdat)
+tvtest <- lmer(
+    sqrt(tv) ~ Region *
+        log(DD5_TOT) +
+        (1 | Population / Sample_ID) +
+        (1 | Year),
+    data = tvdat
+)
 
 # Summarize output of the model
 summary(tvtest)
@@ -272,10 +285,10 @@ summary(tvtest)
 # Plot tv vs. dd5_tot colored by Region
 # alpha = transparency, smaller is more transparent
 ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-  geom_point(shape = 1, size = 3, alpha = 1/3) +
-  geom_smooth(aes(col = Region), method = 'lm') + 
-  xlab(bquote('log(Degree Days above' ~5^o~C*')')) +
-  ylab('sqrt(Terminal Velocity (m/s))')
+    geom_point(shape = 1, size = 3, alpha = 1 / 3) +
+    geom_smooth(aes(col = Region), method = 'lm') +
+    xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
+    ylab('sqrt(Terminal Velocity (m/s))')
 ```
 
 
@@ -308,7 +321,7 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 How can we *estimate* the proportion of water?
 :::
 
-![](images/earth.jpg){fig-align="center"}
+![](images/earth.jpg){fig-align="center" fig-alt="Image of the Earth from space."}
 
 :::{.center}
 What are your ideas?
@@ -321,7 +334,7 @@ What are your ideas?
 - Do all observations have an equal chance of being included?
 - Are observations independent of one another?
 
-![](images/earth.jpg){fig-align="center"}
+![](images/earth.jpg){fig-align="center" fig-alt="Image of the Earth from space."}
 
 
 ## Binomial distributions
@@ -474,12 +487,13 @@ x_tab
 ## Summarizing counts with a histogram
 
 ```{r}
-ggplot(data = tibble(Count = as.numeric(x_tab),
-                     Successes = 0:10),
-       aes(x = Successes, y = Count)) +
-  geom_bar(stat = "identity", fill = "navy") +
-  scale_x_continuous(breaks = 0:10) +
-  labs(x = "n Successes in 10 Trials")
+ggplot(
+    data = tibble(Count = as.numeric(x_tab), Successes = 0:10),
+    aes(x = Successes, y = Count)
+) +
+    geom_bar(stat = "identity", fill = "navy") +
+    scale_x_continuous(breaks = 0:10) +
+    labs(x = "n Successes in 10 Trials")
 ```
 
 
@@ -492,7 +506,7 @@ ggplot(data = tibble(Count = as.numeric(x_tab),
 
 ## Normal distribution
 
-![](images/Heights.png){fig-align="center"}
+![](images/Heights.png){fig-align="center" fig-alt="Photograph of a group of people organized by their height showing that their heights are approximately normally distributed."}
 
 
 :::{.right}
@@ -513,10 +527,10 @@ Schilling et al. [-@Schilling2002-mm]
 - Assigned male at birth
 
 ```{r}
-NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |> 
-  filter(Sex == "Male") |> 
-  select(-Sex) |> 
-  arrange(Height)
+NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |>
+    filter(Sex == "Male") |>
+    select(-Sex) |>
+    arrange(Height)
 NHANES$Height
 ```
 
@@ -524,25 +538,32 @@ NHANES$Height
 ## What patterns do you observe?
 
 ```{r}
+#| fig-alt: "Scatter plot of Height vs. Age for 6,465 males."
+
 ggplot(NHANES, aes(x = Age, y = Height)) +
-  geom_point(size = 1, show.legend = FALSE, alpha = 0.25,
-             position = position_jitter(width = 0.25, seed = 3847293),
-             color = "firebrick4") +
-  scale_x_continuous(breaks = seq(0, 80, by = 5)) +
-  labs(x = "Age (y)", y = "Height (cm)")
+    geom_point(
+        size = 1,
+        show.legend = FALSE,
+        alpha = 0.25,
+        position = position_jitter(width = 0.25, seed = 3847293),
+        color = "firebrick4"
+    ) +
+    scale_x_continuous(breaks = seq(0, 80, by = 5)) +
+    labs(x = "Age (y)", y = "Height (cm)")
 ```
 
 
 ## Distribution of heights (age > 20)
 
 ```{r}
+#| fig-alt: "Histogram of heights for those over age 20."
+
 NHANES_20 <- NHANES |> filter(Age > 20)
 
 ggplot(NHANES_20, aes(Height)) +
-  geom_histogram(bins = 30, show.legend = FALSE,
-                 fill = "firebrick4") +
-  labs(x = "Height (cm)", y = "Count") +
-  scale_x_continuous(breaks = seq(140, 200, by = 10))
+    geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
+    labs(x = "Height (cm)", y = "Count") +
+    scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -551,15 +572,19 @@ ggplot(NHANES_20, aes(Height)) +
 :::: {.columns}
 
 ::: {.column width="40%"}
+
 ```{r}
 head(NHANES_20) |> knitr::kable()
 ```
+
 :::
 
 ::: {.column width="60%"}
+
 ```{r}
 tail(NHANES_20) |> knitr::kable()
 ```
+
 :::
 
 ::::
@@ -568,21 +593,35 @@ tail(NHANES_20) |> knitr::kable()
 ## Heights (mostly) follow a normal distribution
 
 ```{r}
+#| fig-alt: "Density plot of a normal distribution overlaid over the histogram of heights."
+
 ggplot(NHANES_20, aes(Height)) +
-  geom_histogram(aes(y = after_stat(density)),
-                 fill = "firebrick4", 
-                 alpha = 0.5,
-                 bins = 30) +
-  geom_line(data = tibble(
-    Height = seq(min(NHANES_20$Height),
-                 max(NHANES_20$Height),
-                 length.out = 100),
-    y = dnorm(Height, mean = mean(NHANES_20$Height),
-              sd = sd(NHANES_20$Height))),
-    aes(Height, y), linewidth = 1.5, color = "#2D5DA1") +
-  theme(axis.title.y = element_blank(),
-        axis.text.y = element_blank()) +
-  scale_x_continuous(breaks = seq(140, 200, by = 10))
+    geom_histogram(
+        aes(y = after_stat(density)),
+        fill = "firebrick4",
+        alpha = 0.5,
+        bins = 30
+    ) +
+    geom_line(
+        data = tibble(
+            Height = seq(
+                min(NHANES_20$Height),
+                max(NHANES_20$Height),
+                length.out = 100
+            ),
+            y = dnorm(
+                Height,
+                mean = mean(NHANES_20$Height),
+                sd = sd(NHANES_20$Height)
+            )
+        ),
+        aes(Height, y),
+        linewidth = 1.5,
+        color = "#2D5DA1"
+    ) +
+    labs(x = "Height (cm)") +
+    theme(axis.title.y = element_blank(), axis.text.y = element_blank()) +
+    scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -600,8 +639,244 @@ $$
 - $\sqrt{~~~}$: Square root function
 
 
+# R Basics {background-color="#40666e"}
+
+
+## Basic R syntax
+
+- Relatively compact
+    - Often subtle
+- We can learn the basics in a lecture or two
+
+
+## Kinds of data in R
+
+- Numeric: 1.25, 1e6
+- Integer: 1, 2, 41
+- Character: "a", "Female", "The quick brown fox"
+- Logical: `TRUE` or `FALSE`
+- Factor: categorical (character)
+
+
+## Common R objects
+
+1. Vectors
+1. `data.frame`s and `tibble`s
+1. Matrices
+1. Functions
+
+
+## Assigning objects
+
+Use `<-` for assign.
+
+- Best practice is to not use `=` (even though you can).
+- "Assign the object on the right to the object on the left."
+
+```{r}
+#| echo: true
+
+x <- 65
+y <- 3.348723
+z <- 22 / 3
+a <- "Hello world"
+b <- TRUE
+```
+
+:::{.callout-note}
+Base R uses single assignment. Packages have implemented multiple assignment.
+:::
+
+
+## Vectors
+
+```{r}
+#| echo: true
+
+x <- c(112, 2.2, 7, 14.1)
+x
+x[2]
+sort(x)
+```
+
+:::{.callout-important}
+R starts indexing at 1, not at zero (e.g., C, python).
+:::
+
+
+## Vectors and sequences
+
+- `:` generates sequences of integers
+- `seq()` is more flexible
+    - `by = `
+    - `length.out = `
+
+```{r}
+#| echo: true
+
+y1 <- 1:10
+y2 <- seq(1, 10, length.out = 20)
+y1[1:3] # <1>
+y2[1:3]
+```
+
+:::{.callout-note}
+## Sequences in R
+R sequences include the beginning and end. 1:3 is 1, 2, 3.
+:::
+
+## Vectors
+
+```{r}
+#| echo: true
+
+x + 10
+y1^2
+min(x)
+max(x)
+```
+
+
+## Vectors
+
+```{r}
+#| echo: true
+
+sqrt(y2)
+y2_mean <- mean(y2)
+y2_sd <- sd(y2)
+y2_mean
+y2_sd
+```
+
+
+# Problem Set {background-color="#40666e"}
+
+
+## `data.frame()`: a basic unit of storage
+
+Mixed data types per column
+
+  - Numeric
+  - Character
+  - Factor (categorical)
+  - Logical (`TRUE` and `FALSE`)
+
+
+## Making data.frames
+
+```{r}
+#| echo: true
+
+MM <- data.frame(x = 1:3, y = c(10, 17, 21), A = c("a", "b", "c"))
+MM
+```
+
+
+## Extracting from data.frames
+
+Either `$` or `[, ]` notation (with quoted column names).
+
+```{r}
+#| echo: true
+
+MM$x
+MM$A
+MM[, "y"]
+```
+
+
+## Extracting from data.frames
+
+```{r}
+#| echo: true
+
+MM[2, ]
+MM[, 2]
+```
+
+
+## Tibbles
+
+Tibbles and `data.frame`s are essentially identical, but a `tibble` is more modern and works better with tidyverse functions.
+
+- You can convert a `data.frame` into a `tibble` with `as_tibble()`
+- Tibbles never change the type of an input, never change the name of a variable, and never create row names.
+- Tibbles only print 10 rows, and columns display their type (e.g., "chr", "int")
+
+
+## Creating tibbles
+
+```{r}
+#| echo: true
+
+MM <- tibble(
+    x = 1:3,
+    y = x^2, # <1>
+    A = c("a", "b", "c")
+)
+MM
+```
+
+1. Creation of a column can refer back to previously created columns
+
+
+## Matrices
+
+Rectangular object of *one data type*
+
+- Indexed by [Rows, Columns]
+- Default is to fill by column (`byrow = TRUE` for row-wise)
+
+```{r}
+#| echo: true
+
+M <- matrix(1:9, nrow = 3, ncol = 3)
+M
+M[2, 2]
+```
+
+- We won't use matrices very often
+
+
+## Functions
+
+We will get to writing our own functions later, for now: `functionName()`, where parameters go inside `()`.
+
+```{r}
+#| echo: true
+
+c(1)
+sqrt(256)
+```
+
+
+## Functions
+
+```{r}
+#| echo: true
+
+log(2.718)
+exp(1)
+```
+
+Get help from the R command line with ?: `?sqrt` or `?log10`. Also try `help.search("mean")`, etc.
+
+
+## Everything in R is an "object" with a `class()`
+
+```{r}
+#| echo: true
+
+class(x)
+class(sqrt)
+class(MM)
+```
+
+R interprets what to do based on an object's class
+
+
 ## References
 
 ::: {#refs}
 :::
-
