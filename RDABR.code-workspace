@@ -1,8 +1,28 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "cSpell.words": [
+      "Amabile",
+      "Ardila",
+      "bacs",
+      "cowplot",
+      "CRAN",
+      "Cuentan",
+      "Frederico",
+      "ggtext",
+      "Kaplan",
+      "Kernighan",
+      "mathjax",
+      "Paolo",
+      "Piras",
+      "QMLS",
+      "readr",
+      "revealjs",
+      "Utts"
+    ]
+  }
 }
