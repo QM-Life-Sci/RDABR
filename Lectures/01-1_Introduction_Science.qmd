@@ -33,6 +33,7 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 
 ## Where are you?
 
+
 ### Reproducible Data Analysis for Biomedical Research
 
 - Tuesdays and Thursdays 12:30 - 1:45
@@ -43,19 +44,19 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 :::: {.columns}
 
 ::: {.column width="50%"}
-Dr. Elizabeth King (she/her)
+**Dr. Elizabeth King** (she/her)
 
-- Grew up in Southeastern Wisconsin (until 7th grade) $\rightarrow$ Chicagoland 
+- Grew up in Southeastern Wisconsin (until 7th grade) $\rightarrow$ Chicagoland
 - Iowa (4 years) $\rightarrow$ California (10 years) $\rightarrow$ Missouri (12 years)
 - MU 12 years in Biology
 :::
 
 ::: {.column width="50%"}
-Dr. Kevin Middleton (he/him)
+**Dr. Kevin Middleton** (he/him)
 
 - Grew up in Florida
 - North Carolina $\rightarrow$ Rhode Island (10 years) $\rightarrow$ California (1 year) $\rightarrow$ Rhode Island (1 year) $\rightarrow$ California (5 years) $\rightarrow$ Missouri
-- MU 13 years (10 in Medicine, 3 in Biology)
+- MU 13 years (10 in Medicine, 4 in Biology)
 
 :::
 
@@ -63,20 +64,24 @@ Dr. Kevin Middleton (he/him)
 
 - Biologists by training
 - Engineers, theoreticians, statisticians, and programmers by avocation
+- We are married.
 
 
-## {background-image="images/Lab_research.jpg" background-size="100%"}
+## {background-image="images/Lab_research.jpg" background-size="100%" fig-alt="Middleton lab research interest collage."}
 
-## {background-image="images/King_Lab.jpg" background-size="100%"}
+
+## {background-image="images/King_Lab.jpg" background-size="100%" background-size="100%" fig-alt="King lab research interest collage."}
 
 
 ## Are we qualified to teach this class?
 
 - Probably
 - Taught undergraduates, post-bacs, and graduate students for 15+ years
-- Complementary perspectives & skillsets 
+- Complementary perspectives and skill sets
 
 :::{.callout-note}
+
+
 ## Why are we teaching this class?
 
 - These skills are increasingly important for you as scientists
@@ -118,6 +123,9 @@ Dr. Kevin Middleton (he/him)
 ::: {.right}
 Paolo Piras (2024)
 :::
+
+
+## Have you ever read a scientific paper?
 
 
 ## What do we want to accomplish? (Wide view)
@@ -180,7 +188,7 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 - Be proactive about communicating your needs
 
 
-## Expectations for me
+## Expectations for us
 
 - Listen to you
 - Be responsive to your questions
@@ -289,28 +297,32 @@ LLMs can answer the first but not the second.
 - *Debugging challenges*: If your code doesn't work, then figuring out why will be more challenging
 - *Short circuit* the development of problem-solving skills in our learn-by-doing approach
     - Be willing to fail and keep trying.
-- *Limiting you creativity and innovation*: There are many ways to solve a coding challenge
+- *Limiting you creativity and innovation*: There are many ways to solve a coding challenge (think about different recipes for the same dish)
+
+
+## Please don't use AI to write code for you
+
+- Problem sets are graded for completeness *not* correctness.
+- Progress checks will use ideas/code that you have seen before.
+
+"Give me an example of how to change the axis labels in ggplot."
 
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
 
-- Generative AI may be used in this course. The content you submit is your responsibility. Be sure your work accurately reflects your understanding and avoids these pitfalls.
-- You are responsible for understanding what you submit. Simply copying an AI-generated solution does not contribute to gaining understanding.
+- Generative AI is discouraged, may be used in this course. The content you submit is your responsibility. Be sure your work accurately reflects your understanding and avoids these pitfalls.
+- You are responsible for *understanding* what you submit. Simply copying an AI-generated solution does not contribute to gaining understanding.
 
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
 
-If you use AI, please acknowledge it with some variation of this statement:
+If you use AI, you must acknowledge it with some variation of this statement:
 
 > "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 
-## Before you ask AI, ask yourself ...
-
-... how will this help me learn?
-
-
 # Questions {background-color="#f8c471"}
+
 
 # Why do we use statistics?  {background-color="#40666e"}
 
