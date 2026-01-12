@@ -40,28 +40,41 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 
 
 ## Who are we?
+:::: {.columns}
 
+::: {.column width="50%"}
 Dr. Elizabeth King (she/her)
 
+- Grew up in Southeastern Wisconsin (until 7th grade) $\rightarrow$ Chicagoland 
+- Iowa (4 years) $\rightarrow$ California (10 years) $\rightarrow$ Missouri (12 years)
+- MU 12 years in Biology
+:::
 
-## Who are we?
-
+::: {.column width="50%"}
 Dr. Kevin Middleton (he/him)
 
 - Grew up in Florida
 - North Carolina $\rightarrow$ Rhode Island (10 years) $\rightarrow$ California (1 year) $\rightarrow$ Rhode Island (1 year) $\rightarrow$ California (5 years) $\rightarrow$ Missouri
 - MU 13 years (10 in Medicine, 3 in Biology)
-- Biologist by training
-- Engineer, statistician, and programmer by avocation
+
+:::
+
+::::
+
+- Biologists by training
+- Engineers, theoreticians, statisticians, and programmers by avocation
 
 
 ## {background-image="images/Lab_research.jpg" background-size="100%"}
 
+## {background-image="images/King_Lab.jpg" background-size="100%"}
 
-## Am I qualified to teach this class?
+
+## Are we qualified to teach this class?
 
 - Probably
 - Taught undergraduates, post-bacs, and graduate students for 15+ years
+- Complementary perspectives & skillsets 
 
 :::{.callout-note}
 ## Why are we teaching this class?
