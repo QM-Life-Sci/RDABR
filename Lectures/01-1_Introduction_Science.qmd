@@ -56,11 +56,13 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 
 - Grew up in Florida
 - North Carolina $\rightarrow$ Rhode Island (10 years) $\rightarrow$ California (1 year) $\rightarrow$ Rhode Island (1 year) $\rightarrow$ California (5 years) $\rightarrow$ Missouri
-- MU 13 years (10 in Medicine, 4 in Biology)
+- MU 14 years (10 in Medicine, 4 in Biology)
 
 :::
 
 ::::
+
+<hr />
 
 - Biologists by training
 - Engineers, theoreticians, statisticians, and programmers by avocation
@@ -70,7 +72,7 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 ## {background-image="images/Lab_research.jpg" background-size="100%" fig-alt="Middleton lab research interest collage."}
 
 
-## {background-image="images/King_Lab.jpg" background-size="100%" background-size="100%" fig-alt="King lab research interest collage."}
+## {background-image="images/King_Lab.jpg" background-size="100%" fig-alt="King lab research interest collage."}
 
 
 ## Are we qualified to teach this class?
@@ -199,11 +201,11 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 ## Asking questions
 
 - Class
-- Canvas
+- Canvas: Required weekly questions
 - Emails: (kingeg@missouri.edu and middletonk@missouri.edu)
 - Offices:
-    - King: Tucker 401
-    - Middleton: Tucker Hall Room 224 (or 222)
+    - King: Tucker Hall Room 401
+    - Middleton: Tucker Hall Room 224
 - [Anonymously](https://forms.office.com/r/k27q3HWQwa) via web
 
 ![](images/Anonymous_Question.png){fig-align="center" fig-alt="Image showing the location in Canvas to post an anonymous question."}
@@ -222,7 +224,7 @@ Modified from Frederico Ardila-Mantilla's "Todos Cuentan: Cultivating Diversity 
 - What is working or not working for you?
 - How is the pace?
 - What challenges do you have?
-- How can I do better?
+- What can we do better?
 
 Maybe again later in the semester
 
@@ -243,20 +245,27 @@ Maybe again later in the semester
 
 ## General Weekly Plan
 
-Tuesday
+**Tuesday**
 
 - "Lecture", demos, discussion
 - Previous week's problem set due
 - Sit with your partner
 
-Thursday
+**Thursday**
 
 - Finish up Tuesday material
 - Review / questions
-- Start problem set in pairs
+- Start problem set
 
 
 # Wellbeing and Communications {background-color="#40666e"}
+
+
+## Missing class, late assignments, etc.
+
+- Let us know if you are going to miss class or as soon as you can (if feasible) after missing class.
+    - If you miss more than 3 classes, we will ask you to schedule a meeting with us to discuss a plan.
+- If you need more time on an assignment, you must get in touch with us *before it is due* for approval.
 
 
 # Questions {background-color="#f8c471"}
@@ -269,7 +278,7 @@ Thursday
 
 - We (unfortunately) use human terms to describe LLMs: "intelligence", "learn", "understand", "think", "know", "hallucinate"
 - LLMs generate responses based on probabilities (what character/word comes next?), which are derived from their training data.
-- [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs)
+- [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs){target="_blank"}
 
 
 :::{.callout-note}
@@ -302,7 +311,7 @@ LLMs can answer the first but not the second.
 
 ## Please don't use AI to write code for you
 
-- Problem sets are graded for completeness *not* correctness.
+- Problem sets are graded for completeness and effort *not* correctness.
 - Progress checks will use ideas/code that you have seen before.
 
 "Give me an example of how to change the axis labels in ggplot."
@@ -310,15 +319,19 @@ LLMs can answer the first but not the second.
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
 
-- Generative AI is discouraged, may be used in this course. The content you submit is your responsibility. Be sure your work accurately reflects your understanding and avoids these pitfalls.
+- Generative AI is discouraged, but may be used in this course (see last slide).
+- Any content you submit is your responsibility.
+- Be sure your work accurately reflects your understanding and avoids these pitfalls.
 - You are responsible for *understanding* what you submit. Simply copying an AI-generated solution does not contribute to gaining understanding.
+- **Do not use AI for writing answers to free-response questions.**
+    - You are learning to "write" about science.
 
 
 ## Course AI guidelines: "AI Integration Allowed: Human-in-the-Loop"
 
 If you use AI, you must acknowledge it with some variation of this statement:
 
-> "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+> "I acknowledge the use of AI in completing [*which part of*] this assignment and would like to provide a brief explanation of how I utilized AI, specifically [*LLM*], as a tool to support my work. For this assignment, I employed [*LLM*] to [*describe the specific purpose or task*]. To do so I crafted the following prompts: [*List prompts used*]"
 
 
 # Questions {background-color="#f8c471"}
@@ -343,40 +356,40 @@ If you use AI, you must acknowledge it with some variation of this statement:
 #| fig-alt: "Line plot showing the number of revolutions per day across 10 generations in 4 lines of control mice and 4 lines of selected mice."
 
 C <- readr::read_csv(
-    "../data/Mice/Mouse_Control.csv",
-    show_col_types = FALSE
+  "../data/Mice/Mouse_Control.csv",
+  show_col_types = FALSE
 ) |>
-    mutate(
-        Generation = rep(0:10, times = 4),
-        Line = rep(1:4, each = 11),
-        LineType = "Control Lines"
-    ) |>
-    rename(Revolutions = y)
+  mutate(
+    Generation = rep(0:10, times = 4),
+    Line = rep(1:4, each = 11),
+    LineType = "Control Lines"
+  ) |>
+  rename(Revolutions = y)
 HR <- readr::read_csv("../data/Mice/Mouse_HR.csv", show_col_types = FALSE) |>
-    mutate(
-        Generation = rep(0:10, times = 4),
-        Line = rep(5:8, each = 11),
-        LineType = "Selected Lines"
-    ) |>
-    rename(Revolutions = y)
+  mutate(
+    Generation = rep(0:10, times = 4),
+    Line = rep(5:8, each = 11),
+    LineType = "Selected Lines"
+  ) |>
+  rename(Revolutions = y)
 
 DD <- bind_rows(C, HR)
 
 ggplot(
-    DD,
-    aes(x = Generation, y = Revolutions, group = Line, color = LineType)
+  DD,
+  aes(x = Generation, y = Revolutions, group = Line, color = LineType)
 ) +
-    geom_line(linewidth = 1) +
-    geom_point(size = 3) +
-    scale_color_manual(values = c("navy", "firebrick"), name = NULL) +
-    scale_x_continuous(breaks = 0:10) +
-    scale_y_continuous(limits = c(0, 12000), labels = scales::comma) +
-    theme(
-        legend.position = "inside",
-        legend.position.inside = c(0.1, 0.9),
-        axis.title = element_text(face = "bold")
-    ) +
-    labs(y = "Revolutions / Day")
+  geom_line(linewidth = 1) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("navy", "firebrick"), name = NULL) +
+  scale_x_continuous(breaks = 0:10) +
+  scale_y_continuous(limits = c(0, 12000), labels = scales::comma) +
+  theme(
+    legend.position = "inside",
+    legend.position.inside = c(0.1, 0.9),
+    axis.title = element_text(face = "bold")
+  ) +
+  labs(y = "Revolutions / Day")
 ```
 
 
@@ -386,20 +399,20 @@ ggplot(
 #| fig-alt: "Scatter plot of muscle mass plotted against body mass for 3 groups of mice."
 
 MM <- readr::read_rds("../data/Mice/MouseMuscle.rds") |>
-    mutate(Line = factor(Line)) |>
-    drop_na() |>
-    filter(Sex == "Female")
+  mutate(Line = factor(Line)) |>
+  drop_na() |>
+  filter(Sex == "Female")
 
 ggplot(MM, aes(x = Body_Mass, y = Muscle_Mass, color = Line)) +
-    geom_point(size = 3) +
-    scale_color_manual(values = c("navy", "firebrick", "lightblue")) +
-    labs(x = "**Body Mass (g)**", y = "**Muscle Mass (g)**") +
-    theme(
-        strip.background = NULL,
-        strip.text = element_text(color = "black", face = "bold", size = 12),
-        axis.title.x = element_markdown(),
-        axis.title.y = element_markdown()
-    )
+  geom_point(size = 3) +
+  scale_color_manual(values = c("navy", "firebrick", "lightblue")) +
+  labs(x = "**Body Mass (g)**", y = "**Muscle Mass (g)**") +
+  theme(
+    strip.background = NULL,
+    strip.text = element_text(color = "black", face = "bold", size = 12),
+    axis.title.x = element_markdown(),
+    axis.title.y = element_markdown()
+  )
 ```
 
 
@@ -561,6 +574,12 @@ Randomly select 20 trees (left) or randomly select 20 square areas with 0 or mor
 :::
 
 ::::
+
+
+## Asking a question
+
+- Canvas: slides, recording
+- Discussion board: post a question (due Wednesday midnight)
 
 
 ## References
