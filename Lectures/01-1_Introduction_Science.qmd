@@ -356,40 +356,40 @@ If you use AI, you must acknowledge it with some variation of this statement:
 #| fig-alt: "Line plot showing the number of revolutions per day across 10 generations in 4 lines of control mice and 4 lines of selected mice."
 
 C <- readr::read_csv(
-  "../data/Mice/Mouse_Control.csv",
-  show_col_types = FALSE
+    "../data/Mice/Mouse_Control.csv",
+    show_col_types = FALSE
 ) |>
-  mutate(
-    Generation = rep(0:10, times = 4),
-    Line = rep(1:4, each = 11),
-    LineType = "Control Lines"
-  ) |>
-  rename(Revolutions = y)
+    mutate(
+        Generation = rep(0:10, times = 4),
+        Line = rep(1:4, each = 11),
+        LineType = "Control Lines"
+    ) |>
+    rename(Revolutions = y)
 HR <- readr::read_csv("../data/Mice/Mouse_HR.csv", show_col_types = FALSE) |>
-  mutate(
-    Generation = rep(0:10, times = 4),
-    Line = rep(5:8, each = 11),
-    LineType = "Selected Lines"
-  ) |>
-  rename(Revolutions = y)
+    mutate(
+        Generation = rep(0:10, times = 4),
+        Line = rep(5:8, each = 11),
+        LineType = "Selected Lines"
+    ) |>
+    rename(Revolutions = y)
 
 DD <- bind_rows(C, HR)
 
 ggplot(
-  DD,
-  aes(x = Generation, y = Revolutions, group = Line, color = LineType)
+    DD,
+    aes(x = Generation, y = Revolutions, group = Line, color = LineType)
 ) +
-  geom_line(linewidth = 1) +
-  geom_point(size = 3) +
-  scale_color_manual(values = c("navy", "firebrick"), name = NULL) +
-  scale_x_continuous(breaks = 0:10) +
-  scale_y_continuous(limits = c(0, 12000), labels = scales::comma) +
-  theme(
-    legend.position = "inside",
-    legend.position.inside = c(0.1, 0.9),
-    axis.title = element_text(face = "bold")
-  ) +
-  labs(y = "Revolutions / Day")
+    geom_line(linewidth = 1) +
+    geom_point(size = 3) +
+    scale_color_manual(values = c("navy", "firebrick"), name = NULL) +
+    scale_x_continuous(breaks = 0:10) +
+    scale_y_continuous(limits = c(0, 12000), labels = scales::comma) +
+    theme(
+        legend.position = "inside",
+        legend.position.inside = c(0.1, 0.9),
+        axis.title = element_text(face = "bold")
+    ) +
+    labs(y = "Revolutions / Day")
 ```
 
 
@@ -399,20 +399,20 @@ ggplot(
 #| fig-alt: "Scatter plot of muscle mass plotted against body mass for 3 groups of mice."
 
 MM <- readr::read_rds("../data/Mice/MouseMuscle.rds") |>
-  mutate(Line = factor(Line)) |>
-  drop_na() |>
-  filter(Sex == "Female")
+    mutate(Line = factor(Line)) |>
+    drop_na() |>
+    filter(Sex == "Female")
 
 ggplot(MM, aes(x = Body_Mass, y = Muscle_Mass, color = Line)) +
-  geom_point(size = 3) +
-  scale_color_manual(values = c("navy", "firebrick", "lightblue")) +
-  labs(x = "**Body Mass (g)**", y = "**Muscle Mass (g)**") +
-  theme(
-    strip.background = NULL,
-    strip.text = element_text(color = "black", face = "bold", size = 12),
-    axis.title.x = element_markdown(),
-    axis.title.y = element_markdown()
-  )
+    geom_point(size = 3) +
+    scale_color_manual(values = c("navy", "firebrick", "lightblue")) +
+    labs(x = "**Body Mass (g)**", y = "**Muscle Mass (g)**") +
+    theme(
+        strip.background = NULL,
+        strip.text = element_text(color = "black", face = "bold", size = 12),
+        axis.title.x = element_markdown(),
+        axis.title.y = element_markdown()
+    )
 ```
 
 
