@@ -141,7 +141,7 @@ You will develop skills for adapting code from a problem you have solved before.
 
 ## Starting RStudio
 
-![](images/RStudio_Bare.png){fig-align="center" fig-alt="Image of RStudio application on launch."}
+![](images/RStudio.png){fig-align="center" fig-alt="Image of RStudio application on launch."}
 
 
 ## Panes and tabs of the RStudio window
@@ -194,12 +194,14 @@ You will develop skills for adapting code from a problem you have solved before.
 - Install once, use often
     - No need to re-install
     - Don't include `install.package()` in your files
-- `tidyverse`
-- `cowplot`
 
 
 ## Let's install packages together
 
+![](images/RStudio_packages.png){fig-align="center" fig-alt="Image of RStudio packages pane."}
+
+- `tidyverse`
+- `cowplot`
 
 # File systems {background-color="#40666e"}
 
@@ -211,9 +213,10 @@ You will develop skills for adapting code from a problem you have solved before.
 
 ## Working directory
 
-![](images/RStudio_Working_Directory.png){fig-align="center" fig-alt="Image of the RStudio window with an arrow pointing to the Working Directory."}
+![](images/RStudio_Working_Directory.png){fig-width=100% fig-align="center" fig-alt="Image of the RStudio window with an arrow pointing to the Working Directory."}
 
 - All file system operations work relative to the working directory
+- `~/` is your "home" or user directory
 
 
 ## RStudio Projects
@@ -239,6 +242,11 @@ Possible directory structure:
 ```
 
 Some examples...
+
+
+## RStudio Files pane
+
+![](images/RStudio_Files.png){fig-width=100% fig-align="center" fig-alt="Image of the RStudio files pane with arrows pointing to the current directory, the .. to move up a directory level, and the Set As Working Directory button."}
 
 
 ## Swirl
