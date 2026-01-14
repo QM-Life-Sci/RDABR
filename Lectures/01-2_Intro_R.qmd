@@ -22,14 +22,22 @@ csl: evolution.csl
 ```
 
 
+# Question of the week {background-color="#40666e"}
+
+What is one technology that you hope we have in 50 years?
+
+
+# Review and Questions {background-color="#40666e"}
+
+
 # Tools {background-color="#40666e"}
 
 
 ## What tools will we use?
 
 - R: statistical programming language
-- RStudio: Interface for R ([Introduction to RStudio Server](https://book.cds101.com/rstudio-server.html){target="_blank"})
-- [RMarkdown](https://rmarkdown.rstudio.com/){target="_blank"}
+- RStudio: Graphical user interface for R
+- [Quarto](https://quarto.org/){target="_blank"}
 
 
 ## R
@@ -45,14 +53,17 @@ csl: evolution.csl
 
 ## RStudio
 
-- Graphical interface to R
-- R runs within RStudio
+- Graphical user interface to R ("IDE")
+- R runs within [RStudio](https://posit.co/products/open-source/rstudio/?sid=1){target="_blank"}
 - R can run outside of RStudio
 
 ![](images/RStudio.png){fig-align="center" fig-alt="Image of the main RStudio window."}
 
 
-## RMarkdown
+## Let's install R and RStudio
+
+
+## Quarto
 
 [Markup language](https://en.wikipedia.org/wiki/Markup_language){target="_blank"}: Mix R code with text, images, etc. in a **plain text file**
 
@@ -133,7 +144,7 @@ You will develop skills for adapting code from a problem you have solved before.
 ![](images/RStudio_Bare.png){fig-align="center" fig-alt="Image of RStudio application on launch."}
 
 
-## Panes and tabs of an RStudio window
+## Panes and tabs of the RStudio window
 
 - Code
 - Console
@@ -145,17 +156,17 @@ You will develop skills for adapting code from a problem you have solved before.
 - Others that we won't use often
 
 
-## R Console Pane: `>`
+## R Console Pane: `>` prompt
 
 - Interactive
 - Enter and run code
-- Run code from Rmd files
+- Run code from quarto files
 
 
 ## Source Pane
 
 - Text editor
-- Work in an Rmd file and send code to the console
+- Work in an quarto `qmd` file and send code to the console
 
 
 ## Setting up RStudio
@@ -166,7 +177,7 @@ You will develop skills for adapting code from a problem you have solved before.
 - Code editing
 - Appearance
 - Pane layout
-- RMarkdown output
+- R Markdown output
 
 
 ## "Base R" and R Packages
@@ -175,7 +186,7 @@ You will develop skills for adapting code from a problem you have solved before.
 - R's utility is extended via packages
     - Over 20,000 on the main CRAN repository
 - Loading packages is usually one of the first steps of an analysis
-    - `library(...)` near the top of your Rmd
+    - `library(...)` near the top of your qmd
 
 
 ## Installing some packages
