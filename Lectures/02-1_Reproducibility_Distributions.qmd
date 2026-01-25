@@ -206,23 +206,12 @@ How would you format a document that someone else would read?
 
 Difficult to read:
 
-```{r}
-#| eval: false
-#| echo: true
-
-tvtest <- lmer(
-    sqrt(tv) ~ Region *
-        log(DD5_TOT) +
-        (1 | Population / Sample_ID) +
-        (1 | Year),
-    data = tvdat
-)
-summary(tvtest)
-ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-    geom_point(shape = 1, size = 3, alpha = 1 / 3) +
-    geom_smooth(aes(col = Region), method = 'lm') +
-    xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
-    ylab('sqrt(Terminal Velocity (m/s))')
+```
+tvtest <- lmer(sqrt(tv)~Region*log(DD5_TOT)+(1|Population/Sample_ID) +
+(1|Year),data=tvdat); summary(tvtest)
+ggplot(tvdat,aes(x=log(DD5_TOT),y=sqrt(tv),col=Region))+geom_point(shape=1,size=3,alpha=1/3)+geom_smooth(aes(col=Region),method='lm')+
+xlab(bquote('log(Degree Days above'~5^o~C*')'))+
+ylab('sqrt(Terminal Velocity (m/s))')
 ```
 
 
@@ -524,7 +513,7 @@ Schilling et al. [-@Schilling2002-mm]
 
 ## Heights for 6,465 individuals
 
-- Assigned male at birth
+- Self-identified as male
 
 ```{r}
 NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |>
