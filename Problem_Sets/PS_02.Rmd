@@ -82,10 +82,10 @@ sd(4:10)
 
 Execute the chunk above and look at the R console output. Explain what we have done here and what R must be doing without telling you. Write your answer after the ">" below. (">" is the Markdown syntax for a block quote, which will make finding your answers easier.)
 
-> 
+>
 
 
-Now add comments to the code chunk above briefly annotating your answer above. 
+Now add comments to the code chunk above briefly annotating your answer above.
 
 
 ## Vectors
@@ -112,7 +112,6 @@ Look at the help for `seq()` and `rep()` to help you with 5 through 9 (and maybe
 Choose names for each of these vectors. Add your code to the block below.
 
 ```{r}
-
 
 ```
 
@@ -150,7 +149,6 @@ The numbers (1-9) in the list below correspond to those in the list above.
 
 ```{r}
 
-
 ```
 
 
@@ -170,7 +168,7 @@ all.equal(a * a, 2)
 
 Line by line, explain what the statements above are doing and the R output of each. Look at the help for `all.equal()` if you need to. Enter your explanation after the `>` below.
 
-> 
+>
 
 
 ## `data.frame()`s and `tibble()`s
@@ -196,7 +194,6 @@ Use the `str()` function to get information about the data.frame. This will allo
 
 ```{r}
 
-
 ```
 
 
@@ -218,7 +215,6 @@ Use your data.frame (or tibble) from the question above. Extract the following s
 5. Rows 1-10 of only the Productivity column
 
 ```{r}
-
 
 ```
 
@@ -249,7 +245,6 @@ Try functions operating on the matrix you created above.
 
 ```{r}
 
-
 ```
 
 
@@ -264,14 +259,14 @@ Take the following code chunk and make the code more readable by adding spaces a
 
 ```{r}
 # FIXME
-M1 <- data.frame(x=11:20,y=c(20:11),l=letters[1:10])
-M2 <- tibble(ID=seq(1, 100, 1),x=rnorm(100,10,5),y=8.4*x+rnorm(100,0,1))
+M1<-data.frame(x=11:20,y=c(20:11),l=letters[1:10])
+M2 <- tibble(ID=seq(1,100,1),x=rnorm(100,10,5),y=8.4*x+rnorm(100,0,1))
 ```
 
 What is `letters`?
 
-> 
+>
 
 Explain how `y` is constructed in `M2`.
 
-> 
+>
