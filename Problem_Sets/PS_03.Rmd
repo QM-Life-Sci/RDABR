@@ -34,7 +34,6 @@ Be sure to set the seed for the random number generator, so that your analysis w
 
 ```{r}
 
-
 ```
 
 
@@ -46,12 +45,12 @@ Calculate the mean and standard deviation for your vector of random numbers.
 
 How do the mean and sd compare to the values you specified above? If they differ, why do you think that might be?
 
-> 
+>
 
 
 Imagine that you generate two sets of 100 values, drawn from the same distribution that you specified above (i.e., both have the same mean and sd). Do you expect the means and standard deviations to be identical? Why or why not?
 
-> 
+>
 
 
 ### Considerations with histograms
@@ -65,6 +64,8 @@ Below is the most basic code to plot a histogram:
 You should delete the first line and replace `x` in the plotting statement to be your vector created above.
 
 ```{r}
+#| fig-alt: "Histogram of the numbers 1:20 showing even bars across the range 1 to 20."
+
 x <- 1:20 # Delete this line and use the vector you assigned above.
 
 ggplot(tibble(x), aes(x)) +
@@ -81,9 +82,9 @@ In the chunk below, copy the code above. Add the argument `bins = ` to `geom_his
 
 ```
 
-How does the shape of the histogram change as you add more bins? 
+How does the shape of the histogram change as you add more bins?
 
-> 
+>
 
 
 ### Density plots as an alternative
@@ -96,7 +97,7 @@ One alternative to histograms is to use a density estimate which does not requir
 
 What do you observe about the density plot compared to the histogram?
 
-> 
+>
 
 
 ### Counting and quantiles
@@ -159,7 +160,7 @@ Add the two sums together and divide by 10000. Confirm that this value matches (
 
 What do you find?
 
-> 
+>
 
 
 Repeat the analysis above to confirm that 95% are within 2 sd and 99.7% are within 3 sd. Feel free to combine steps if you wish.
@@ -170,7 +171,7 @@ Repeat the analysis above to confirm that 95% are within 2 sd and 99.7% are with
 
 How closely do they match? If they are off, why might that be?
 
-> 
+>
 
 
 
@@ -182,7 +183,7 @@ The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to t
 
 We are going to work with a part of this data set to explore the mean, median, and standard deviation.
 
-![](https://www.cirrusimage.com/Trees/Fir/silver_fir_12.jpg){fig-align="center"}
+![](https://www.cirrusimage.com/Trees/Fir/silver_fir_12.jpg){fig-align="center" fig-alt="Photograph of a silver fur."}
 
 
 ## Activity
@@ -193,10 +194,12 @@ The data we will work with are in the file `Silver_fir.csv`. We can read this in
 
 The code below is a minimal example of how to read data in. The first imports directly from a web address. The second (commented code) from a local file, assumed to be in the same directory as the current file.
 
-You can use either. Just comment the other out. If you use the second, make sure to place the file in the same folder as the Rmd. 
+You can use either. Just comment the other out. If you use the second, make sure to place the file in the same folder as the Rmd.
 
 ```{r}
-SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv")
+SF <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv"
+)
 
 # SF <- read_csv("Silver_fir.csv")
 
@@ -205,7 +208,7 @@ SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/m
 Before we work with the data, we need to do a couple of things.
 
 - Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_csv()`).
-- The columns `family` and `block` are numeric, but should be converted to factors. Add a pipe with `mutate(family = factor(family))` and one for `block` as well. 
+- The columns `family` and `block` are numeric, but should be converted to factors. Add a pipe with `mutate(family = factor(family))` and one for `block` as well.
 - Only `select()` the columns: `family`, `block`, `population`, and `ht97mm` (height in 1997 in mm)
 
 Go back to the code block above and add these steps, piping (` |> `) the results of one step to the next.
@@ -219,7 +222,7 @@ Examine the resulting file with `str()` or `glimpse()`. You should have only 4 c
 
 ### Counting
 
-These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`. 
+These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`.
 
 Tally up (`count()`) by `population`, `family`, and `block` to determine number of observations in each subgroup. Calculate the mean number of observations per group. See lecture 3-1 for an example of counting and summarizing.
 
@@ -229,7 +232,7 @@ Tally up (`count()`) by `population`, `family`, and `block` to determine number 
 
 About how many seedlings are at the smallest replicate `block` level of the data?
 
-> 
+>
 
 
 We want to look at the distributions of heights (`ht97mm`), but first we need to drop all NA values.
@@ -237,7 +240,7 @@ We want to look at the distributions of heights (`ht97mm`), but first we need to
 Use `drop_na()` to drop all NA values from the data:
 
 ```{r}
-SF <- SF |> 
+SF <- SF |>
   drop_na()
 ```
 
@@ -299,7 +302,7 @@ Now summarize height by population by calculating the mean, standard deviation, 
 
 Compare the mean and the median across the populations. In this sample is the mean a good estimate of the central tendency?
 
-> 
+>
 
 
 # Intuition for distributions / summaries
@@ -307,6 +310,8 @@ Compare the mean and the median across the populations. In this sample is the me
 At the end of lecture 3-2, we used the Law of Large Numbers to show how the mean of a set of samples from a population is a good estimate of the population's mean. That code, condensed into one chunk is:
 
 ```{r}
+#| fig-alt: "Histogram of 1000 numbers with a mean of 10 and sd of 4 showing a largely normal distribution"
+
 # Generate 1000 random normal numbers with a mean of 10 and sd of 4
 set.seed(423766)
 x <- rnorm(n = 1000, mean = 10, sd = 4)
@@ -347,14 +352,12 @@ We left off in lecture with two questions:
 
 What is your prediction for each question?
 
-> 
+>
 
 Copy the code above to answer each question. For simplicity, use the same set of random values created above.
 
 ```{r}
 # What would change with larger sample sizes (~100) but the same number of iterations (100)?
-
-
 
 # What would change with more iterations (1000) but the same sample size (20)?
 
@@ -362,5 +365,4 @@ Copy the code above to answer each question. For simplicity, use the same set of
 
 What observations do you make? Pay particular attention to the x-axis scale in the histograms.
 
-> 
-
+>

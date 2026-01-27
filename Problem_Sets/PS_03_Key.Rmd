@@ -71,7 +71,9 @@ Below is the most basic code to plot a histogram:
 You should delete the first line and replace `x` in the plotting statement to be your vector created above.
 
 ```{r}
-x <- 1:20 # Delete this line and use the vector you assigned above.
+#| fig-alt: "Histogram with a mean of 5 showing a broadly normal distribution with a range of approximately 4 to 6."
+
+# x <- 1:20 # Delete this line and use the vector you assigned above.
 
 ggplot(tibble(x), aes(x)) +
   geom_histogram()
@@ -85,6 +87,8 @@ Basically ggplot is saying that it has divided the data into 30 equally sized ra
 In the chunk below, copy the code above. Add the argument `bins = ` to `geom_histogram()`. Start with 5 bins and gradually increase the number of bins: 5, 10, 25, 50, 100.
 
 ```{r}
+#| fig-alt: "Histogram with a mean of 5 showing a broadly normal distribution with a range of approximately 4 to 6. The bins are very narrow."
+
 # FIXME
 
 ggplot(tibble(x), aes(x)) +
@@ -92,7 +96,7 @@ ggplot(tibble(x), aes(x)) +
 
 ```
 
-How does the shape of the histogram change as you add more bins? 
+How does the shape of the histogram change as you add more bins?
 
 > The shape changes somewhat. When there are only 5 bins, each one represents a large range of the data. It looks vaguely normal, but it's hard to tell what the distribution really looks like. When the number of bins is very high, the bins are really narrow, and th eplot looks very sporadic.
 
@@ -102,6 +106,8 @@ How does the shape of the histogram change as you add more bins?
 One alternative to histograms is to use a density estimate which does not require binning in the same way as a histogram. Copy the histogram code from above, and replace `geom_histogram()` with `geom_density()`.
 
 ```{r}
+#| fig-alt: "A line plot with a single density line with a normal (bell) shape."
+
 # FIXME
 
 ggplot(tibble(x), aes(x)) +
@@ -218,7 +224,7 @@ The Silver Fir (*Abies alba*) is a widespread evergreen conifer tree native to t
 
 We are going to work with a part of this data set to explore the mean, median, and standard deviation.
 
-![](https://www.cirrusimage.com/Trees/Fir/silver_fir_12.jpg){fig-align="center"}
+![](https://www.cirrusimage.com/Trees/Fir/silver_fir_12.jpg){fig-align="center" fig-alt="Photograph of a silver fur."}
 
 
 ## Activity
@@ -229,25 +235,26 @@ The data we will work with are in the file `Silver_fir.csv`. We can read this in
 
 The code below is a minimal example of how to read data in. The first imports directly from a web address. The second (commented code) from a local file, assumed to be in the same directory as the current file.
 
-You can use either. Just comment the other out. If you use the second, make sure to place the file in the same folder as the Rmd. 
+You can use either. Just comment the other out. If you use the second, make sure to place the file in the same folder as the Rmd.
 
 ```{r}
 # FIXME
-SF <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv") |> 
-  mutate(family = factor(family),
-         block = factor(block)) |> 
+SF <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv"
+) |>
+  mutate(family = factor(family), block = factor(block)) |>
   select(family, block, population, ht97mm)
 
-# SF <- read_csv("Silver_fir.csv") |> 
+# SF <- read_csv("Silver_fir.csv") |>
 #   mutate(family = factor(family),
-#          block = factor(block)) |> 
+#          block = factor(block)) |>
 #   select(family, block, population, ht97mm)
 ```
 
 Before we work with the data, we need to do a couple of things.
 
 - Determine how missing data were coded in the file and pass the appropriate argument for NAs (look at the help for `read_csv()`).
-- The columns `family` and `block` are numeric, but should be converted to factors. Add a pipe with `mutate(family = factor(family))` and one for `block` as well. 
+- The columns `family` and `block` are numeric, but should be converted to factors. Add a pipe with `mutate(family = factor(family))` and one for `block` as well.
 - Only `select()` the columns: `family`, `block`, `population`, and `ht97mm` (height in 1997 in mm)
 
 Go back to the code block above and add these steps, piping (` |> `) the results of one step to the next.
@@ -265,17 +272,17 @@ str(SF)
 
 ### Counting
 
-These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`. 
+These data have several layers of nesting. Each seedling has a unique `id` and comes from one of 16 `population`s. Within each `population`, multiple plants come from each `block` within a `family`.
 
 Tally up (`count()`) by `population`, `family`, and `block` to determine number of observations in each subgroup. Calculate the mean number of observations per group. See lecture 3-1 for an example of counting and summarizing.
 
 ```{r}
 # FIXME
-SF |> 
+SF |>
   count(population, family, block)
 
-SF |> 
-  count(population, family, block) |> 
+SF |>
+  count(population, family, block) |>
   summarize(mean_n = mean(n))
 ```
 
@@ -288,7 +295,7 @@ We want to look at the distributions of heights (`ht97mm`), but first we need to
 Use `drop_na()` to drop all NA values from the data:
 
 ```{r}
-SF <- SF |> 
+SF <- SF |>
   drop_na()
 ```
 
@@ -344,6 +351,8 @@ Plot the density of the distribution of `ht97mm`, colored by population.
 - If the x axis labs collide with each other add `theme(axis.text.x = element_text(angle = 90))` to rotate the axis labels by 90 degrees.
 
 ```{r}
+#| fig-alt: "A 4 x 4 panel of histograms for each population as a different panel. Most all are normally distrubited but some have extreme values."
+
 # FIXME
 ggplot(SF, aes(ht97mm, fill = population)) +
   geom_density() +
@@ -356,12 +365,14 @@ Now summarize height by population by calculating the mean, standard deviation, 
 ```{r}
 # FIXME
 
-SF_summary <- SF |> 
-  group_by(population) |> 
-  summarize(mean_height = mean(ht97mm),
-            sd_height = sd(ht97mm),
-            median_ht = median(ht97mm),
-            .groups = "drop")
+SF_summary <- SF |>
+  group_by(population) |>
+  summarize(
+    mean_height = mean(ht97mm),
+    sd_height = sd(ht97mm),
+    median_ht = median(ht97mm),
+    .groups = "drop"
+  )
 
 knitr::kable(SF_summary)
 ```
@@ -376,6 +387,8 @@ Compare the mean and the median across the populations. In this sample is the me
 At the end of lecture 3-2, we used the Law of Large Numbers to show how the mean of a set of samples from a population is a good estimate of the population's mean. That code, condensed into one chunk is:
 
 ```{r}
+#| fig-alt: "Histogram of 1000 numbers with a mean of 10 and sd of 4 showing a largely normal distribution. The range is approximately 8 to 11."
+
 # Generate 1000 random normal numbers with a mean of 10 and sd of 4
 set.seed(423766)
 x <- rnorm(n = 1000, mean = 10, sd = 4)
@@ -421,6 +434,8 @@ What is your prediction for each question?
 Copy the code above to answer each question. For simplicity, use the same set of random values created above.
 
 ```{r}
+#| fig-alt: "Histogram of 1000 numbers with a mean of 10 and sd of 4 showing a largely normal distribution. The range is approximately 9 to 10.5."
+
 # FIXME
 
 # What would change with larger sample sizes (~100) but the same number of iterations (100)?
@@ -440,6 +455,10 @@ ggplot(tibble(sample_means), aes(sample_means)) +
 
 mean(x)
 mean(sample_means)
+```
+
+```{r}
+#| fig-alt: "Histogram of 1000 numbers with a mean of 10 and sd of 4 showing a largely normal distribution. The range is approximately 7 to 12."
 
 # What would change with more iterations (1000) but the same sample size (20)?
 set.seed(12366)
@@ -463,4 +482,3 @@ mean(sample_means)
 What observations do you make? Pay particular attention to the x-axis scale in the histograms.
 
 > All of the combinations estimate the mean equally well. There is a wide range in the spread of the estimates. The first is ~8-11, then second ~9-10.5, and the third 7-12. Smaller sample sizes (#1 and #3) are less certain about the mean. The larger sample of 100 leads to a more confident estimate of the mean.
-
