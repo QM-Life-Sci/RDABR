@@ -224,20 +224,20 @@ Easier to read:
 #| eval: false
 
 tvtest <- lmer(
-    sqrt(tv) ~ Region *
-        log(DD5_TOT) +
-        (1 | Population / Sample_ID) +
-        (1 | Year),
-    data = tvdat
+  sqrt(tv) ~ Region *
+    log(DD5_TOT) +
+    (1 | Population / Sample_ID) +
+    (1 | Year),
+  data = tvdat
 )
 
 summary(tvtest)
 
 ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-    geom_point(shape = 1, size = 3, alpha = 1 / 3) +
-    geom_smooth(aes(col = Region), method = 'lm') +
-    xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
-    ylab('sqrt(Terminal Velocity (m/s))')
+  geom_point(shape = 1, size = 3, alpha = 1 / 3) +
+  geom_smooth(aes(col = Region), method = 'lm') +
+  xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
+  ylab('sqrt(Terminal Velocity (m/s))')
 ```
 
 
@@ -261,11 +261,11 @@ ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
 # Fit a hierarchical linear model
 # Random effects: Sample nested in Population and Year
 tvtest <- lmer(
-    sqrt(tv) ~ Region *
-        log(DD5_TOT) +
-        (1 | Population / Sample_ID) +
-        (1 | Year),
-    data = tvdat
+  sqrt(tv) ~ Region *
+    log(DD5_TOT) +
+    (1 | Population / Sample_ID) +
+    (1 | Year),
+  data = tvdat
 )
 
 # Summarize output of the model
@@ -274,10 +274,10 @@ summary(tvtest)
 # Plot tv vs. dd5_tot colored by Region
 # alpha = transparency, smaller is more transparent
 ggplot(tvdat, aes(x = log(DD5_TOT), y = sqrt(tv), col = Region)) +
-    geom_point(shape = 1, size = 3, alpha = 1 / 3) +
-    geom_smooth(aes(col = Region), method = 'lm') +
-    xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
-    ylab('sqrt(Terminal Velocity (m/s))')
+  geom_point(shape = 1, size = 3, alpha = 1 / 3) +
+  geom_smooth(aes(col = Region), method = 'lm') +
+  xlab(bquote('log(Degree Days above' ~ 5^o ~ C * ')')) +
+  ylab('sqrt(Terminal Velocity (m/s))')
 ```
 
 
@@ -477,12 +477,12 @@ x_tab
 
 ```{r}
 ggplot(
-    data = tibble(Count = as.numeric(x_tab), Successes = 0:10),
-    aes(x = Successes, y = Count)
+  data = tibble(Count = as.numeric(x_tab), Successes = 0:10),
+  aes(x = Successes, y = Count)
 ) +
-    geom_bar(stat = "identity", fill = "navy") +
-    scale_x_continuous(breaks = 0:10) +
-    labs(x = "n Successes in 10 Trials")
+  geom_bar(stat = "identity", fill = "navy") +
+  scale_x_continuous(breaks = 0:10) +
+  labs(x = "n Successes in 10 Trials")
 ```
 
 
@@ -517,9 +517,9 @@ Schilling et al. [-@Schilling2002-mm]
 
 ```{r}
 NHANES <- read_csv("../data/NHANES.csv", show_col_types = FALSE) |>
-    filter(Sex == "Male") |>
-    select(-Sex) |>
-    arrange(Height)
+  filter(Sex == "Male") |>
+  select(-Sex) |>
+  arrange(Height)
 NHANES$Height
 ```
 
@@ -530,15 +530,15 @@ NHANES$Height
 #| fig-alt: "Scatter plot of Height vs. Age for 6,465 males."
 
 ggplot(NHANES, aes(x = Age, y = Height)) +
-    geom_point(
-        size = 1,
-        show.legend = FALSE,
-        alpha = 0.25,
-        position = position_jitter(width = 0.25, seed = 3847293),
-        color = "firebrick4"
-    ) +
-    scale_x_continuous(breaks = seq(0, 80, by = 5)) +
-    labs(x = "Age (y)", y = "Height (cm)")
+  geom_point(
+    size = 1,
+    show.legend = FALSE,
+    alpha = 0.25,
+    position = position_jitter(width = 0.25, seed = 3847293),
+    color = "firebrick4"
+  ) +
+  scale_x_continuous(breaks = seq(0, 80, by = 5)) +
+  labs(x = "Age (y)", y = "Height (cm)")
 ```
 
 
@@ -550,9 +550,9 @@ ggplot(NHANES, aes(x = Age, y = Height)) +
 NHANES_20 <- NHANES |> filter(Age > 20)
 
 ggplot(NHANES_20, aes(Height)) +
-    geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
-    labs(x = "Height (cm)", y = "Count") +
-    scale_x_continuous(breaks = seq(140, 200, by = 10))
+  geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
+  labs(x = "Height (cm)", y = "Count") +
+  scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -585,32 +585,32 @@ tail(NHANES_20) |> knitr::kable()
 #| fig-alt: "Density plot of a normal distribution overlaid over the histogram of heights."
 
 ggplot(NHANES_20, aes(Height)) +
-    geom_histogram(
-        aes(y = after_stat(density)),
-        fill = "firebrick4",
-        alpha = 0.5,
-        bins = 30
-    ) +
-    geom_line(
-        data = tibble(
-            Height = seq(
-                min(NHANES_20$Height),
-                max(NHANES_20$Height),
-                length.out = 100
-            ),
-            y = dnorm(
-                Height,
-                mean = mean(NHANES_20$Height),
-                sd = sd(NHANES_20$Height)
-            )
-        ),
-        aes(Height, y),
-        linewidth = 1.5,
-        color = "#2D5DA1"
-    ) +
-    labs(x = "Height (cm)") +
-    theme(axis.title.y = element_blank(), axis.text.y = element_blank()) +
-    scale_x_continuous(breaks = seq(140, 200, by = 10))
+  geom_histogram(
+    aes(y = after_stat(density)),
+    fill = "firebrick4",
+    alpha = 0.5,
+    bins = 30
+  ) +
+  geom_line(
+    data = tibble(
+      Height = seq(
+        min(NHANES_20$Height),
+        max(NHANES_20$Height),
+        length.out = 100
+      ),
+      y = dnorm(
+        Height,
+        mean = mean(NHANES_20$Height),
+        sd = sd(NHANES_20$Height)
+      )
+    ),
+    aes(Height, y),
+    linewidth = 1.5,
+    color = "#2D5DA1"
+  ) +
+  labs(x = "Height (cm)") +
+  theme(axis.title.y = element_blank(), axis.text.y = element_blank()) +
+  scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -800,9 +800,9 @@ Tibbles and `data.frame`s are essentially identical, but a `tibble` is more mode
 #| echo: true
 
 MM <- tibble(
-    x = 1:3,
-    y = x^2, # <1>
-    A = c("a", "b", "c")
+  x = 1:3,
+  y = x^2, # <1>
+  A = c("a", "b", "c")
 )
 MM
 ```
