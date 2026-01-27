@@ -26,22 +26,23 @@ LW <- read_excel("../data/Earth_Land_Water.xlsx") |>
 LW |> as.data.frame()
 
 ggplot(LW, aes(x = Sample, y = `Cumulative Percent Water`)) +
-  geom_line(color = "firebrick4", linewidth = 2) +
+  geom_point(size = 3) +
+  geom_line(color = "firebrick4", linewidth = 1) +
   scale_y_continuous(limits = c(0, 1))
 
-BinomCI(120, 187, conf.level = 0.95, method = "clopper-pearson")
+BinomCI(118, 118 + 78, conf.level = 0.95, method = "clopper-pearson")
 
 
 ggplot(
   data = tibble(
     Successes = 0:18,
-    Probability = dbinom(0:18, 18, prob = 0.642)
+    Probability = dbinom(0:18, 18, prob = 0.6020408)
   ),
   aes(Successes, Probability)
 ) +
   geom_bar(stat = "identity", fill = "firebrick4") +
   scale_x_continuous(breaks = 0:18) +
-  labs(x = "n Successes from 18 Trials (Pr = 0.642)")
+  labs(x = "n Successes from 18 Trials (Pr = 0.602)")
 
 ##############################################################################
 
@@ -79,7 +80,7 @@ sample_size <- 1
 
 LW <- tibble(
   Sample = 1:n_samples,
-  Water = rbinom(n = n_samples, size = sample_size, prob = 0.642),
+  Water = rbinom(n = n_samples, size = sample_size, prob = 0.6020408),
   Land = sample_size - Water,
   C_Land = cumsum(Land),
   C_Water = cumsum(Water),
