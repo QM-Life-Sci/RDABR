@@ -2,11 +2,12 @@
 title: 'Problem Set 07'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
-output:
-  html_document:
+format:
+  html:
     toc: true
-    toc_depth: 4
+    toc_depth: 2
     toc_float: true
+    embed-resources: true
 ---
 
 ```{r}
@@ -14,7 +15,14 @@ output:
 #| message: false
 #| warning: false
 
+library(tidyverse)
+library(performance)
+library(see)
+library(broom)
+library(readxl)
+library(cowplot)
 
+theme_set(theme_classic())
 ```
 
 ## Setup
@@ -37,89 +45,111 @@ In PS 6, we continued analyzing the data set where lion age was related to the p
 
 ### Activity
 
-Copy your code from PS 6 to import the `LionAges.csv` and make a scatterplot of age regressed on proportion of black. 
+Copy your code from PS 6 to import the `LionAges.csv` and make a scatterplot of age regressed on proportion of black.
 
 Add an OLS regression line to your plot using `geom_smooth()` following the examples in the lecture slides and PC 1.
 
 ```{r}
+# FIXME
 
+LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
 
+ggplot(LA, aes(y = age, x = proportion.black)) +
+    geom_point(size = 4, color = "navy") +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+    scale_x_continuous(limits = c(0, 1)) +
+    scale_y_continuous(breaks = 1:14) +
+    labs(x = "Proportion Black", y = "Age (y)")
 ```
 
 Copy over the linear model you fit where age is modeled by proportion of black.
 
 ```{r}
+# FIXME
 
-
+fm <- lm(age ~ proportion.black, data = LA)
 ```
 
 Pass the `lm()` object to the `check_model()` function. This will print a 5-panel figure of diagnostics. You can use the "Zoom" button in the Plots panel to make the image larger.
 
 ```{r}
+# FIXME
 
-
+check_model(fm)
 ```
 
 We'll go through the diagnostics one-by-one.
 
 What does the "Posterior Predictive Check" represent? Do you see any problems with it?
 
-> 
+> The green line is the density plot of the observed y values. The blue lines are simulated values based on the model fit. This looks fine here.
 
 
 What does the "Linearity" panel check? Do you see any problems with it?
 
-> 
+> This is a check that there really is a linear relationship between the x and y variables. The line is pretty wavy, but there are also not a lot of data points. It seems flat enough.
 
 
 What does the "Homogeneity of Variance" panel check? Do you see any problems with it?
 
-> 
+> This is a check that the variation in the residuals is (relatively) constant across all the values of x. It's mostly flat here, but it does deviate away fro, horizontal at large fitted values of age.
 
 
 What does the "Influential Observations" panel check? Do you see any problems with it?
 
-> 
+> This panel shows a diagnostic for points that have an undue influence on the linear model (e.g., high "leverage"). This plot show that point #30 is influential.
 
 
 Finally, run the three additional checks:
 
-- `check_heteroskedasticity()` also spelled `check_heteroscedasticity()` 
+- `check_heteroskedasticity()` also spelled `check_heteroscedasticity()`
 - `check_normality()`
 - `check_outliers()`
 
 ```{r}
+# FIXME
 
-
+check_heteroskedasticity(fm)
+check_normality(fm)
+check_outliers(fm)
 ```
 
 What do these checks report? Do the results agree with the disagnostic plots?
 
-> 
+> `check_heteroskedasticity()` reports signficant non-homogeniety, which appears to agree with plot #3, where the variance increases with the fitted values. `check_outliers()` reports that observation 30 is an outlier.
 
 
 In class we made a plot using `geom_label()`, with the observation numbers plotted instead of points. Adapt that plot here to identify the influential observation. Include the code you wrote above to also draw the OLS regression line on the plot.
 
 ```{r}
+# FIXME
 
-
+LA |>
+    mutate(ID = 1:n()) |>
+    ggplot(aes(proportion.black, age, label = ID)) +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+    geom_label()
 ```
 
 What does it mean to say that point #30 has a lot of influence on the regression as compared to, for example point #17?
 
-> 
+> Point 30 is both away from the regression line and at an extreme value of proportion black. Thus it is able to exert a significant "pull" on the regression line. Point 17, falls almost exactly on the regression line. So it is not able to pull the line much at all (the observed value is right where the model predicts it to be).
 
 
 Filter out observation #30 by whatever method you want. Then refit the model and print the summary.
 
 ```{r}
+# FIXME
 
-
+LA_2 <- LA |> slice(-which.max(LA$age))
+fm_2 <- lm(age ~ proportion.black, data = LA_2)
+summary(fm_2)
+summary(fm)
 ```
 
 Compare the summaries for the original model with all the data points and the new model with the outlier removed. How much do the coefficients change? Does dropping one data point change your conclusions about the ability to predict age from proportion of black in the nose?
 
-> 
+> The slope goes from 10.6 in the first model to 8.8 in the next model, so much lower, but still really high. The intercept changes as well, but that is not as interesting. Regardless of the change in slope, proportion.black is still a signficant preditor of age. The P-value are both in the 10^-7 range.
 
 
 ## Stalk-eyed flies
@@ -131,38 +161,48 @@ In Problem Set 6 we continued analyzing the stalk-eyed fly data. We want to look
 Import the `Stalkies.csv` as in PS 6 and run the same linear model. Feel free to copy your code or the code from the key.
 
 ```{r}
+# FIXME
 
+stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |>
+    mutate(food_source = factor(food_source))
 
+fm <- lm(eye_span ~ food_source, data = stalk)
+summary(fm)
 ```
 
 
 Pass the fitted model to `check_model()` as above to plot the regression diagnostics.
 
 ```{r}
+# FIXME
 
+check_model(fm)
 
 ```
 
 What do you notice is different about these diagnostic plots compared to the one above?
 
-> 
+> There are only two x "values", so the plots look really wonky.
 
 
 What can you conclude about the utility of diagnostic plots when the predictor is a categorical variable?
 
-> 
+> It's not that useful.
 
 
 Run the same 3 additional checks as above.
 
 ```{r}
+# FIXME
 
-
+check_heteroskedasticity(fm)
+check_normality(fm)
+check_outliers(fm)
 ```
 
 What do these results show?
 
-> 
+> These check so significant heteroscedasticity and non-normality of residuals.
 
 
 Let's further investigate. In the chunk below, add a column to your stalk-eyed fly tibble with the residuals. There are a few ways to access the residuals:
@@ -172,20 +212,24 @@ Let's further investigate. In the chunk below, add a column to your stalk-eyed f
 - `augment()` from the `broom` package (see example in the lecture slides)
 
 ```{r}
+# FIXME
 
-
+stalk <- augment(fm, stalk)
 ```
 
 Finally, plot a histogram of the *residuals* for the fitted model. Color by food source and facet the plot by food source.
 
 ```{r}
+# FIXME
 
-
+ggplot(stalk, aes(.resid, fill = food_source)) +
+    geom_histogram() +
+    facet_grid(food_source ~ .)
 ```
 
 What do you notice about the residuals? Does this agree with the diagnostics above?
 
-> 
+> The corn residuals are very compact and probably normally distributed. The cotton residuals are much more spread out, and it's hard to tell of they are normal or not. This seems to agree with the diagnostics: different variances and non-normal distributions of residuals.
 
 
 ## Working with lists
@@ -211,8 +255,8 @@ mylist
 Now the 1st element has a string, the 2nd has a list (which itself contains a numeric, a string, and a vector). How would you extract the 3rd element from the `z` vector?
 
 ```{r}
-
-
+# FIXME
+mylist[[2]]$z[3]
 ```
 
 We will use lists in a much less convoluted way, which is what you should do until you get comfortable (once you are comfortable with lists, their immense flexibility makes them a great way to pass collections of different kinds of data around among code).
@@ -241,8 +285,32 @@ Rather than creating separate plots, we want to make them inside a loop, where w
 This is all we need for the setup. At this point, you have the data, two vectors (one of columns names and one of y-axis labels), and an empty list.
 
 ```{r}
+# FIXME
+M <- read_excel("../data/mammals.xlsx", na = "NA") |>
+    mutate(
+        log_Mass = log10(adult_body_mass_g),
+        log_BMR = log10(basal_met_rate_m_l_o2hr)
+    )
 
+cols_analyze <- c(
+    "ageat_eye_opening_d",
+    "log_BMR",
+    "gestation_len_d",
+    "litter_size"
+)
 
+axis_labels <- c(
+    "Age at Eye Opening",
+    "log10 BMR",
+    "Gestation Length",
+    "Litter Size"
+)
+
+M <- M |>
+    select(log_Mass, all_of(cols_analyze)) |>
+    drop_na(log_Mass)
+
+pp <- list()
 ```
 
 No we can work on a loop to iterate through the columns, making a plot for each column. Here is the [pseudocode](https://builtin.com/data-science/pseudocode):
@@ -251,13 +319,25 @@ No we can work on a loop to iterate through the columns, making a plot for each 
     - We want to iterate from 1 to `length(cols_analyze)`
 2. Extract the *ii*th element of the columns to analyze vector. Assign to an object `col`.
 3. Extract the *ii*th element of the y-axis label to `lab`.
-4. Make a bivariate plot of the column vs. log Body Mass (assign to an object). This will look a little different from ggplots you have made before, particularly the aesthetics. Because you are supplying raw strings, you need to use the `.data` object, which is what ggplot uses internally to keep track of data. It will look something like: 
+4. Make a bivariate plot of the column vs. log Body Mass (assign to an object). This will look a little different from ggplots you have made before, particularly the aesthetics. Because you are supplying raw strings, you need to use the `.data` object, which is what ggplot uses internally to keep track of data. It will look something like:
     - `aes(x = .data[["log_Mass"]], y = .data[[col]])` depending on what variable name you used for log10 Body mass
 5. Assign the plot to the *ii*th element of your list.
 
 ```{r}
+# FIXME
+for (ii in 1:length(cols_analyze)) {
+    col <- cols_analyze[ii]
+    lab <- axis_labels[ii]
 
-
+    p <- ggplot(M, aes(x = .data[["log_Mass"]], y = .data[[col]])) +
+        geom_point(alpha = 0.5, size = 0.5) +
+        labs(x = "log10 Body Mass (g)", y = lab) +
+        theme(
+            axis.text = element_text(size = 10),
+            axis.title = element_text(size = 10)
+        )
+    pp[[ii]] <- p
+}
 ```
 
 At the end of the loop you will have a list that contains 4 plots. Try printing a plot by running `pp[[1]]` at the command line. If you get warnings saying something like `Removed ... rows containing missing values (geom_point).`, that is just ggplot saying that there are `NA`s in the data. A nice fix-up would be to go back to the data and `drop_na()` for the *ii*th column before you plot.
@@ -265,8 +345,14 @@ At the end of the loop you will have a list that contains 4 plots. Try printing 
 Now you can make a 2x2 grid of plots. The `cowplot` function `plot_grid()` can take a list of plots as an argument: `plotlist = ...`. Pass your list of plots, and specify 2 columns and 2 rows (check the help for `?plot_grid`).
 
 ```{r}
-
-
+# FIXME
+plot_grid(
+    plotlist = pp,
+    ncol = 2,
+    nrow = 2,
+    labels = c("a", "b", "c", "d"),
+    label_size = 8
+)
 ```
 
 You will get 4 sets of warning messages about missing data. This is okay. We could edit the code to subset and filter out NAs inside the loop to avoid these messages.
