@@ -37,6 +37,8 @@ Two variables can be correlated and still maintain bivariate normality (one of t
 Run the code and verify that it works. You might have to install the `mvtnorm` and `ggExtra` packages.
 
 ```{r}
+#| fig-alt: "Scatterplot of a bivariate normal distribution, which looks like a spherical cloud of points. Histograms along the edges show that each is a normal distribution."
+
 library(mvtnorm)
 library(ggExtra)
 
@@ -91,6 +93,8 @@ What does this result tell you about the correlation between two variables?
 In lecture, we used a set of simulated data to learn how ordinary least squares regression minimizes the sum of the squared residuals. The code we used was
 
 ```{r}
+#| fig-alt: "Scatterplot of Y vs. X showing a generally positive trend in Y with increasing X. An orange line passes through the points."
+
 set.seed(4)
 n <- 30
 
@@ -224,7 +228,7 @@ Possums are Australian marsupial (pouched) mammals (not to be confused with Nort
 
 Here is a photograph:
 
-![](https://collections.museumsvictoria.com.au/content/media/4/360404-small.jpg)
+![](https://collections.museumsvictoria.com.au/content/media/4/360404-small.jpg){fig-alt="Photograph of a mountain brushtail possum."}
 
 ## Activity
 

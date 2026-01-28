@@ -37,6 +37,8 @@ Two variables can be correlated and still maintain bivariate normality (one of t
 Run the code and verify that it works. You might have to install the `mvtnorm` and `ggExtra` packages.
 
 ```{r}
+#| fig-alt: "Scatterplot of a bivariate normal distribution, which looks like a spherical cloud of points. Histograms along the edges show that each is a normal distribution."
+
 library(mvtnorm)
 library(ggExtra)
 
@@ -89,6 +91,8 @@ What does this result tell you about the correlation between two variables?
 In lecture, we used a set of simulated data to learn how ordinary least squares regression minimizes the sum of the squared residuals. The code we used was
 
 ```{r}
+#| fig-alt: "Scatterplot of Y vs. X showing a generally positive trend in Y with increasing X. An orange line passes through the points."
+
 set.seed(4)
 n <- 30
 
@@ -180,12 +184,18 @@ Make two scatter plots:
 Feel free to color the points, add axis titles, etc., as you wish.
 
 ```{r}
+#| fig-alt: "Scatterplot of proportion of black in lion noses plotted against age, showing increasing black as age increases."
+
 # FIXME
 
 ggplot(LA, aes(x = age, y = proportion.black)) +
     geom_point(size = 4, color = "navy") +
     scale_y_continuous(limits = c(0, 1)) +
     scale_x_continuous(breaks = 1:14)
+```
+
+```{r}
+#| fig-alt: "Scatterplot of age plotted against proportion of black in lion noses, showing increasing age as proportion black increases."
 
 ggplot(LA, aes(y = age, x = proportion.black)) +
     geom_point(size = 4, color = "navy") +
@@ -221,7 +231,7 @@ When we regress age on proportion black, what we are saying is that we know the 
 
 How would the interpretation differ if you regressed proportion black on age?
 
-> In this case, we would be trying to predict the peoportion from the age. That is to say we would already know the age and be trying to determine the proportion. Depending on the scientific question that might make sense. Or maybe not.
+> In this case, we would be trying to predict the proportion from the age. That is to say we would already know the age and be trying to determine the proportion. Depending on the scientific question that might make sense. Or maybe not.
 
 
 # Possum head size
@@ -230,7 +240,7 @@ Possums are Australian marsupial (pouched) mammals (not to be confused with Nort
 
 Here is a photograph:
 
-![](https://collections.museumsvictoria.com.au/content/media/4/360404-small.jpg)
+![](https://collections.museumsvictoria.com.au/content/media/4/360404-small.jpg){fig-alt="Photograph of a mountain brushtail possum."}
 
 ## Activity
 
@@ -256,6 +266,8 @@ Make two plots, with points colored by sex in each:
 Feel free to add axis labels, etc. Length and width measurements are in millimeters.
 
 ```{r}
+#| fig-alt: "Scatterplot of skull length plotted against age with points colored by sex showing a positive relationship between the two variables."
+
 # FIXME
 
 library(ggsci)
@@ -265,6 +277,10 @@ ggplot(MBP, aes(age, skull_l, color = sex)) +
     geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
     scale_color_aaas() +
     labs(x = "Age (y)", y = "Skull Length (mm)")
+```
+
+```{r}
+#| fig-alt: "Scatterplot of skull width plotted against age with points colored by sex showing a positive relationship between the two variables in males but not in females."
 
 ggplot(MBP, aes(age, skull_w, color = sex)) +
     geom_point(size = 3) +
