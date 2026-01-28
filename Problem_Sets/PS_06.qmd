@@ -2,11 +2,12 @@
 title: 'Problem Set 06'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
-output:
-  html_document:
+format:
+  html:
     toc: true
-    toc_depth: 4
+    toc_depth: 2
     toc_float: true
+    embed-resources: true
 ---
 
 ```{r}
@@ -35,7 +36,7 @@ Remember that, almost always, $\theta_{null}$ is 0 (the default for linear model
 
 ### Activity
 
-We want to first do a simulation to better understand what the *P*-value in the summary represents. Keep in mind that, for science that we do typically, we do not have the ability to do this kind of simulation where we know the answer ahead of time. 
+We want to first do a simulation to better understand what the *P*-value in the summary represents. Keep in mind that, for science that we do typically, we do not have the ability to do this kind of simulation where we know the answer ahead of time.
 
 We can use simulations to explore how statistical models behave under controlled conditions. When simulations give us the answer that we know is there (because we set up the simulation to begin with), it gives us confidence that the same process will work in the real world with real data where we don't know the answer.
 
@@ -44,28 +45,20 @@ Start by generating two sets of n = 20 random numbers drawn from normal distribu
 I have set the seed for you, so that our answers will match.
 
 ```{r}
-# FIXME
-
 set.seed(4578)
 
-x1 <- rnorm(20, mean = 5, sd = 0.9)
-x2 <- rnorm(20, mean = 6, sd = 0.9)
+
 ```
 
 Calculate the mean of each group and the difference in the means (`x1_mean - x2_mean`). Assign the difference to a variable `d_obs`.
 
 ```{r}
-# FIXME
 
-(x1_mean <- mean(x1))
-(x2_mean <- mean(x2))
-
-(d_obs <- x1_mean - x2_mean)
 ```
 
 What are the means and observed difference in the means between `x1` and `x2`?
 
-> The mean of x1 is 4.67 and of x2 5.90. The difference is -1.22.
+>
 
 
 The code block below carries out a randomization to generate a distribution of differences when x1 and x2 are randomly assigned. Read through the code and the comments, and be sure you understand what each step is doing.
@@ -73,7 +66,7 @@ The code block below carries out a randomization to generate a distribution of d
 Change `eval: false` to `eval: true`, and run the code. If you have named the variables `x1`, `x2`, and `d_obs`, then it should run without modification.
 
 ```{r}
-#| eval: true
+#| eval: false
 
 # Combine x1 and x2 into 1 vector
 x <- c(x1, x2)
@@ -89,11 +82,12 @@ d <- numeric(iters)
 d[1] <- d_obs
 
 # Run the randomization
-for (ii in 2:iters) {                      # Iterate from 2 to iters
-  x_shuffled <- sample(x, replace = FALSE) # Shuffle all the elements of x
-  x1s <- x_shuffled[1:20]                  # Assign 1-20 to x1s
-  x2s <- x_shuffled[21:40]                 # Assign 11-40 to x2s
-  d[ii] <- mean(x1s) - mean(x2s)           # Assign the difference of means to the iith position of d
+for (ii in 2:iters) {
+    # Iterate from 2 to iters
+    x_shuffled <- sample(x, replace = FALSE) # Shuffle all the elements of x
+    x1s <- x_shuffled[1:20] # Assign 1-20 to x1s
+    x2s <- x_shuffled[21:40] # Assign 11-40 to x2s
+    d[ii] <- mean(x1s) - mean(x2s) # Assign the difference of means to the iith position of d
 }
 ```
 
@@ -102,15 +96,12 @@ Now we have a vector of 10,000 differences. The first position holds the observe
 Make a histogram of the differences.
 
 ```{r}
-# FIXME
 
-ggplot(tibble(d), aes(d)) +
-  geom_histogram(bins = 30)
 ```
 
-From just looking at the plot, what is the approximate mean value for the differences? 
+From just looking at the plot, what is the approximate mean value for the differences?
 
-> The distribution is centered on 0. So the mean is probably near 0.
+>
 
 
 To the plot above, add two vertical lines, one at the value of the observed difference and one at the same value but with the opposite sign. You can copy the code to make the histogram from the chunk above.
@@ -118,45 +109,34 @@ To the plot above, add two vertical lines, one at the value of the observed diff
 There are a few examples in the slides for Unit 6 that show you how to add a vertical line. Search for "geom_vline".
 
 ```{r}
-# FIXME
-
-ggplot(tibble(d), aes(d)) +
-  geom_histogram(bins = 30) +
-  geom_vline(xintercept = c(d_obs, abs(d_obs)), color = "hotpink", linewidth = 2)
 
 ```
 
 Just from looking at the plot, take a guess about how many times the randomized data returned a difference greater than the observed difference (i.e., more extreme). Remember to consider both tails.
 
-> Not many. Just a few points are outside of the vertical lines.
+>
 
 
 Add up the number of times that the random difference is less than or equal to the observed difference *or* greater than or equal to the opposite sign of the observed difference. I.e., you are summing up the counts in the tails of the distribution.
 
 ```{r}
-# FIXME
 
-sum(d <= d_obs | d >= abs(d_obs))
 ```
 
 Finally calculate the *P*-value for the test of equality of the two means. You can either divide the sum above by `iters` or use `mean()` instead of summing the inequalities.
 
 ```{r}
-# FIXME
 
-sum(d <= d_obs | d >= abs(d_obs)) / iters
-
-mean(d <= d_obs | d >= abs(d_obs))
 ```
 
 What is the *P*-value? This represents the probability that we would observe the difference of -1.22 or anything greater by chance alone.
 
-> P = 0.0003.
+>
 
 
 How likely is it that you would observe a difference like this by chance?
 
-> Very unlikely. Only 3 times in 10000 (2 plus the one we observed).
+>
 
 
 So far we have determined the *P*-value for the difference by simulation. Notice that we did not calculate a *t*-statistic at all -- only the difference in the means between the two groups.
@@ -166,27 +146,20 @@ We want to fit a linear model to these data and compare. To do that, we first ne
 Create a tibble with the combined observations `x1` and `x2` as one variable just called `x`. Also create a grouping variable, e.g., a variable called "Grp" with values "x1" and "x2", which is repeated 20 times each. Look at the help for `rep()` for suggestions. Check that your tibble is correct.
 
 ```{r}
-# FIXME
 
-DD <- tibble(x, 
-             Grp = rep(c("x1", "x2"), each = 20))
-DD
 ```
 
 Finally, fit a linear model where `x` is predicted by the new grouping variable. Print the summary of the linear model.
 
 ```{r}
-# FIXME
 
-fm <- lm(x ~ Grp, data = DD)
-summary(fm)
 ```
 
 This is the same linear model that we used in PS 5.
 
 Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grpx2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
 
-> They are very close but not exact. For the linear model the *P*-value is 0.000126, and for the randomization it was 0.0003. For that, we only used 10000 iterations. Maybe more iterations would be more exact. Also we didn't do exactly the same test, so it's not realistic to find an exact match. If we chose another seed, we would get slightly different results, but still very close to the linear model.
+>
 
 
 ## Stalk-eyed flies
@@ -198,10 +171,7 @@ In Problem Set 5 we analyzed a data set where the eye span of stalk-eyed flies w
 Import the `Stalkies.csv` as in PS 5. Feel free to copy your code or the code from the key.
 
 ```{r}
-# FIXME
 
-stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |> 
-  mutate(food_source = factor(food_source))
 ```
 
 #### Exact CIs vs. approximate CIs
@@ -211,30 +181,17 @@ Calculate the approximate and exact 95% confidence intervals for the means of th
 For the exact confidence interval, you will need to calculate the appropriate *t*-statistic, using the right degrees of freedom for each group separately (consider these as separate confidence intervals). Be sure to use a positive value for *t*, or your CI limits will be reversed.
 
 ```{r}
-# FIXME
 
-SEM <- function(x) {sd(x) / sqrt(length(x))}
-
-stalk |> 
-  group_by(food_source) |> 
-  summarize(mean_ES = mean(eye_span),
-            SEM_ES = SEM(eye_span),
-            Approx_Lo = mean_ES - 2 * SEM_ES,
-            Approx_Hi = mean_ES + 2 * SEM_ES,
-            df = length(eye_span) - 1,
-            t_crit = abs(qt(p = 0.025, df = df)),
-            Exact_Lo = mean_ES - t_crit * SEM_ES,
-            Exact_Hi = mean_ES + t_crit * SEM_ES)
 ```
 
 How do the exact and approximate CIs compare for this dataset?
 
-> They are pretty close to 2 digits. Only one of the four bounds differs.
+>
 
 
 For the example we looked at in class, undulation rate in flying snakes, the difference in the two CIs was quite large. How do you explain the close similarity here?
 
-> The sample sizes are much larger here.
+>
 
 
 #### Tests of means
@@ -247,15 +204,12 @@ Return to the linear model you fit for PS 5. Those instructions were:
 Copy the code here and execute it.
 
 ```{r}
-# FIXME
 
-fm <- lm(eye_span ~ food_source, data = stalk)
-summary(fm)
 ```
 
 Interpret the *P*-values for the two parameter estimates: `(Intercept)` and `food_sourceCotton`. What hypothesis tests do these values represent? How likely was each parameter estimate to have arisen by chance alone?
 
-> The *P*-values are both very small: 10^-16 and 7 x 10^-10 for the intercept and the difference between the means of the corn and cotton group. Both *P*-values represent tests that the coefficients are equal to zero. It's not useful to compare the mean of the corm group to zero, so that very small *P*-value is of little interest. The *P*-value for `food_sourceCotton` tests whether the difference between the means of the corn and cotton groups is different from zero. This is a test we are interested in. In this case, the difference is likely different, because there is only a very small chance that the difference arose by chance alone.
+>
 
 
 #### Using `confint()`
@@ -265,16 +219,12 @@ R has a very useful function for calculating confidence intervals for parameter 
 Pass the linear model object you saved to the `confint()` function.
 
 ```{r}
-# FIXME
 
-confint(fm)
 ```
 
 What are the 95% confidence intervals for the "Intercept" and for the difference? Does the intercept agree with the corn CI you calculate above? If it does not, why do you think that might be? Does the difference CI make sense when interpreted in the context of the hypothesis test above?
 
-> The 95% CI for the intercept (i.e., corn group mean) is 1.95 - 2.14. The difference is -0.63 - -0.37. The CI for corn is different and wider here. This is not unexpected, because these two confidence intervals don't really represent the same thing. The CI for corn in isolation that you calculated above does not have in influence from the cotton points, whereas in the linear model it does. If you compare the standard errors, you see that the SE of the mean is 0.016, but the standard error of the Intercept parameter estimate is 0.047. So there is much more uncertainty in the parameter estimate, which is reflected in the wider CI. So in general, they should be close but not exact. 
-
-> The CI for the difference does not overlap with zero (and is very far from zero), which agrees with the *P*-value of 7 x 10^-10.
+>
 
 
 ## Lion noses
@@ -286,53 +236,41 @@ In PS 4, we looked at a data set where lion age was related to the proportion of
 Import the `LionAges.csv` data as you did in PS 4 and make a scatterplot of age regressed on proportion of black. Feel free to copy your code over.
 
 ```{r}
-# FIXME
 
-LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
-
-ggplot(LA, aes(y = age, x = proportion.black)) +
-  geom_point(size = 4, color = "navy") +
-  scale_x_continuous(limits = c(0, 1)) +
-  scale_y_continuous(breaks = 1:14) +
-  labs(x = "Proportion Black", y = "Age (y)")
 ```
 
 Copy over the linear model you fit where age is modeled by proportion of black.
 
 ```{r}
-# FIXME
 
-fm <- lm(age ~ proportion.black,
-         data = LA)
-summary(fm)
 ```
 
 
 What are the slope and the intercept for the OLS regression line?
 
-> The slope is 10.6 and the intercept is 0.879.
+>
 
 
 What is you interpretation of the intercept of the regression in biological terms?
 
-> A lion with no black coloring on its nose is 0.88 years old.
+>
 
 
 What is you interpretation of the slope of the regression in mathematical terms?
 
-> For a 1 unit increase in proportion black, age increases by 10.6 years.
+>
 
 
 What hypothesis test do the *t*-value and the *P*-value for the `proportion.black` coefficient of 10.6 represent?
 
-> They test the hypothesis that the slope equals zero.
+>
 
 
 Is a slope of 10.6 likely to be observed by chance for these data?
 
-> No - the *P*-value is very small: 7 x 10^-8.
+>
 
 
 Is proportion of black coloring a good predictor of age in lions?
 
-> It appears so based on these data.
+>
