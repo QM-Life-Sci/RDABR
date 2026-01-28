@@ -2,11 +2,12 @@
 title: 'Problem Set 04'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
-output:
-  html_document:
+format:
+  html:
     toc: true
-    toc_depth: 3
+    toc_depth: 2
     toc_float: true
+    embed-resources: true
 ---
 
 ```{r}
@@ -51,8 +52,8 @@ head(x)
 cor(x[, "V1"], x[, "V2"])
 
 P <- ggplot(as_tibble(x), aes(V1, V2)) +
-  geom_point(alpha = 0.25, color = "firebrick") +
-  coord_equal()
+    geom_point(alpha = 0.25, color = "firebrick") +
+    coord_equal()
 
 ggMarginal(P, type = "histogram", fill = "firebrick")
 ```
@@ -66,21 +67,23 @@ Use the code block above to explore the relationship between the correlation and
 
 - Gradually change the correlation `r` to 0.1, 0.2, 0.5, 0.8, 0.9, 0.99. Rerun the code each time. Also try some negative correlations. You only need to change the one line: r <- 0.
 
-What happens to the *joint* distribution of V1 and V2 as the correlation moves away from 0 and gets closer to 1 or -1? 
+What happens to the *joint* distribution of V1 and V2 as the correlation moves away from 0 and gets closer to 1 or -1?
 
-> It gradually goes from looking like a fuzzy ball of points to a squished fuzzy ball of points. When r is positive it trends from lower left to upper right, when r is negative from upper left to lower right.
+>
 
 
 In the line `x <- rmvnorm(n = 1e4, mean = c(0, 0), sigma = sigma)`, we set the mean of the normal distribution for V1 and V2 (`mean = c(0, 0)`). Change the values for the means and see how the correlation changes.
 
 How does the pattern change when you change the mean(s)?
 
-> The x and/or y axis labels change, but the overall pattern and the resulting correlations do not change.
+>
+
 
 
 What does this result tell you about the correlation between two variables?
 
-> Correlation is independent of the mean. The mean can change but the correlation remains the same.
+>
+
 
 
 # Simulating OLS regression
@@ -97,9 +100,13 @@ Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
 M <- tibble(X, Y)
 
 ggplot(M, aes(X, Y)) +
-  geom_smooth(formula = y ~ x, method = "lm",
-              se = FALSE, color = "darkorange") +
-  geom_point(color = "navy", size = 3)
+    geom_smooth(
+        formula = y ~ x,
+        method = "lm",
+        se = FALSE,
+        color = "darkorange"
+    ) +
+    geom_point(color = "navy", size = 3)
 
 fm <- lm(Y ~ X + 1, data = M)
 summary(fm)
@@ -111,8 +118,8 @@ The important part of the summary to look at are these lines:
 
 ```
 Coefficients:
-            Estimate Std. Error t value Pr(>|t|)    
-(Intercept) -0.03541    2.31743  -0.015    0.988    
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept) -0.03541    2.31743  -0.015    0.988
 X            2.39525    0.22035  10.870 1.48e-11 ***
 ```
 
@@ -125,19 +132,23 @@ We will use this code block to explore how the functional relationship between a
 
 In the code block above, systematically change the following aspects of the simulation (but only change one thing at a time). For each, describe how the shape of the plot changes as well as the values for intercept and slope. Using factors of 10 will usually allow you to see the patterns.
 
-The slope of the line, by changing 2.3 to larger or smaller values.
+The slope of the line, by changing 2.3 to larger or smaller values
 
-> When the slope is small (0.1), there is no relationship, and the values fall far from the line. When the slope is large (20), the points fall very close to the line. Nonetheless, the slope estimate reported in the summary matches pretty well. The intercept doesn't change much.
+>
+
 
 
 The range of X, by changing its standard deviation
 
-> When X has a larger range (sd = 10), the points fall right on the line. When X has a small range (sd = 0.1), the points fall far from the line and the slope goes closer to 0. The intercept doesn't change very much.
+>
+
 
 
 The random noise parameter (`rnorm(n, mean = 1, sd = 1)`) by altering its mean and standard deviation.
 
-> Adding more noise via a higher mean changes the scale of the y axis, but the slope remains the same (and as expected at 2.3). Adding more noise via a larger standard deviation (sd = 10) moves the points away from the line and changes the slope and intercept. Reducing the noise (sd = 0.1), reduces the spread around the line and results in a slope near 2.3. 
+>
+
+
 
 # Going further
 
@@ -145,7 +156,8 @@ A pharmaceutical company is testing a new drug. They have data that shows a larg
 
 If the drug is approved for use, do you expect that all patients given the drug will respond the same (show improvement) and with the same magnitude. Why or why not?
 
-> Because of the large variation in both groups in the experimental testing data, we would expect to see a similar amount of variation in the response to the drug in a real population. Actually we might even expect to see a larger amount of variation when large numbers of people start taking the drug due to person-to-person differences. This pattern is one reason why often severe side-effects and reactions to new drug don't become apparent until after they are approved.
+>
+
 
 
 # Lion noses
@@ -160,11 +172,7 @@ The file `LionAges.csv` contains the data. Read the data into an R object. It ha
 - `proportion.black`: Proportion of the nose that is black (between 0 and 1).
 
 ```{r}
-# FIXME
 
-LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
-
-LA
 ```
 
 Make two scatter plots:
@@ -175,49 +183,39 @@ Make two scatter plots:
 Feel free to color the points, add axis titles, etc., as you wish.
 
 ```{r}
-# FIXME
 
-ggplot(LA, aes(x = age, y = proportion.black)) +
-  geom_point(size = 4, color = "navy") +
-  scale_y_continuous(limits = c(0, 1)) +
-  scale_x_continuous(breaks = 1:14)
-
-ggplot(LA, aes(y = age, x = proportion.black)) +
-  geom_point(size = 4, color = "navy") +
-  scale_x_continuous(limits = c(0, 1)) +
-  scale_y_continuous(breaks = 1:14)
 ```
 
 Use the `lm()` function to fit a regression where age is predicted by proportion black. Assign the model to a variable. Then generate the `summary()`
 
 ```{r}
-# FIXME
 
-fm <- lm(age ~ proportion.black,
-         data = LA)
-summary(fm)
 ```
 
 What are the slope and the intercept for the best fit line?
 
-> The slope is 10.6 and the intercept is 0.879.
+>
 
 
 What is you interpretation of the slope of the regression in mathematical terms?
 
-> For a 1 unit increase in proportion black, age increases by 10.6 years.
+>
+
 
 Why is the slope so large?
 
-> Age is restricted to the range 0 to 1, so the slope of age must be large to accommodate a change from 1-13 years in 1 unit of proportion black.
+>
+
 
 When we regress age on proportion black, what we are saying is that we know the proportion and want to predict age. Does that make sense in this situation?
 
-> It might be useful to predict age from a photo, so this seems to make sense.
+>
+
 
 How would the interpretation differ if you regressed proportion black on age?
 
-> In this case, we would be trying to predict the peoportion from the age. That is to say we would already know the age and be trying to determine the proportion. Depending on the scientific question that might make sense. Or maybe not.
+>
+
 
 
 # Possum head size
@@ -233,16 +231,13 @@ Here is a photograph:
 Load the `possum.csv` data set.
 
 ```{r}
-# FIXME
 
-MBP <- read_csv("../data/possum.csv", show_col_types = FALSE)
-
-glimpse(MBP)
 ```
 
 What columns does the data contain? See if you can decipher from the column names what they represent. What types are they?
 
-> `site`: A number representing the site the animal was trapped at; `pop`: Character representing the trapping location (Vic or other); `sex`: Character sec of the animal; `age`: Numeric age of the animal; `skull_l`, `skull_w`: Numeric measures of skull length and width; `total_l`: Numeric total length of the possum; `tail_l`: Numeric length of the tail
+>
+
 
 Make two plots, with points colored by sex in each:
 
@@ -252,21 +247,7 @@ Make two plots, with points colored by sex in each:
 Feel free to add axis labels, etc. Length and width measurements are in millimeters.
 
 ```{r}
-# FIXME
 
-library(ggsci)
-
-ggplot(MBP, aes(age, skull_l, color = sex)) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
-  scale_color_aaas() +
-  labs(x = "Age (y)", y = "Skull Length (mm)")
-
-ggplot(MBP, aes(age, skull_w, color = sex)) +
-  geom_point(size = 3) +
-  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
-  scale_color_aaas() +
-  labs(x = "Age (y)", y = "Skull Width (mm)")
 ```
 
 You will get a couple of warning messages from ggplot:
@@ -274,31 +255,30 @@ You will get a couple of warning messages from ggplot:
 ```
 Warning messages:
 1: Removed 2 rows containing non-finite outside the scale range
-(`stat_smooth()`). 
+(`stat_smooth()`).
 2: Removed 2 rows containing missing values or values outside the scale range
-(`geom_point()`). 
+(`geom_point()`).
 ```
 
 See if you can determine what these messages mean.
 
-> There are missing data.
+>
+
 
 What patterns do you observe in the plot of **skull length vs. age** with respect to age and sex?
 
-> As the animals get older, skull length increases. Males appear to grow faster than females.
+>
+
 
 What patterns do you observe in the plot of **skull width vs. age** with respect to age and sex?
 
-> As males age, skull width increases. But for females, skull width appears to be roughly constant.
+>
 
 
 Split the data into two separate tibbles one for females and one for males, by filtering on sex. For an example, see lecture 3-1, where we filtered the NHANES data.
 
 ```{r}
-# FIXME
 
-MBP_f <- MBP |> filter(sex == "f")
-MBP_m <- MBP |> filter(sex == "m")
 ```
 
 For each sex:
@@ -309,23 +289,17 @@ For each sex:
 You will have 4 regressions. You can either assign the regression to an object or simply pipe (`>|`) the `lm()` to `summary()`.
 
 ```{r}
-# FIXME
 
-lm(skull_l ~ age, data = MBP_f) |> summary()
-lm(skull_l ~ age, data = MBP_m) |> summary()
-
-lm(skull_w ~ age, data = MBP_f) |> summary()
-lm(skull_w ~ age, data = MBP_m) |> summary()
 ```
 
 How do the slopes compare between females and males for **skull length**? Does this agree with the plot you made above?
 
-> The slope for females is 0.368 and for males is 0.791. Both slopes are positive, and the slope for males is larger. This is the pattern in the plot.
+>
 
 
 How do the slopes compare between females and males for **skull width**? Does this agree with the plot you made above?
 
-> The slope for females is 0.082 and for males is 0.773. The slope for females is near zero, which is what it appears to be in the plot. The slope for males is positive and much larger. So again this agrees with the plot.
+>
 
 
 In the coming weeks, we will learn how to test whether there is a difference in the slopes between males and females.
