@@ -46,7 +46,7 @@ ggplot2::theme_set(cowplot::theme_cowplot())
 ::: {.column width="50%"}
 **Dr. Elizabeth King** (she/her)
 
-- Grew up in Southeastern Wisconsin (until 7th grade) $\rightarrow$ Chicagoland
+- Grew up in Southeastern Wisconsin (until 7th grade) $\rightarrow$ Chicago-land
 - Iowa (4 years) $\rightarrow$ California (10 years) $\rightarrow$ Missouri (12 years)
 - MU 12 years in Biology
 :::
