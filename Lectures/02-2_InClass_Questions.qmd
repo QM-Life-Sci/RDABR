@@ -1,0 +1,60 @@
+---
+title: "Unit 2: Reproducibility and Distributions"
+subtitle: "Discussion Questions"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: print
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+theme_set(theme_classic(base_size = 20))
+```
+
+
+## Reproducibility
+
+> If you are trying to create reproducible research, are repeated trials in your experiment enough to prove it is reliable, or is replication among other researchers still needed? 
+
+## Distributions
+
+> Will we be using non-binomial distributions in this course? 
+
+> We talked about how simulating data can be useful, but the probability was always 50/50. Is it still useful simulating data when the probability is not 50/50? 
+
+
+## Mistakes
+
+> What are the most common mistakes other students have made in the past when you were teaching similar content to this course? 
+
+## R Coding
+
+> When bringing over the data from the classes land vs water, how did you bring that data over into Swirl? Did you copy and paste it? 
+
+> Is lecture gonna be the same throughout the semester where it is more data concepts or will we be working together for the programming and problem set type examples?
+
+> Are there specific guidelines that you adhere to when writing code, other than to leave white space, to ensure it is easier to read?
+
+> What seems to be the hardest part of coding in general? 
+
+> Does programming/coding ever get “easy”?
+
+
+
+
+
+
+
