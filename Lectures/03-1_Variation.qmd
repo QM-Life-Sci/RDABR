@@ -60,9 +60,9 @@ theme_set(theme_classic(base_size = 20))
 
 ```{r}
 ds <- read_csv(
-    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Datasaurus_data.csv",
-    col_names = c("x1", "x2"),
-    show_col_types = FALSE
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Datasaurus_data.csv",
+  col_names = c("x1", "x2"),
+  show_col_types = FALSE
 )
 knitr::kable(ds)
 ```
@@ -72,12 +72,12 @@ knitr::kable(ds)
 
 ```{r}
 ds |>
-    summarize(across(
-        .cols = everything(),
-        .fns = list(Mean = mean, `Std. Dev.` = sd)
-    )) |>
-    mutate(across(.fns = round, digits = 2)) |>
-    knitr::kable()
+  summarize(across(
+    .cols = everything(),
+    .fns = list(Mean = mean, `Std. Dev.` = sd)
+  )) |>
+  mutate(across(.fns = round, digits = 2)) |>
+  knitr::kable()
 ```
 
 . . .
@@ -96,11 +96,11 @@ with(ds, cor.test(x1, x2))
 #| fig-alt: "Scatterplot that looks like a dinosaur."
 
 ggplot(ds, aes(x = x1, y = x2)) +
-    geom_point(color = "navy") +
-    scale_x_continuous(limits = c(0, 100)) +
-    scale_y_continuous(limits = c(0, 100)) +
-    coord_fixed() +
-    labs(caption = expression(paste("Alberto Cairo's ", italic("Datasaurus"))))
+  geom_point(color = "navy") +
+  scale_x_continuous(limits = c(0, 100)) +
+  scale_y_continuous(limits = c(0, 100)) +
+  coord_fixed() +
+  labs(caption = expression(paste("Alberto Cairo's ", italic("Datasaurus"))))
 ```
 
 
@@ -115,11 +115,11 @@ ggplot(ds, aes(x = x1, y = x2)) +
 set.seed(38479238)
 
 DD <- tibble(
-    weight = c(rnorm(50, 5, 1), rnorm(40, 5.5, 1), rnorm(10, 15, 2)),
-    group = rep(c("Control", "Treatment"), each = 50),
-    year = rep(c(1, 2, 3, 5, 4), each = 10, times = 2)
+  weight = c(rnorm(50, 5, 1), rnorm(40, 5.5, 1), rnorm(10, 15, 2)),
+  group = rep(c("Control", "Treatment"), each = 50),
+  year = rep(c(1, 2, 3, 5, 4), each = 10, times = 2)
 ) |>
-    mutate(year = factor(year))
+  mutate(year = factor(year))
 ```
 
 ```{r}
@@ -142,8 +142,8 @@ DD |> knitr::kable(digits = 2)
 DD |> count(group)
 
 DD |>
-    group_by(group) |>
-    summarize(mean = mean(weight))
+  group_by(group) |>
+  summarize(mean = mean(weight))
 ```
 
 . . .
@@ -161,21 +161,21 @@ t.test(weight ~ group, data = DD)
 #| fig-alt: "Two-column plot of Weight by Group. The control group is a single cluster. The Treatment group has two clusters."
 
 DD |>
-    ggplot(aes(group, weight)) +
-    geom_point(
-        position = position_jitter(width = 0.2),
-        size = 3,
-        alpha = 0.75
-    ) +
-    stat_summary(fun = mean, geom = "point", size = 5, color = "steelblue") +
-    stat_summary(
-        fun.data = mean_se,
-        geom = "errorbar",
-        width = 0.1,
-        color = "steelblue",
-        linewidth = 1
-    ) +
-    labs(x = "Group", y = "Weight (g)")
+  ggplot(aes(group, weight)) +
+  geom_point(
+    position = position_jitter(width = 0.2),
+    size = 3,
+    alpha = 0.75
+  ) +
+  stat_summary(fun = mean, geom = "point", size = 5, color = "steelblue") +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1,
+    color = "steelblue",
+    linewidth = 1
+  ) +
+  labs(x = "Group", y = "Weight (g)")
 ```
 
 
@@ -186,22 +186,22 @@ DD |>
 #| fig-alt: "Two-column plot of Weight by Group. The control group is a single cluster. The Treatment group has two clusters where all the points in oue group are from the same year."
 
 DD |>
-    ggplot(aes(group, weight, color = year)) +
-    geom_point(
-        position = position_jitter(width = 0.2),
-        size = 3,
-        alpha = 0.75
-    ) +
-    stat_summary(fun = mean, geom = "point", size = 5, color = "black") +
-    stat_summary(
-        fun.data = mean_se,
-        geom = "errorbar",
-        width = 0.1,
-        color = "black",
-        linewidth = 1
-    ) +
-    scale_color_brewer(type = "qual", name = "Year", palette = "Set1") +
-    labs(x = "Group", y = "Weight (g)")
+  ggplot(aes(group, weight, color = year)) +
+  geom_point(
+    position = position_jitter(width = 0.2),
+    size = 3,
+    alpha = 0.75
+  ) +
+  stat_summary(fun = mean, geom = "point", size = 5, color = "black") +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1,
+    color = "black",
+    linewidth = 1
+  ) +
+  scale_color_brewer(type = "qual", name = "Year", palette = "Set1") +
+  labs(x = "Group", y = "Weight (g)")
 
 ```
 
@@ -246,7 +246,7 @@ str(iris)
 
 library(tidyverse)
 ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point()
+  geom_point()
 ```
 
 - `ggplot()` sets up the plot using `iris` data.
@@ -276,7 +276,7 @@ library(tidyverse)
 theme_set(theme_classic(base_size = 20)) # Preferred ggplot theme
 
 ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point()
+  geom_point()
 ```
 
 - `data =` is optional and often omitted if the data is the first argument to the function
@@ -288,7 +288,7 @@ ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
 #| fig-alt: "Scatterplot of Petal Width vs. Petal length showing a positive relationship."
 
 ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
-    geom_point()
+  geom_point()
 ```
 
 
@@ -302,7 +302,7 @@ ggplot(data = iris, aes(x = Petal.Length, y = Petal.Width)) +
 #| fig-alt: "Histogram of Petal Length showing two clusters of bars."
 
 ggplot(iris, aes(x = Petal.Length)) +
-    geom_histogram()
+  geom_histogram()
 ```
 
 - Using `geom_histogram()` instead of `geom_point()`
@@ -316,7 +316,7 @@ ggplot(iris, aes(x = Petal.Length)) +
 #| fig-alt: "Scatterplot of Petal Width vs. Petal length colored by Species. The species appear to cluster."
 
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
-    geom_point(size = 3)
+  geom_point(size = 3)
 ```
 
 - `color = Species` colors points by the `Species` column (a factor)
@@ -330,7 +330,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
 #| fig-alt: "Scatterplot of Petal Width vs. Petal length with point shape by Species. The species appear to cluster."
 
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, shape = Species)) +
-    geom_point(size = 3)
+  geom_point(size = 3)
 ```
 
 - `shape = Species` encodes _Species_ by the point shape
@@ -344,7 +344,7 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width, shape = Species)) +
 #| fig-alt: "Scatterplot of Petal Width vs. Petal length colored by Species. The species appear to cluster. The point size is larger."
 
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, shape = Species)) +
-    geom_point(size = 5)
+  geom_point(size = 5)
 
 ```
 
@@ -360,8 +360,8 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width, shape = Species)) +
 
 library(wesanderson)
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
-    geom_point(size = 3) +
-    scale_color_manual(values = wes_palette("Moonrise2"))
+  geom_point(size = 3) +
+  scale_color_manual(values = wes_palette("Moonrise2"))
 ```
 
 - Add an interesting color palette
@@ -378,8 +378,8 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
 
 library(viridis)
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
-    geom_point(size = 3) +
-    scale_color_viridis(discrete = TRUE, option = "viridis")
+  geom_point(size = 3) +
+  scale_color_viridis(discrete = TRUE, option = "viridis")
 ```
 
 - `library(viridis)` works for colorblind and grayscale friendly images.
@@ -418,14 +418,14 @@ Accessible palettes
 #| fig-alt: "Scatterplot of Petal Width vs. Petal length with point color by Species and additional custom axis labels and caption."
 
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
-    geom_point(size = 3) +
-    scale_color_viridis(discrete = TRUE, option = "viridis") +
-    labs(
-        x = "Petal Length (cm)",
-        y = "Petal Width (cm)",
-        title = "Irises",
-        caption = "Anderson (1935)"
-    )
+  geom_point(size = 3) +
+  scale_color_viridis(discrete = TRUE, option = "viridis") +
+  labs(
+    x = "Petal Length (cm)",
+    y = "Petal Width (cm)",
+    title = "Irises",
+    caption = "Anderson (1935)"
+  )
 ```
 
 - Add a main title and better axis titles
@@ -439,15 +439,15 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
 #| fig-alt: "Scatterplot of Petal Width vs. Petal length with point color by Species and additional custom axis labels and ticks and a caption."
 
 ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
-    geom_point(size = 3) +
-    scale_color_viridis(discrete = TRUE, option = "viridis") +
-    scale_x_continuous(breaks = seq(1, 7, by = 0.5)) +
-    labs(
-        x = "Petal Length (cm)",
-        y = "Petal Width (cm)",
-        title = "Irises",
-        caption = "Anderson (1935)"
-    )
+  geom_point(size = 3) +
+  scale_color_viridis(discrete = TRUE, option = "viridis") +
+  scale_x_continuous(breaks = seq(1, 7, by = 0.5)) +
+  labs(
+    x = "Petal Length (cm)",
+    y = "Petal Width (cm)",
+    title = "Irises",
+    caption = "Anderson (1935)"
+  )
 ```
 
 - `scale_x_continuous()` controls the axis ticks and tick labels
@@ -465,23 +465,23 @@ ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
 #| fig-alt: "Plot of height vs. age for 6465 individuals from the NHANES dataset."
 
 NHANES <- read_csv(
-    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/NHANES.csv",
-    show_col_types = FALSE
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/NHANES.csv",
+  show_col_types = FALSE
 ) |>
-    filter(Sex == "Male") |>
-    select(-Sex) |>
-    arrange(Height)
+  filter(Sex == "Male") |>
+  select(-Sex) |>
+  arrange(Height)
 
 ggplot(NHANES, aes(x = Age, y = Height)) +
-    geom_point(
-        size = 1,
-        show.legend = FALSE,
-        alpha = 0.25,
-        position = position_jitter(width = 0.25, seed = 3847293),
-        color = "firebrick4"
-    ) +
-    scale_x_continuous(breaks = seq(0, 80, by = 5)) +
-    labs(x = "Age (y)", y = "Height (cm)")
+  geom_point(
+    size = 1,
+    show.legend = FALSE,
+    alpha = 0.25,
+    position = position_jitter(width = 0.25, seed = 3847293),
+    color = "firebrick4"
+  ) +
+  scale_x_continuous(breaks = seq(0, 80, by = 5)) +
+  labs(x = "Age (y)", y = "Height (cm)")
 ```
 
 
@@ -493,9 +493,9 @@ ggplot(NHANES, aes(x = Age, y = Height)) +
 NHANES_20 <- NHANES |> filter(Age > 20)
 
 ggplot(NHANES_20, aes(Height)) +
-    geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
-    labs(x = "Height (cm)", y = "Count") +
-    scale_x_continuous(breaks = seq(140, 200, by = 10))
+  geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
+  labs(x = "Height (cm)", y = "Count") +
+  scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -511,9 +511,9 @@ What do you think the distribution will look like?
 NHANES_40 <- NHANES |> filter(Age > 35.5 & Age < 40.5)
 
 ggplot(NHANES_40, aes(Height)) +
-    geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
-    labs(x = "Height (cm)", y = "Count") +
-    scale_x_continuous(breaks = seq(140, 200, by = 10))
+  geom_histogram(bins = 30, show.legend = FALSE, fill = "firebrick4") +
+  labs(x = "Height (cm)", y = "Count") +
+  scale_x_continuous(breaks = seq(140, 200, by = 10))
 ```
 
 
@@ -540,12 +540,12 @@ x <- rbinom(n = 10000, size = 10, prob = 0.5)
 x_tab <- table(x)
 
 ggplot(
-    data = tibble(Count = as.numeric(x_tab), Successes = 0:10),
-    aes(x = Successes, y = Count)
+  data = tibble(Count = as.numeric(x_tab), Successes = 0:10),
+  aes(x = Successes, y = Count)
 ) +
-    geom_bar(stat = "identity", fill = "navy") +
-    scale_x_continuous(breaks = 0:10) +
-    labs(x = "n Successes in 10 Trials")
+  geom_bar(stat = "identity", fill = "navy") +
+  scale_x_continuous(breaks = 0:10) +
+  labs(x = "n Successes in 10 Trials")
 ```
 
 
@@ -693,8 +693,8 @@ What do you think the histogram will look like?
 #| fig-alt: "Histogram of Taller SNPs showing an approximate normal distribution centered on about 1650 SNPs."
 
 ggplot(data = tibble(x), aes(x)) +
-    geom_histogram(bins = 30, fill = "skyblue") +
-    labs(x = "Number of Taller SNPs", y = "Count")
+  geom_histogram(bins = 30, fill = "skyblue") +
+  labs(x = "Number of Taller SNPs", y = "Count")
 ```
 
 
@@ -719,9 +719,9 @@ What are your ideas?
 exact_prob <- tibble(x = 0:SNPs, y = dbinom(x, SNPs, prob = 0.5))
 
 ggplot(exact_prob, aes(x, y)) +
-    geom_bar(stat = "identity", color = "navy") +
-    scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
-    labs(x = "Number of Taller SNPs", y = "Probability")
+  geom_bar(stat = "identity", color = "navy") +
+  scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
+  labs(x = "Number of Taller SNPs", y = "Probability")
 ```
 
 
@@ -733,9 +733,9 @@ ggplot(exact_prob, aes(x, y)) +
 exact_prob <- tibble(x = 0:SNPs, y = dbinom(x, SNPs, prob = 0.5))
 
 ggplot(exact_prob, aes(x, y)) +
-    geom_bar(stat = "identity", color = "navy") +
-    scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
-    labs(x = "Number of Taller SNPs", y = "Probability")
+  geom_bar(stat = "identity", color = "navy") +
+  scale_x_continuous(breaks = seq(0, 3290, by = 500)) +
+  labs(x = "Number of Taller SNPs", y = "Probability")
 ```
 
 
@@ -745,9 +745,9 @@ ggplot(exact_prob, aes(x, y)) +
 exact_prob <- tibble(x = 1550:1750, y = dbinom(x, SNPs, prob = 0.5))
 
 ggplot(exact_prob, aes(x, y)) +
-    geom_bar(stat = "identity", color = "navy") +
-    scale_x_continuous(breaks = seq(1550, 1750, by = 50)) +
-    labs(x = "Number of Taller SNPs", y = "Probability")
+  geom_bar(stat = "identity", color = "navy") +
+  scale_x_continuous(breaks = seq(1550, 1750, by = 50)) +
+  labs(x = "Number of Taller SNPs", y = "Probability")
 ```
 
 
@@ -797,7 +797,7 @@ $$
 #| echo: true
 
 Normal <- function(x, mu, sigma) {
-    (1 / (sqrt(2 * pi * sigma^2))) * exp((-1 * (x - mu)^2) / (2 * sigma^2))
+  (1 / (sqrt(2 * pi * sigma^2))) * exp((-1 * (x - mu)^2) / (2 * sigma^2))
 }
 
 Normal(x = 1, mu = 0, sigma = 1)
@@ -823,8 +823,8 @@ Calculate the probability across the range $-3$ to $3$ for $\mu = 0$ and $\sigma
 ```{r}
 #| echo: true
 Std_Normal <- tibble(
-    x = seq(-3, 3, length.out = 100),
-    Probability = dnorm(x, mean = 0, sd = 1)
+  x = seq(-3, 3, length.out = 100),
+  Probability = dnorm(x, mean = 0, sd = 1)
 )
 ```
 
@@ -835,19 +835,19 @@ Plot the probability as a line:
 #| eval: false
 
 ggplot() +
-    geom_line(
-        data = Std_Normal,
-        aes(x, Probability),
-        color = "salmon",
-        linewidth = 1.5
-    ) +
-    geom_point(
-        aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
-        size = 4,
-        color = "darkgreen"
-    ) +
-    scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
-    scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+  geom_line(
+    data = Std_Normal,
+    aes(x, Probability),
+    color = "salmon",
+    linewidth = 1.5
+  ) +
+  geom_point(
+    aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
+    size = 4,
+    color = "darkgreen"
+  ) +
+  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
 
 
@@ -857,19 +857,19 @@ ggplot() +
 #| fig-alt: "Plot of the probability density distribution of a standard normal distribution with a point at x = 1 lying on the line."
 
 ggplot() +
-    geom_line(
-        data = Std_Normal,
-        aes(x, Probability),
-        color = "salmon",
-        linewidth = 1.5
-    ) +
-    geom_point(
-        aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
-        size = 5,
-        color = "darkgreen"
-    ) +
-    scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
-    scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+  geom_line(
+    data = Std_Normal,
+    aes(x, Probability),
+    color = "salmon",
+    linewidth = 1.5
+  ) +
+  geom_point(
+    aes(x = 1, y = dnorm(x = 1, mean = 0, sd = 1)),
+    size = 5,
+    color = "darkgreen"
+  ) +
+  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
 
 Area under the curve = 1 integrating $Pr[x]$ for $-\infty < x < \infty$
@@ -964,8 +964,8 @@ Number of lateral plates (plates) in threespine sticklebacks (*Gasterosteus acul
 
 ```{r}
 SticklebackPlates <- read_csv(
-    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
-    show_col_types = FALSE
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
+  show_col_types = FALSE
 )
 ```
 
@@ -980,10 +980,10 @@ knitr::kable(SticklebackPlates)
 #| fig-alt: "Histogram of number of plates in each of three genotypes: mm, Mm, and MM. Each genotype has a different shape of distribution."
 
 ggplot(SticklebackPlates, aes(x = plates)) +
-    geom_histogram(bins = 30, fill = "gray75") +
-    facet_grid(genotype ~ .) +
-    labs(x = "Number of Lateral Body Plates", y = "Count") +
-    theme(strip.text = element_text(face = "italic"))
+  geom_histogram(bins = 30, fill = "gray75") +
+  facet_grid(genotype ~ .) +
+  labs(x = "Number of Lateral Body Plates", y = "Count") +
+  theme(strip.text = element_text(face = "italic"))
 ```
 
 
@@ -993,8 +993,8 @@ ggplot(SticklebackPlates, aes(x = plates)) +
 #| echo: true
 
 SticklebackPlates |>
-    group_by(genotype) |>
-    summarize(mean_plate = mean(plates), median_plate = median(plates))
+  group_by(genotype) |>
+  summarize(mean_plate = mean(plates), median_plate = median(plates))
 ```
 
 How do the mean and median compare?
@@ -1006,17 +1006,17 @@ How do the mean and median compare?
 #| fig-alt: "Histogram of number of plates in each of three genotypes: mm, Mm, and MM. Each genotype has a different shape of distribution which is summaried by different values for the mean and median."
 
 M <- SticklebackPlates |>
-    group_by(genotype) |>
-    summarize(Mean = mean(plates), Median = median(plates), .groups = "drop") |>
-    gather(Value, x, -genotype)
+  group_by(genotype) |>
+  summarize(Mean = mean(plates), Median = median(plates), .groups = "drop") |>
+  gather(Value, x, -genotype)
 
 ggplot(SticklebackPlates, aes(x = plates, group = genotype)) +
-    geom_histogram(bins = 30, fill = "gray75") +
-    geom_vline(data = M, aes(xintercept = x, color = Value), linewidth = 2) +
-    scale_color_manual(values = c("firebrick4", "navyblue")) +
-    facet_grid(genotype ~ .) +
-    labs(x = "Number of Lateral Body Plates", y = "Count") +
-    theme(strip.text = element_text(face = "italic"))
+  geom_histogram(bins = 30, fill = "gray75") +
+  geom_vline(data = M, aes(xintercept = x, color = Value), linewidth = 2) +
+  scale_color_manual(values = c("firebrick4", "navyblue")) +
+  facet_grid(genotype ~ .) +
+  labs(x = "Number of Lateral Body Plates", y = "Count") +
+  theme(strip.text = element_text(face = "italic"))
 ```
 
 
@@ -1050,29 +1050,29 @@ $$\sigma = \sqrt{\frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}}$$
 #| fig-alt: "Probability density plot of the standard normal distribution with vertical bars for 1, 2, and 3 standard deviations."
 
 ggplot() +
-    geom_line(
-        data = Std_Normal,
-        aes(x, Probability),
-        color = "gray75",
-        linewidth = 1
-    ) +
-    geom_segment(
-        aes(x = c(-1, 1), xend = c(-1, 1), y = 0, yend = dnorm(x = c(-1, 1))),
-        color = "orange",
-        linewidth = 1.5
-    ) +
-    geom_segment(
-        aes(x = c(-2, 2), xend = c(-2, 2), y = 0, yend = dnorm(x = c(-2, 2))),
-        color = "darkgreen",
-        linewidth = 1.5
-    ) +
-    geom_segment(
-        aes(x = c(-3, 3), xend = c(-3, 3), y = 0, yend = dnorm(x = c(-3, 3))),
-        color = "navy",
-        linewidth = 1.5
-    ) +
-    scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
-    scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
+  geom_line(
+    data = Std_Normal,
+    aes(x, Probability),
+    color = "gray75",
+    linewidth = 1
+  ) +
+  geom_segment(
+    aes(x = c(-1, 1), xend = c(-1, 1), y = 0, yend = dnorm(x = c(-1, 1))),
+    color = "orange",
+    linewidth = 1.5
+  ) +
+  geom_segment(
+    aes(x = c(-2, 2), xend = c(-2, 2), y = 0, yend = dnorm(x = c(-2, 2))),
+    color = "darkgreen",
+    linewidth = 1.5
+  ) +
+  geom_segment(
+    aes(x = c(-3, 3), xend = c(-3, 3), y = 0, yend = dnorm(x = c(-3, 3))),
+    color = "navy",
+    linewidth = 1.5
+  ) +
+  scale_y_continuous(limits = c(0, 0.4), breaks = seq(0, 0.4, by = 0.05)) +
+  scale_x_continuous(breaks = seq(-3, 3, by = 0.5))
 ```
 
 
@@ -1094,7 +1094,7 @@ $$\sigma^2 = \frac{\sum^{n}_{i = 1}\left( x_i - \bar{x} \right)^2}{n}$$
 #| echo: true
 
 quantile(iris$Sepal.Length, probs = 0.75) -
-    quantile(iris$Sepal.Length, probs = 0.25)
+  quantile(iris$Sepal.Length, probs = 0.25)
 
 IQR(iris$Sepal.Length)
 ```
@@ -1146,8 +1146,8 @@ n <- 100 # <1>
 squares <- numeric(length = 100) # <2>
 
 for (ii in 1:n) {
-    # <3>
-    squares[ii] <- ii^2 # <4>
+  # <3>
+  squares[ii] <- ii^2 # <4>
 }
 
 squares
@@ -1172,8 +1172,8 @@ x <- rnorm(n = 1000, mean = 10, sd = 4)
 mean(x)
 
 ggplot(tibble(x), aes(x)) +
-    geom_histogram(bins = 30, fill = "coral") +
-    labs(y = "Count")
+  geom_histogram(bins = 30, fill = "coral") +
+  labs(y = "Count")
 ```
 
 
@@ -1190,8 +1190,8 @@ n_means <- 100
 sample_means <- numeric(n_means)
 
 for (ii in 1:n_means) {
-    s <- sample(x, size = sample_size, replace = FALSE) # <1>
-    sample_means[ii] <- mean(s)
+  s <- sample(x, size = sample_size, replace = FALSE) # <1>
+  sample_means[ii] <- mean(s)
 }
 ```
 
@@ -1217,8 +1217,8 @@ What will the distribution of sample *means* look like? What will the range be?
 #| fig-alt: "Distribution of the resampled means. The values are roughly normally distributed but narrower than the raw data."
 
 ggplot(tibble(sample_means), aes(sample_means)) +
-    geom_histogram(bins = 30, fill = "gold") +
-    labs(x = "Sample Mean", y = "Count")
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count")
 ```
 
 
