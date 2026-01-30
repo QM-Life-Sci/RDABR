@@ -30,10 +30,9 @@ theme_set(theme_classic(base_size = 20))
 
 ## Problem set
 
-- Turn in when you are ready
-- "Official" due date is Thursday
-- Do you want a week to complete problem sets?
-
+- Due date is Thursday (communicate if you need more time)
+- How is it going?
+- Slides about R basics
 
 ## Week three check in
 
