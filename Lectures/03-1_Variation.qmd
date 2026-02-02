@@ -48,7 +48,7 @@ theme_set(theme_classic(base_size = 20))
 4. What are you confident you understand?
 5. Do you feel comfortable asking questions during class? Why or why not?
 6. Do you feel supported in this class? If not, what would help?
-7. What’s one thing I could do to improve your learning experience?
+7. What’s one thing we could do to improve your learning experience?
 8. What’s something you’ve learned that has surprised you?
 
 
