@@ -48,8 +48,8 @@ theme_set(theme_classic(base_size = 20))
 4. What are you confident you understand?
 5. Do you feel comfortable asking questions during class? Why or why not?
 6. Do you feel supported in this class? If not, what would help?
-7. What’s one thing we could do to improve your learning experience?
-8. What’s something you’ve learned that has surprised you?
+7. What is one thing we could do to improve your learning experience?
+8. What is something you’ve learned that has surprised you?
 
 
 # Introduction to Data Visualization {background-color="#40666e"}
@@ -1002,7 +1002,7 @@ How do the mean and median compare?
 ## Mean is sensitive to extreme values
 
 ```{r}
-#| fig-alt: "Histogram of number of plates in each of three genotypes: mm, Mm, and MM. Each genotype has a different shape of distribution which is summaried by different values for the mean and median."
+#| fig-alt: "Histogram of number of plates in each of three genotypes: mm, Mm, and MM. Each genotype has a different shape of distribution which is summarized by different values for the mean and median."
 
 M <- SticklebackPlates |>
   group_by(genotype) |>
