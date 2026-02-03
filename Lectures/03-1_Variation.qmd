@@ -28,16 +28,24 @@ theme_set(theme_classic(base_size = 20))
 
 # Housekeeping {background-color="#40666e"}
 
+
 ## Problem set
 
 - Due date is Thursday (communicate if you need more time)
 - How is it going?
 - Slides about R basics
 
-## Week three check in
+
+## Three-week check in
 
 - Qualtrics survey that will be linked from Canvas (no assignment)
 - Optional, but we hope you will complete it
+- Available Thursday until Tuesday
+
+
+## Question for Thursday
+
+> If you could have any (not-flight) adaptation that any animal has, what would it be?
 
 
 ## Questions
