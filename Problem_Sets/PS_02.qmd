@@ -188,6 +188,20 @@ Create a `data.frame` or `tibble` with the following columns:
 If you use a `tibble()`, you will need to load the `tidyverse` package: `library(tidyverse)`. Typically, packages are loaded at the beginning of a script (e.g., the first `setup` chunk).
 
 ```{r}
+library(tidyverse)
+
+set.seed(15)
+
+dd <- tibble(Tx_Group = rep(c("control", "high"), each = 10),
+       Replicate = c(rep(c(1, 2), each = 5),
+                     rep(c(1, 2), each = 5)),
+       Productivity = c(rnorm(n = 10, mean = 5, sd = 2),
+                        rnorm(n = 10, mean = 8, sd = 2))
+       )
+
+ggplot(data = dd, aes(x = Tx_Group, y = Productivity, color = factor(Replicate))) +
+  geom_point()
+
 
 ```
 

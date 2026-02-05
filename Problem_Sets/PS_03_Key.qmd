@@ -236,7 +236,7 @@ The data we will work with are in the file `Silver_fir.csv`. We can read this in
 
 The code below is a minimal example of how to read data in. The first imports directly from a web address. The second (commented code) from a local file, assumed to be in the same directory as the current file.
 
-You can use either. Just comment the other out. If you use the second, make sure to place the file in the same folder as the Rmd.
+You can use either. Just comment the other out. If you use the second, make sure to place the file in the same folder as the qmd.
 
 ```{r}
 # FIXME
@@ -385,7 +385,7 @@ Compare the mean and the median across the populations. In this sample is the me
 
 # Intuition for distributions / summaries
 
-At the end of lecture 3-2, we used the Law of Large Numbers to show how the mean of a set of samples from a population is a good estimate of the population's mean. That code, condensed into one chunk is:
+In lecture 3, we used the Law of Large Numbers to show how the mean of a set of samples from a population is a good estimate of the population's mean. That code, condensed into one chunk is:
 
 ```{r}
 #| fig-alt: "Histogram of 1000 numbers with a mean of 10 and sd of 4 showing a largely normal distribution. The range is approximately 8 to 11."
@@ -423,7 +423,7 @@ mean(sample_means)
 
 ## Activity
 
-We left off in lecture with two questions:
+With this code as a starting point, we could ask two additional questions:
 
 1. What would change with larger sample sizes (~100) but the same number of iterations (100)?
 2. What would change with more iterations (1000) but the same sample size (20)?
@@ -432,7 +432,7 @@ What is your prediction for each question?
 
 > Your answer will vary.
 
-Copy the code above to answer each question. For simplicity, use the same set of random values created above.
+Copy the code above and modify the relevant values to answer each question above. For simplicity, use the same set of random values created above.
 
 ```{r}
 #| fig-alt: "Histogram of 1000 numbers with a mean of 10 and sd of 4 showing a largely normal distribution. The range is approximately 9 to 10.5."
