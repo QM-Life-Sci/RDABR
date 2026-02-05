@@ -692,6 +692,18 @@ What do you think the histogram will look like?
 :::
 
 
+## Question for Thursday
+
+> If you could have any (not-flight) adaptation that any animal has, what would it be?
+
+
+## Questions from Discussion Board & Plan for Today
+
+- How to turn in the problem set & your mammal!
+- Rendering & Scripts
+- Subsets
+- Basic functions
+
 ## Distribution of "Taller" SNPs
 
 ```{r}
@@ -760,6 +772,7 @@ ggplot(exact_prob, aes(x, y)) +
 
 # Questions {background-color="#f8c471"}
 
+# Problem Set - Get Ready to Code
 
 # Distributions {background-color="#40666e"}
 
