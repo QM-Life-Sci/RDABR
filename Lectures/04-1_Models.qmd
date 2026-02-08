@@ -198,10 +198,6 @@ The method you use for inference is part of the model.
 - Different sets of assumptions
 - Many will give very similar answers
 
-:::{.center}
-"clarifying the mapping from assumptions to inference to decision"^[https://statmodeling.stat.columbia.edu/2024/12/28/bayesian-inference-isnt-just-about-getting-the-answer-its-also-about-clarifying-the-mapping-from-assumptions-to-inference-to-decision/]
-:::
-
 
 ## Example: Wing Dimorphic Crickets
 
