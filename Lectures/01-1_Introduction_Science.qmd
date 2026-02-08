@@ -12,7 +12,6 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
