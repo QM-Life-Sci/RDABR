@@ -10,7 +10,6 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
@@ -28,69 +27,69 @@ library(ggExtra)
 theme_set(theme_classic(base_size = 20))
 
 ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
-    require(latex2exp)
-    n <- length(X)
-    pred <- (X * b + (mean(Y) - b * mean(X)))
-    SSy <- sum((Y - pred)^2)
+  require(latex2exp)
+  n <- length(X)
+  pred <- (X * b + (mean(Y) - b * mean(X)))
+  SSy <- sum((Y - pred)^2)
 
-    M <- tibble(X, Y, pred)
+  M <- tibble(X, Y, pred)
 
-    if (do.plot) {
-        p <- ggplot() +
-            geom_point(
-                data = tibble(X = mean(X), Y = mean(Y)),
-                aes(X, Y),
-                color = "navy",
-                size = 7,
-                pch = 1
-            ) +
-            geom_abline(
-                slope = b,
-                intercept = mean(Y) - b * mean(X),
-                color = "navy",
-                linewidth = 1
-            ) +
-            geom_segment(
-                data = M,
-                aes(x = X, xend = X, y = Y, yend = pred),
-                color = "firebrick",
-                linewidth = 1
-            ) +
-            geom_point(data = M, aes(x = X, y = Y), size = 3)
+  if (do.plot) {
+    p <- ggplot() +
+      geom_point(
+        data = tibble(X = mean(X), Y = mean(Y)),
+        aes(X, Y),
+        color = "navy",
+        size = 7,
+        pch = 1
+      ) +
+      geom_abline(
+        slope = b,
+        intercept = mean(Y) - b * mean(X),
+        color = "navy",
+        linewidth = 1
+      ) +
+      geom_segment(
+        data = M,
+        aes(x = X, xend = X, y = Y, yend = pred),
+        color = "firebrick",
+        linewidth = 1
+      ) +
+      geom_point(data = M, aes(x = X, y = Y), size = 3)
 
-        v1 <- round(b, 2)
-        v2 <- round(SSy, 2)
+    v1 <- round(b, 2)
+    v2 <- round(SSy, 2)
 
-        ll1 <- glue::glue("$\\theta_1 = {v1}$")
-        ll2 <- glue::glue("$\\SS = {v2}$")
+    ll1 <- glue::glue("$\\theta_1 = {v1}$")
+    ll2 <- glue::glue("$\\SS = {v2}$")
 
-        xpos <- min(X) + 0.15 * diff(range(X))
-        ypos <- min(Y) + 0.8 * diff(range(Y))
+    xpos <- min(X) + 0.15 * diff(range(X))
+    ypos <- min(Y) + 0.8 * diff(range(Y))
 
-        if (do.labels) {
-            p <- p +
-                annotate(
-                    geom = "text",
-                    label = TeX(ll1, output = "character"),
-                    x = xpos,
-                    y = ypos,
-                    parse = TRUE,
-                    hjust = 0,
-                    size = 9
-                ) +
-                annotate(
-                    geom = "text",
-                    label = TeX(ll2, output = "character"),
-                    x = xpos,
-                    y = ypos * 0.96,
-                    parse = TRUE,
-                    hjust = 0,
-                    size = 9
-                )
-        }
-        print(p)
+    if (do.labels) {
+      p <- p +
+        annotate(
+          geom = "text",
+          label = TeX(ll1, output = "character"),
+          x = xpos,
+          y = ypos,
+          parse = TRUE,
+          hjust = 0,
+          size = 9
+        ) +
+        annotate(
+          geom = "text",
+          label = TeX(ll2, output = "character"),
+          x = xpos,
+          y = ypos * 0.96,
+          parse = TRUE,
+          hjust = 0,
+          size = 9
+        )
     }
-    return(SSy)
+    print(p)
+  }
+  return(SSy)
 }
 
 ```
@@ -98,14 +97,15 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
 
 # Housekeeping {background-color="#40666e"}
 
-- Review problem set keys
-- Three-week Check In: complete before Thursday (if you choose to)
-- PS 2
+- Review problem set key: PS 2
+- Three-week Check In: complete by end of day today (if you choose to)
+    - We don't know who you are in the results
 - PS 3 due Thursday
-    - PS keys available on Canvas
+    - Key will be available on Canvas
 - Progress Check 1 next week
     - Tuesday: Questions and review (feel free to submit ahead)
     - Thursday: In class working time
+- Finish a bit of Unit 3
 
 
 # Questions {background-color="#f8c471"}
@@ -116,14 +116,14 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
 
 ## Scientific questions
 
-- Is there an effect (e.g., mean differences)?
-- How large is the effect?
-- (How large) is the association?
-- (How well) can I predict a quantity, group, or classification of interest?
-- Many others
+- *Is there* an effect (e.g., mean differences between groups)?
+- How *large* is the effect?
+- (*How large*) is the association?
+- (*How well*) can I predict a quantity, group, or classification of interest?
+- Many others...
 
 
-## Remember the Goal of Statistics
+## (One of) the Goals of Statistics
 
 > "a way of taming **uncertainty**, of turning raw **data** into arguments that can resolve profound questions" [@Amabile1989-pf]
 
@@ -173,45 +173,6 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
 ::::
 
 
-## Example: Canid relationships
-
-> What are the phylogenetic relationships between dog breeds & other canids?
-
-:::: {.columns}
-
-::: {.column width="60%"}
-![](https://i.imgur.com/spdaSkP.jpg){fig-align="center" fig-alt=""}
-:::
-
-::: {.column width="40%"}
-- Simultaneous & rapid radiation
-- Single origin of dogs
-- Multiple origins
-- Ancient breeds are monophyletic
-- Every possible tree....
-:::
-
-::::
-
-
-## Example: Predict the species of a fossil
-
-> Is this bone more like a chimpanzee, australopith, Neandertal, or modern human?
-
-:::: {.columns}
-
-::: {.column width="40%"}
-![](https://i.imgur.com/cQ1Kl1v.png){fig-align="center" fig-alt=""}
-:::
-
-::: {.column width="60%"}
-- What is the percent correct classification of known fossils?
-- What are the relative probabilities of new fossil being in one of four taxonomic groups?
-:::
-
-::::
-
-
 ## Example: Growth models in Alligators?
 
 ![](https://i.imgur.com/scZSjNE.png){fig-align="center" fig-alt="Femur length plotted against Age for alligators from five different treatment groups."}
@@ -221,7 +182,10 @@ $$Determinate:~Length \left(Age\right) = \frac{\theta_1}{1 + \exp((\theta_2 - Ag
 $$Indeterminate:~Length\left(Age\right) = \theta_0 + \theta_1 Age + \theta_2 Age^2$$
 
 
-## Your Own Experiences
+## Think about your own lab experiences
+
+- Research
+- Courses
 
 
 ## Models and Inference
@@ -237,9 +201,6 @@ The method you use for inference is part of the model.
 :::{.center}
 "clarifying the mapping from assumptions to inference to decision"^[https://statmodeling.stat.columbia.edu/2024/12/28/bayesian-inference-isnt-just-about-getting-the-answer-its-also-about-clarifying-the-mapping-from-assumptions-to-inference-to-decision/]
 :::
-
-
-## {background-image="https://i.imgur.com/kgPmw0b.jpg" background-size="100%"  fig-alt="Image of two different morphs of crickets."}
 
 
 ## Example: Wing Dimorphic Crickets
@@ -271,10 +232,10 @@ Controlling for body mass,
 
 ```{r}
 CD <- read_csv(
-    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Cricket_Metabolic_MassCor.csv",
-    show_col_types = FALSE
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Cricket_Metabolic_MassCor.csv",
+  show_col_types = FALSE
 ) |>
-    mutate(Wing_Morph = if_else(Wing_Morph == "LW", "Long Wing", "Short Wing"))
+  mutate(Wing_Morph = if_else(Wing_Morph == "LW", "Long Wing", "Short Wing"))
 ```
 
 ```{r}
@@ -283,8 +244,8 @@ CD <- read_csv(
 glimpse(CD)
 
 CD |>
-    group_by(Wing_Morph) |>
-    summarize(mean = mean(CO2_resid))
+  group_by(Wing_Morph) |>
+  summarize(mean = mean(CO2_resid))
 ```
 
 
@@ -294,21 +255,21 @@ CD |>
 #| fig-alt: "Scatterplot of Mass-specific CO2 plotted for each of the long wing and short wing groups of crickets. The mean for each group is plotted as a single red dot."
 
 P <- CD |>
-    ggplot(aes(Wing_Morph, CO2_resid)) +
-    geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
-    stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
-    labs(x = "Wing Morph", y = "Mass-Specific CO<sub>2</sub>") +
-    theme(axis.title.y = element_markdown())
+  ggplot(aes(Wing_Morph, CO2_resid)) +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
+  labs(x = "Wing Morph", y = "Mass-Specific CO<sub>2</sub>") +
+  theme(axis.title.y = element_markdown())
 print(P)
 ```
 
 
 ## Do long-winged crickets have a higher resting metabolic rate than short-winged crickets?
 
-- What is the probability the two groups have the same mean?
-- What is the probability of observing a difference like this from sampling error only?
-- What is the probability these are two samples from the same distribution?
-- How well can you predict metabolic rate from wing morph?
+- What is the probability the two groups have the *same mean*?
+- What is the probability of observing a difference this large *from sampling error only*?
+- What is the probability these are two samples from the *same distribution*?
+- *How well* can you predict metabolic rate from wing morph?
 
 
 ## Could the observed difference be sampling error?
@@ -320,15 +281,15 @@ print(P)
 ```
 
 
-## How large a difference do you get from sampling error?
+## How large of a difference do you get from sampling error?
 
-1. Assume long-winged and short-winged crickets share a distribution
+1. Assume long-winged and short-winged crickets are from *the same* distribution
 2. Put all values from both morphs in one group
-3. Randomly assign Long Wing and Short Wing labels to observed values of `CO2_resid`
+3. Randomly assign Long Wing and Short Wing labels to "observed" values
 4. Repeat over and over
 
 
-## How large a difference do you get from sampling error?
+## How large of a difference do you get from sampling error?
 
 ```{r}
 #| fig-alt: "Scatterplot of Mass-specific CO2 plotted for both morph groups pooled together. The mean for all points is plotted as a single red dot."
@@ -336,16 +297,16 @@ print(P)
 CD$Group <- "ALL"
 
 CD |>
-    ggplot(aes(Group, CO2_resid)) +
-    geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
-    stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
-    labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
-    theme(axis.title.y = element_markdown())
+  ggplot(aes(Group, CO2_resid)) +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
+  labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
+  theme(axis.title.y = element_markdown())
 
 ```
 
 
-## How large a difference do you get from sampling error?
+## How large of a difference do you get from sampling error?
 
 ```{r}
 #| fig-align: center
@@ -354,19 +315,19 @@ CD |>
 CD$WM_Shuffle <- sample(CD$Wing_Morph)
 
 CD |>
-    group_by(WM_Shuffle) |>
-    summarize(Mean = mean(CO2_resid))
+  group_by(WM_Shuffle) |>
+  summarize(Mean = mean(CO2_resid))
 
 CD |>
-    ggplot(aes(WM_Shuffle, CO2_resid)) +
-    geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
-    stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
-    labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
-    theme(axis.title.y = element_markdown())
+  ggplot(aes(WM_Shuffle, CO2_resid)) +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
+  labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
+  theme(axis.title.y = element_markdown())
 ```
 
 
-## How big of a difference do you get from sampling error?
+## How large of a difference do you get from sampling error?
 
 ```{r}
 #| fig-align: center
@@ -375,26 +336,26 @@ CD |>
 CD$WM_Shuffle <- sample(CD$Wing_Morph)
 
 CD |>
-    group_by(WM_Shuffle) |>
-    summarize(Mean = mean(CO2_resid))
+  group_by(WM_Shuffle) |>
+  summarize(Mean = mean(CO2_resid))
 
 CD |>
-    ggplot(aes(WM_Shuffle, CO2_resid)) +
-    geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
-    stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
-    labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
-    theme(axis.title.y = element_markdown())
+  ggplot(aes(WM_Shuffle, CO2_resid)) +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
+  labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
+  theme(axis.title.y = element_markdown())
 ```
 
 
-## What do we expect to see when there is a meaningful difference between wing morphs?
+## What do we expect to see when there *is* a meaningful difference between wing morphs?
 
 ```{r}
 print(P)
 ```
 
 
-## What do we expect to see when there is a meaningful difference between wing morphs?
+## What do we expect to see when there *is* a meaningful difference between wing morphs?
 
 1. Assume corrected metabolic rate is normally distributed
 2. Draw random values for long wings from a normal distribution with a *higher* mean
@@ -414,11 +375,11 @@ mean.sw <- -1
 mean.lw <- 2
 
 SS <- tibble(
-    Wing_Morph = c(rep("Short Wing", n.sw), rep("Long Wing", n.lw)),
-    Sim_CO2 = c(rnorm(n.sw, mean.sw), rnorm(n.lw, mean.lw))
+  Wing_Morph = c(rep("Short Wing", n.sw), rep("Long Wing", n.lw)),
+  Sim_CO2 = c(rnorm(n.sw, mean.sw), rnorm(n.lw, mean.lw))
 )
 
-SS |> group_by(Wing_Morph) |> summarise(Mean = mean(Sim_CO2))
+SS |> group_by(Wing_Morph) |> summarize(Mean = mean(Sim_CO2))
 ```
 
 
@@ -428,14 +389,14 @@ SS |> group_by(Wing_Morph) |> summarise(Mean = mean(Sim_CO2))
 #| echo: false
 #| fig-alt: "Scatterplot of Mass-specific CO2 plotted for simulated groups of long wing and short wing crickets. The mean for each simulated group is plotted as a single red dot."
 
-SS |> group_by(Wing_Morph) |> summarise(Mean = mean(Sim_CO2))
+SS |> group_by(Wing_Morph) |> summarize(Mean = mean(Sim_CO2))
 
 SS |>
-    ggplot(aes(Wing_Morph, Sim_CO2)) +
-    geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
-    stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
-    labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
-    theme(axis.title.y = element_markdown())
+  ggplot(aes(Wing_Morph, Sim_CO2)) +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
+  labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
+  theme(axis.title.y = element_markdown())
 
 ```
 
@@ -449,18 +410,18 @@ mean.sw <- -1
 mean.lw <- 2
 
 SS <- tibble(
-    Wing_Morph = c(rep("Short Wing", n.sw), rep("Long Wing", n.lw)),
-    Sim_CO2 = c(rnorm(n.sw, mean.sw), rnorm(n.lw, mean.lw))
+  Wing_Morph = c(rep("Short Wing", n.sw), rep("Long Wing", n.lw)),
+  Sim_CO2 = c(rnorm(n.sw, mean.sw), rnorm(n.lw, mean.lw))
 )
 
-SS |> group_by(Wing_Morph) |> summarise(Mean = mean(Sim_CO2))
+SS |> group_by(Wing_Morph) |> summarize(Mean = mean(Sim_CO2))
 
 SS |>
-    ggplot(aes(Wing_Morph, Sim_CO2)) +
-    geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
-    stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
-    labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
-    theme(axis.title.y = element_markdown())
+  ggplot(aes(Wing_Morph, Sim_CO2)) +
+  geom_point(position = position_jitter(width = 0.3), alpha = 0.25) +
+  stat_summary(fun = mean, geom = "point", size = 4, color = "firebrick4") +
+  labs(x = "Wing Morph", y = "Mass-Specific CO~2~") +
+  theme(axis.title.y = element_markdown())
 ```
 
 
@@ -480,23 +441,41 @@ George Box (1976; attributed)
 $$y = mx + b$$
 
 - Often not a single unequivocally correct model.
-- Some very wrong and some less wrong.
-- Your role is to choose and defend a model, given your questions and the assumptions of the model.
+- Some models are very wrong and some less wrong.
+- Your role as a scientist is to choose (and defend) a model, given your questions and the assumptions of the model.
 
 
 ## Types of data
 
-*Continuous*
+:::: {.columns}
 
-- Real number line (rounding okay)
-- Bone lengths, age, oil content of corn
+::: {.column width="50%"}
+
+**Continuous**
+
+- Real number line (rounding okay): bone lengths, age, mouse masses, oil content of corn
 - Counts of species
 
-*Categorical*
+:::
+
+::: {.column width="50%"}
+**Categorical**
 
 - Binomial: 0/1, land/water, etc.
-- Treatment or observation groups (Ag/Non-Ag land use)
-- Genotypes (Sticklebacks: *MM*, *Mm*, *mm*)
+- Treatment or observation groups: Ag/Non-Ag land use; long- or short-winged crickets
+- Genotypes: *MM*, *Mm*, *mm*
+:::
+
+::::
+
+
+::: {.callout-important}
+
+- (Almost) all data can be assigned to either continuous or categorical.
+- The type of data will determine the statistical analysis.
+
+:::
+
 
 
 # Strength of Association {background-color="#40666e"}
@@ -508,29 +487,29 @@ Pairs of continuous variables
 
 :::: {.columns}
 
-::: {.column width="30%"}
+::: {.column width="40%"}
 
 ![](images/lion_nose.png){fig-alt="Photograph of a line nose with black coloration."}
 
 :::
 
-::: {.column width="70%"}
+::: {.column width="60%"}
 
 ```{r}
 #| fig-height: 8
 #| fig-alt: "Scatterplot of proportion black plotted against Age for a sample of lions."
 
 LA <- read_csv(
-    "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
-    show_col_types = FALSE
+  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+  show_col_types = FALSE
 ) |>
-    rename(Age = age, `Proportion Black` = proportion.black)
+  rename(Age = age, `Proportion Black` = proportion.black)
 
 ggplot(LA, aes(Age, `Proportion Black`)) +
-    geom_point(size = 6, color = "navy") +
-    scale_y_continuous(limits = c(0, 1)) +
-    scale_x_continuous(breaks = 1:14) +
-    theme_classic(base_size = 30)
+  geom_point(size = 6, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14) +
+  theme_classic(base_size = 30)
 ```
 
 :::
@@ -544,28 +523,28 @@ ggplot(LA, aes(Age, `Proportion Black`)) +
 #| fig-alt: "Scatterplot of proportion black plotted against age for a sample of lions and scatterplot of age plotted against proportion black for a sample of lions."
 
 p1 <- ggplot(
-    LA,
-    aes(
-        x = Age,
-        y = `Proportion Black`
-    )
+  LA,
+  aes(
+    x = Age,
+    y = `Proportion Black`
+  )
 ) +
-    geom_point(size = 4, color = "navy") +
-    scale_y_continuous(limits = c(0, 1)) +
-    scale_x_continuous(breaks = 1:14) +
-    theme_classic(base_size = 20)
+  geom_point(size = 4, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14) +
+  theme_classic(base_size = 20)
 
 p2 <- ggplot(
-    LA,
-    aes(
-        y = Age,
-        x = `Proportion Black`
-    )
+  LA,
+  aes(
+    y = Age,
+    x = `Proportion Black`
+  )
 ) +
-    geom_point(size = 4, color = "navy") +
-    scale_x_continuous(limits = c(0, 1)) +
-    scale_y_continuous(breaks = 1:14) +
-    theme_classic(base_size = 20)
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14) +
+  theme_classic(base_size = 20)
 p1 + p2
 ```
 
@@ -605,28 +584,23 @@ where
 
 - $x$ and $y$ are paired
 - Observations are independent
-- Bivariate normality
-    - Separately, $x$ and $y$ are normally distributed
-
-
-## Bivariate normality
+- Bivariate normality: Separately, $x$ and $y$ are normally distributed
 
 ```{r}
-#| echo: true
-#| output-location: slide
+#| echo: false
 #| fig-alt: "Scatterplot of y vs. x drawn from a bivariate normal distribution with marginal histograms showing that each is normal."
 
 library(ggExtra)
 set.seed(43237497)
 
 BVN <- tibble(
-    x = rnorm(1e4, mean = 0, sd = 1),
-    y = rnorm(1e4, mean = 0, sd = 1)
+  x = rnorm(1e4, mean = 0, sd = 1),
+  y = rnorm(1e4, mean = 0, sd = 1)
 )
 
 P <- ggplot(BVN, aes(x, y)) +
-    geom_point(alpha = 0.25, color = "firebrick") +
-    coord_equal()
+  geom_point(alpha = 0.25, color = "firebrick") +
+  coord_equal()
 
 ggMarginal(P, type = "histogram", fill = "firebrick")
 ```
@@ -634,13 +608,8 @@ ggMarginal(P, type = "histogram", fill = "firebrick")
 
 ## Correlation in R: `cor()`
 
-Random bivariate normal data:
-
-```{r}
-#| echo: true
-
-cor(BVN$x, BVN$y)
-```
+- No "direction" in correlation
+- `cor(A, B)` == `cor(B, A)`
 
 Lion nose coloration:
 
@@ -690,25 +659,25 @@ What else could be *separately* causing the patterns I observe?
 
 :::: {.columns}
 
-::: {.column width="30%"}
+::: {.column width="40%"}
 ![](images/lion_nose.png){fig-alt="Photograph of a line nose with black coloration."}
 
 ```{r}
 LA <- read_csv(
-    "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
-    show_col_types = FALSE
+  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+  show_col_types = FALSE
 ) |>
-    rename(
-        Age = age,
-        `Proportion Black` = proportion.black
-    )
+  rename(
+    Age = age,
+    `Proportion Black` = proportion.black
+  )
 
 r <- round(
-    cor(
-        LA$Age,
-        LA$`Proportion Black`
-    ),
-    digits = 2
+  cor(
+    LA$Age,
+    LA$`Proportion Black`
+  ),
+  digits = 2
 )
 ```
 
@@ -716,23 +685,23 @@ Correlation: $r$ = `r r`
 
 :::
 
-::: {.column width="70%"}
+::: {.column width="50%"}
 
 ```{r}
 #| fig-height: 8
 #| fig-alt: "Scatterplot of proportion black plotted against Age for a sample of lions."
 
 ggplot(
-    LA,
-    aes(
-        Age,
-        `Proportion Black`
-    )
+  LA,
+  aes(
+    Age,
+    `Proportion Black`
+  )
 ) +
-    geom_point(size = 6, color = "navy") +
-    scale_y_continuous(limits = c(0, 1)) +
-    scale_x_continuous(breaks = 1:14) +
-    theme_classic(base_size = 30)
+  geom_point(size = 6, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14) +
+  theme_classic(base_size = 30)
 ```
 
 :::
@@ -748,16 +717,16 @@ ggplot(
 #| fig-alt: "Scatterplot of proportion black plotted against age for a sample of lions and scatterplot of age plotted against proportion black for a sample of lions."
 
 p1 <- ggplot(LA, aes(x = Age, y = `Proportion Black`)) +
-    geom_point(size = 4, color = "navy") +
-    scale_y_continuous(limits = c(0, 1)) +
-    scale_x_continuous(breaks = 1:14) +
-    theme_classic(base_size = 20)
+  geom_point(size = 4, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14) +
+  theme_classic(base_size = 20)
 
 p2 <- ggplot(LA, aes(y = Age, x = `Proportion Black`)) +
-    geom_point(size = 4, color = "navy") +
-    scale_x_continuous(limits = c(0, 1)) +
-    scale_y_continuous(breaks = 1:14) +
-    theme_classic(base_size = 20)
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14) +
+  theme_classic(base_size = 20)
 
 p1 + p2
 ```
@@ -809,7 +778,7 @@ M <- tibble(X, Y)
 #| fig-alt: "Scatterplot of Y plotted against X, showing a moderate positive relationship."
 
 p <- ggplot(M, aes(X, Y)) +
-    geom_point(size = 4, color = "navy")
+  geom_point(size = 4, color = "navy")
 p
 ```
 
@@ -862,9 +831,9 @@ cc <- tibble("Concentration" = seq(from = 10, to = 110, by = 10))
 cc$Absorbance = cc$Concentration * 0.025 + rnorm(nrow(cc), 0, 0.15)
 
 ggplot(cc, aes(Concentration, Absorbance)) +
-    geom_point(size = 3) +
-    scale_x_continuous(n.breaks = 10) +
-    scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, by = 0.5))
+  geom_point(size = 3) +
+  scale_x_continuous(n.breaks = 10) +
+  scale_y_continuous(limits = c(0, 3), breaks = seq(0, 3, by = 0.5))
 ```
 
 :::
@@ -890,15 +859,15 @@ y_bar <- paste("bar(Y)==", round(mean(Y), 2))
 x_bar <- paste("bar(X)==", round(mean(X), 2))
 
 p +
-    geom_point(
-        data = tibble(X = mean(X), Y = mean(Y)),
-        aes(X, Y),
-        color = "navy",
-        size = 7,
-        pch = 1
-    ) +
-    annotate("text", x = 9.25, y = 28, label = y_bar, parse = TRUE, size = 7) +
-    annotate("text", x = 9.25, y = 27, label = x_bar, parse = TRUE, size = 7)
+  geom_point(
+    data = tibble(X = mean(X), Y = mean(Y)),
+    aes(X, Y),
+    color = "navy",
+    size = 7,
+    pch = 1
+  ) +
+  annotate("text", x = 9.25, y = 28, label = y_bar, parse = TRUE, size = 7) +
+  annotate("text", x = 9.25, y = 27, label = x_bar, parse = TRUE, size = 7)
 ```
 
 
@@ -978,41 +947,24 @@ ss <- ssPlot(X, Y, 2.6)
 
 ## Minimizing Sums of Squares
 
-- Search a range of values for $\theta_1$
-
 ```{r}
-#| echo: true
+#| fig-alt: "Plot of the sums of squares for a range of values for the slope. The parabolic relationship has a minimum at slope of 2.4."
+#| echo: false
 
-# To hold output
 SumSq <- tibble(
-    theta_1 = seq(-10, 10, by = 0.01),
-    SS = numeric(length(theta_1))
+  theta_1 = seq(-10, 10, by = 0.01),
+  SS = numeric(length(theta_1))
 )
-head(SumSq)
-```
-
-
-## Minimizing Sums of Squares
-
-```{r}
-#| echo: true
 
 # Iterate through slopes
 for (ii in 1:nrow(SumSq)) {
-    theta_1 <- SumSq$theta_1[ii]
-    SumSq$SS[ii] <- ssPlot(X, Y, theta_1, do.plot = FALSE)
+  theta_1 <- SumSq$theta_1[ii]
+  SumSq$SS[ii] <- ssPlot(X, Y, theta_1, do.plot = FALSE)
 }
 
 # Location of minimum SS
 minSS.theta_1 <- SumSq$theta_1[which.min(SumSq$SS)]
 minSS.SS <- SumSq$SS[which.min(SumSq$SS)]
-```
-
-
-## Minimizing Sums of Squares
-
-```{r}
-#| fig-alt: "Plot of the sums of squares for a range of values for the slope. The parabolic relationship has a minimum at slope of 2.4."
 
 xpos <- min(SumSq$theta_1) + 0.55 * diff(range(SumSq$theta_1))
 ypos <- min(SumSq$SS) + 0.3 * diff(range(SumSq$SS))
@@ -1023,54 +975,48 @@ ll1 <- glue::glue("$\\theta_1 = {v1}$")
 ll2 <- glue::glue("$\\SS = {v2}$")
 
 ggplot() +
-    geom_line(data = SumSq, aes(x = theta_1, y = SS), linewidth = 1.25) +
-    geom_point(
-        data = tibble(x = minSS.theta_1, y = minSS.SS),
-        aes(x, y),
-        color = "coral",
-        size = 5
-    ) +
-    labs(x = TeX("$\\theta_1$"), y = "Sum of Squares") +
-    annotate(
-        geom = "text",
-        label = TeX(ll1, output = "character"),
-        x = xpos,
-        y = ypos,
-        parse = TRUE,
-        hjust = 0,
-        size = 9
-    ) +
-    annotate(
-        geom = "text",
-        label = TeX(ll2, output = "character"),
-        x = xpos,
-        y = ypos * 0.70,
-        parse = TRUE,
-        hjust = 0,
-        size = 9
-    )
+  geom_line(data = SumSq, aes(x = theta_1, y = SS), linewidth = 1.25) +
+  geom_point(
+    data = tibble(x = minSS.theta_1, y = minSS.SS),
+    aes(x, y),
+    color = "coral",
+    size = 5
+  ) +
+  labs(x = TeX("$\\theta_1$"), y = "Sum of Squares") +
+  annotate(
+    geom = "text",
+    label = TeX(ll1, output = "character"),
+    x = xpos,
+    y = ypos,
+    parse = TRUE,
+    hjust = 0,
+    size = 9
+  ) +
+  annotate(
+    geom = "text",
+    label = TeX(ll2, output = "character"),
+    x = xpos,
+    y = ypos * 0.70,
+    parse = TRUE,
+    hjust = 0,
+    size = 9
+  )
 ```
-
-
-## Direct calculation of $\theta_1$ and $\theta_0$
-
-$$\theta_1 = \frac{\sum\left(X_{i}-\bar{X}\right)\left(Y_{i}-\bar{Y}\right)}{\sum\left(X_{i}-\bar{X}\right)^{2}}$$
-
-Numerator:  Sum of the products of *X* and *Y*
-
-Denominator: Sum of squares of *X*
-
-$$\theta_0 = \bar{Y} - \theta_1 \bar{X}$$
 
 
 ## Bivariate regression as a linear model
 
-- Don't have to manually search for values of intercept ($\theta_0$) and slope ($\theta_1$)
-    - Although we can
-- Want to solve the equation directly
-    - Matrix algebra
+- Don't manually search for values of intercept ($\theta_0$) and slope ($\theta_1$) ^[Although we can.]
+- Solve the equation directly
 
-R has a function to do this: `lm()`
+::: {.callout-tip}
+## R has a function to do this
+
+Linear model: `lm()`
+
+- `lm` is used to fit linear models, ... It can be used to carry out regression, ... analysis of variance and analysis of covariance ....
+
+:::
 
 
 ## Linear models: `lm()`
@@ -1100,15 +1046,6 @@ my_model
 - Equivalent to: $Y = \theta_0 + \theta_1 X$
 - Intercept (`1`) is assumed
     - `Y ~ X + 1`
-
-
-## $\theta_1 = 2.39525$
-
-```{r}
-#| fig-alt: "Scatterplot of Y plotted against X. The exact line with slope of 2.39525 is plotted through the mean of Y. Vertical lines connect the points to the line."
-
-ss <- ssPlot(X, Y, 2.39525)
-```
 
 
 # Questions {background-color="#f8c471"}
