@@ -10,7 +10,6 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
@@ -151,7 +150,7 @@ FAIR Guidelines [@Wilkinson2016-tf]
 1. **F**indability
 2. **A**ccessibility
 3. **I**nteroperability
-4. **R**eusability (Reproducibility)
+4. **R**mutability (Reproducibility)
 
 Essential for long term data use, sharing, and curation.
 
@@ -344,7 +343,7 @@ Summarized by counts and converted to proportions
 2. Simulate data following the question
 3. Check that your answer agrees
 
-Simulation is how we know that statistical tests "work" and are not biased (conservative or anticonservative).
+Simulation is how we know that statistical tests "work" and are not biased (conservative or anti-conservative).
 
 
 ## Simulating from binomial distributions: `rbinom()`
