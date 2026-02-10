@@ -70,7 +70,7 @@ You should delete the first line and replace `x` in the plotting statement to be
 x <- 1:20 # Delete this line and use the vector you assigned above.
 
 ggplot(tibble(x), aes(x)) +
-    geom_histogram()
+  geom_histogram()
 ```
 
 Run the code above. You will get a message: "`stat_bin()` using `bins = 30`. Pick better value with `binwidth`".
@@ -199,7 +199,7 @@ You can use either. Just comment the other out. If you use the second, make sure
 
 ```{r}
 SF <- read_csv(
-    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv"
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Silver_fir.csv"
 )
 
 # SF <- read_csv("Silver_fir.csv")
@@ -242,7 +242,7 @@ Use `drop_na()` to drop all NA values from the data:
 
 ```{r}
 SF <- SF |>
-    drop_na()
+  drop_na()
 ```
 
 898 rows should remain. Verify this:
@@ -330,13 +330,13 @@ sample_means <- numeric(n_means)
 
 # Iterate through, calculating the mean for each sample
 for (ii in 1:n_means) {
-    s <- sample(x, size = sample_size, replace = FALSE)
-    sample_means[ii] <- mean(s)
+  s <- sample(x, size = sample_size, replace = FALSE)
+  sample_means[ii] <- mean(s)
 }
 
 ggplot(tibble(sample_means), aes(sample_means)) +
-    geom_histogram(bins = 30, fill = "gold") +
-    labs(x = "Sample Mean", y = "Count")
+  geom_histogram(bins = 30, fill = "gold") +
+  labs(x = "Sample Mean", y = "Count")
 
 mean(x)
 
