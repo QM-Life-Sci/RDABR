@@ -105,7 +105,7 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
 - Progress Check 1 next week
     - Tuesday: Questions and review (feel free to submit ahead)
     - Thursday: In class working time
-- Finish a bit of Unit 3
+- Question for Thursday: Would you rather be able to speak all languages fluently or understand animals’ communication?
 
 
 # Questions {background-color="#f8c471"}
