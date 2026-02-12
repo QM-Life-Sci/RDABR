@@ -54,8 +54,8 @@ head(x)
 cor(x[, "V1"], x[, "V2"])
 
 P <- ggplot(as_tibble(x), aes(V1, V2)) +
-    geom_point(alpha = 0.25, color = "firebrick") +
-    coord_equal()
+  geom_point(alpha = 0.25, color = "firebrick") +
+  coord_equal()
 
 ggMarginal(P, type = "histogram", fill = "firebrick")
 ```
@@ -102,13 +102,13 @@ Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
 M <- tibble(X, Y)
 
 ggplot(M, aes(X, Y)) +
-    geom_smooth(
-        formula = y ~ x,
-        method = "lm",
-        se = FALSE,
-        color = "darkorange"
-    ) +
-    geom_point(color = "navy", size = 3)
+  geom_smooth(
+    formula = y ~ x,
+    method = "lm",
+    se = FALSE,
+    color = "darkorange"
+  ) +
+  geom_point(color = "navy", size = 3)
 
 fm <- lm(Y ~ X + 1, data = M)
 summary(fm)
@@ -189,18 +189,18 @@ Feel free to color the points, add axis titles, etc., as you wish.
 # FIXME
 
 ggplot(LA, aes(x = age, y = proportion.black)) +
-    geom_point(size = 4, color = "navy") +
-    scale_y_continuous(limits = c(0, 1)) +
-    scale_x_continuous(breaks = 1:14)
+  geom_point(size = 4, color = "navy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(breaks = 1:14)
 ```
 
 ```{r}
 #| fig-alt: "Scatterplot of age plotted against proportion of black in lion noses, showing increasing age as proportion black increases."
 
 ggplot(LA, aes(y = age, x = proportion.black)) +
-    geom_point(size = 4, color = "navy") +
-    scale_x_continuous(limits = c(0, 1)) +
-    scale_y_continuous(breaks = 1:14)
+  geom_point(size = 4, color = "navy") +
+  scale_x_continuous(limits = c(0, 1)) +
+  scale_y_continuous(breaks = 1:14)
 ```
 
 Use the `lm()` function to fit a regression where age is predicted by proportion black. Assign the model to a variable. Then generate the `summary()`
@@ -273,20 +273,20 @@ Feel free to add axis labels, etc. Length and width measurements are in millimet
 library(ggsci)
 
 ggplot(MBP, aes(age, skull_l, color = sex)) +
-    geom_point(size = 3) +
-    geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
-    scale_color_aaas() +
-    labs(x = "Age (y)", y = "Skull Length (mm)")
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  scale_color_aaas() +
+  labs(x = "Age (y)", y = "Skull Length (mm)")
 ```
 
 ```{r}
 #| fig-alt: "Scatterplot of skull width plotted against age with points colored by sex showing a positive relationship between the two variables in males but not in females."
 
 ggplot(MBP, aes(age, skull_w, color = sex)) +
-    geom_point(size = 3) +
-    geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
-    scale_color_aaas() +
-    labs(x = "Age (y)", y = "Skull Width (mm)")
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  scale_color_aaas() +
+  labs(x = "Age (y)", y = "Skull Width (mm)")
 ```
 
 You will get a couple of warning messages from ggplot:
