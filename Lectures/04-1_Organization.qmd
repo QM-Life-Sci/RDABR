@@ -57,6 +57,7 @@ csl: evolution.csl
 
 - Discussion questions due *Monday night*
 - Review / discussion / questions
+- Intro to micropublication project
 - Start working
 
 
