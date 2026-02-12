@@ -1,0 +1,69 @@
+---
+title: "Check-in and Progress Check 1"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+---
+
+
+# Check-in {background-color="#40666e"}
+
+
+## Impressions
+
+- Pacing
+    - Mostly just right, some too fast
+- Difficulty
+    - Mostly just right, some too challenging
+
+
+## Themes
+
+- Programming is challenging
+    - Practice, think about what you have learned so far
+- Work in class is comfortable, work outside of class is difficult
+    - It will get better
+    - Ask us for help
+- More
+    - In-class coding
+    - Explaining R code
+    - Repeated examples (up to a point)
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Progress check {background-color="#40666e"}
+
+
+## General guidelines
+
+- Work on your own
+    - Challenge of working alone
+- Use all your problem sets, lecture slide code, etc.
+- Ask us for help
+
+
+## Tuesday in class
+
+- Discussion questions due *Monday night*
+- Review / discussion / questions
+- Start working
+
+
+## Thursday in class
+
+- (More) discussion questions due *Wednesday night*
+- Review / discussion / questions
+- Continue working
+
+# Questions {background-color="#f8c471"}
