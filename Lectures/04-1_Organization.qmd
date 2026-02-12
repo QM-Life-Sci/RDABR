@@ -49,22 +49,36 @@ csl: evolution.csl
 
 - Work on your own
     - Challenge of working alone
+    - Clear picture of where you are
 - Use all your problem sets, lecture slide code, etc.
 - Ask us for help
+
+
+## Today
+
+- Problem set 4, question 1 (correlation)
+- Finish lecture material (regression)
+- Back to PS 4
+- Stop and review the pipe: `|>`
 
 
 ## Tuesday in class
 
 - Discussion questions due *Monday night*
+    - General review topics
 - Review / discussion / questions
 - Intro to micropublication project
+- Progress check available
 - Start working
 
 
 ## Thursday in class
 
+- PS 4 is due (but try to finish earlier)
 - (More) discussion questions due *Wednesday night*
 - Review / discussion / questions
 - Continue working
+- Due the *following* Thursday (2/26)
+
 
 # Questions {background-color="#f8c471"}
