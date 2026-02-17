@@ -55,7 +55,7 @@ Produce a *reproducible* micropublication-style report (3-5 pages)
 
 - Scientific question / Background
 - Use your own data or data from the literature
-    - I will help you
+    - We will help you
 - Methods and analysis
     - Describing analyses and writing about results
 - A figure (can be multi-panel, can have images, must be reproducible)
@@ -90,11 +90,6 @@ Produce a *reproducible* micropublication-style report (3-5 pages)
 
 # Questions {background-color="#f8c471"}
 
-Pipe
-Functions
-Set Seed
-Plots
-
 
 ## R "Vocabulary"
 
@@ -128,6 +123,8 @@ extract_functions(c(qmds_lecture, qmds_problems_sets))
 ## What does set seed do?
 
 ```{r}
+#| echo: true
+
 xx <- 1:10
 
 set.seed(462)
@@ -143,10 +140,10 @@ sample(xx)
 
 ## Object types in R
 
-- Tibble vs data.frame
-- Array
-- Vector
-- List
+- tibble vs data.frame
+- vector
+- list
+- functions
 
 
 ## `data.frame()`: a basic unit of storage
@@ -220,25 +217,6 @@ MM
 
 1. Creation of a column can refer back to previously created columns
 
-
-## Matrices
-
-Rectangular object of *one data type*
-
-- Indexed by [Rows, Columns]
-- Default is to fill by column (`byrow = TRUE` for row-wise)
-
-```{r}
-#| echo: true
-
-M <- matrix(1:9, nrow = 3, ncol = 3)
-M
-M[2, 2]
-```
-
-- We won't use matrices very often
-
-
 ## Functions
 
 We will get to writing our own functions later, for now: `functionName()`, where parameters go inside `()`.
@@ -262,121 +240,48 @@ exp(1)
 
 Get help from the R command line with ?: `?sqrt` or `?log10`. Also try `help.search("mean")`, etc.
 
+## The pipe `|>`
 
-## Everything in R is an "object" with a `class()`
-
-```{r}
-#| echo: true
-
-x <- 2
-class(x)
-class(sqrt)
-class(MM)
-```
-
-R interprets what to do based on an object's class
-
-
-
-## What to put where in `ggplot()`
-
-> Is there a rule of thumb for understanding if the code for a plot should go inside the parentheses of ggplot, be added on with +, or be added using the pipe?
-
-
-## Let's make a plot
-
-```{r}
-# Histogram
-
-lines <- tibble(vlines = seq(-3, 3, by = 1))
-
-ggplot() +
-  geom_histogram(
-    data = tibble(x),
-    mapping = aes(x),
-    bins = 30,
-    fill = "purple"
-  ) +
-  geom_vline(
-    data = lines,
-    mapping = aes(xintercept = vlines),
-    color = "orange"
-  )
-
-# Density plot
-ggplot() +
-  geom_density(data = tibble(x), mapping = aes(x), fill = "purple") +
-  geom_vline(
-    data = lines,
-    mapping = aes(xintercept = vlines),
-    color = "orange"
-  )
-```
-
-
-## Simulate data
+- R allows you to chain operations together with a pipe: `|>`
+- Passes the object from the previous operation to the next
 
 ```{r}
 #| echo: true
 
-set.seed(42)
-
-W <- tibble(
-  x = seq(0, 100, by = 5),
-  y = 3 * x + 2 + rnorm(length(x), mean = 0, sd = 25)
-)
-
-ggplot(W, aes(x, y)) +
-  geom_point()
+sqrt(c(1, 5, 13))
+c(1, 5, 13) |>
+  sqrt()
 ```
 
+- Read left-to-right, top-to-bottom
 
-## Look at an `lm()` summary
+
+## Combine functions to explore data! {.smaller}
+
+- You can combine multiple operations with the "pipe", or `|>`.
+- This makes your code clean and more human-readable if you translate `|>` to "then".
 
 ```{r}
 #| echo: true
+#| message: false
 
-# "Fitted model"
-fm <- lm(y ~ x + 1, data = W)
+bats <- read_csv("../data/bats.csv")
 
-# summary(fm)
-coef(fm)
+bats |>
+    group_by(sex, age, condition) |>
+    summarize(avg_mass = mean(mass)) |>
+    arrange(desc(avg_mass))
 ```
 
-The slope is `r round(coef(fm)[2], 2)` and the intercept is `r round(coef(fm)[1], 2)`.
+> Read the code above as take the bats tibble, then group by sex, age, and condition and get the average mean for each combination. Finally, arrange the data in descending order by mass.
 
 
-## Coloring points
 
-```{r}
-set.seed(42)
 
-W <- tibble(
-  x = seq(0, 100, by = 5),
-  y = 3 * x + 2 + rnorm(length(x), mean = 0, sd = 25),
-  Group = "G1"
-)
-W2 <- tibble(
-  x = seq(0, 100, by = 5),
-  y = 5 * x + 12 + rnorm(length(x), mean = 0, sd = 25),
-  Group = "G2"
-)
+# Let's practice together
 
-WW <- bind_rows(W, W2)
-
-ggplot() +
-  geom_point(data = WW, aes(x, y, color = Group)) +
-  scale_color_manual(values = c("purple", "pink"))
-
-library(ggsci)
-ggplot() +
-  geom_point(data = WW, aes(x, y, color = Group)) +
-  scale_color_bmj()
-
-library(paletteer)
-ggplot() +
-  geom_point(data = WW, aes(x, y, color = Group)) +
-  scale_color_paletteer_d("nbapalettes::pacers_classic")
-```
-
-https://pmassicotte.github.io/paletteer_gallery/#qualitative
+- Setting the seed
+- Making a tibble
+- Piping
+- Using functions
+- Building some plots
