@@ -38,7 +38,7 @@ library(tidyverse)
 
 - New finding - novel discoveries, new reagents and/or methods
 - Null/negative result
-- Replication - successful (including being scooped)
+- Replication - successful (including being "scooped")
 - Replication - unsuccessful
 - Materials and Reagents
 - Methodology
@@ -89,8 +89,6 @@ Produce a *reproducible* micropublication-style report (3-5 pages)
 
 
 # Questions {background-color="#f8c471"}
-
-
 
 Pipe
 Functions
