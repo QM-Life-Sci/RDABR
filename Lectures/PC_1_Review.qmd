@@ -87,6 +87,7 @@ Produce a *reproducible* micropublication-style report (3-5 pages)
 - 5/12: Presentations (2 slides)
 - 5/16: Project due
 
+
 # Questions {background-color="#f8c471"}
 
 
@@ -95,6 +96,35 @@ Pipe
 Functions
 Set Seed
 Plots
+
+
+## R "Vocabulary"
+
+> I was wondering if we could go over some of the more important functions in R and use examples and go line by line just explaining what everything is doing. The help page is useful but the explanations can be very over-engineered and sometimes the human answer is the better one.
+
+
+## R "Vocabulary"
+
+(Almost) all the functions used in Units 1-4:
+
+```{r}
+source("../extract_functions.R")
+
+qmds_lecture <- list.files(
+  pattern = "^[0-4]*-[1-6].*qmd$",
+  path = "../Lectures",
+  full.names = TRUE
+)[1:7]
+
+qmds_problems_sets <- list.files(
+  pattern = "^PS_[0-9]*[_Key]*.qmd$",
+  path = "../Problem_Sets",
+  full.names = TRUE
+)[1:6]
+
+extract_functions(c(qmds_lecture, qmds_problems_sets))
+
+```
 
 
 ## What does set seed do?
@@ -113,15 +143,12 @@ sample(xx)
 ```
 
 
-
-
 ## Object types in R
 
 - Tibble vs data.frame
 - Array
 - Vector
 - List
-
 
 
 ## `data.frame()`: a basic unit of storage
@@ -134,17 +161,21 @@ Mixed data types per column
   - Logical (`TRUE` and `FALSE`)
 
 
-## Making data.frames
+## Making data.frame()s
 
 ```{r}
 #| echo: true
 
-MM <- data.frame(x = 1:3, y = c(10, 17, 21), A = c("a", "b", "c"))
+MM <- data.frame(
+  x = 1:3,
+  y = c(10, 17, 21),
+  A = c("a", "b", "c")
+)
 MM
 ```
 
 
-## Extracting from data.frames
+## Extracting from data.frame()s
 
 Either `$` or `[, ]` notation (with quoted column names).
 
@@ -157,7 +188,7 @@ MM[, "y"]
 ```
 
 
-## Extracting from data.frames
+## Extracting from data.frame()s
 
 ```{r}
 #| echo: true
@@ -176,7 +207,7 @@ Tibbles and `data.frame`s are essentially identical, but a `tibble` is more mode
 - Tibbles only print 10 rows, and columns display their type (e.g., "chr", "int")
 
 
-## Creating tibbles
+## Creating Tibbles
 
 ```{r}
 #| echo: true
@@ -239,6 +270,7 @@ Get help from the R command line with ?: `?sqrt` or `?log10`. Also try `help.sea
 ```{r}
 #| echo: true
 
+x <- 2
 class(x)
 class(sqrt)
 class(MM)
@@ -261,22 +293,29 @@ R interprets what to do based on an object's class
 lines <- tibble(vlines = seq(-3, 3, by = 1))
 
 ggplot() +
-  geom_histogram(data = tibble(x),
-                 mapping = aes(x),
-                 bins = 30, fill = "purple") +
-  geom_vline(data = lines,
-             mapping = aes(xintercept = vlines),
-             color = "orange")
+  geom_histogram(
+    data = tibble(x),
+    mapping = aes(x),
+    bins = 30,
+    fill = "purple"
+  ) +
+  geom_vline(
+    data = lines,
+    mapping = aes(xintercept = vlines),
+    color = "orange"
+  )
 
 # Density plot
 ggplot() +
-  geom_density(data = tibble(x),
-               mapping = aes(x),
-               fill = "purple") +
-  geom_vline(data = lines,
-             mapping = aes(xintercept = vlines),
-             color = "orange")
+  geom_density(data = tibble(x), mapping = aes(x), fill = "purple") +
+  geom_vline(
+    data = lines,
+    mapping = aes(xintercept = vlines),
+    color = "orange"
+  )
 ```
+
+
 ## Simulate data
 
 ```{r}
@@ -284,10 +323,10 @@ ggplot() +
 
 set.seed(42)
 
-W <- tibble(x = seq(0, 100, by = 5),
-            y = 3 * x + 2 + rnorm(length(x),
-                                  mean = 0,
-                                  sd = 25))
+W <- tibble(
+  x = seq(0, 100, by = 5),
+  y = 3 * x + 2 + rnorm(length(x), mean = 0, sd = 25)
+)
 
 ggplot(W, aes(x, y)) +
   geom_point()
@@ -314,16 +353,16 @@ The slope is `r round(coef(fm)[2], 2)` and the intercept is `r round(coef(fm)[1]
 ```{r}
 set.seed(42)
 
-W <- tibble(x = seq(0, 100, by = 5),
-            y = 3 * x + 2 + rnorm(length(x),
-                                  mean = 0,
-                                  sd = 25),
-            Group = "G1")
-W2 <- tibble(x = seq(0, 100, by = 5),
-             y = 5 * x + 12 + rnorm(length(x),
-                                    mean = 0,
-                                    sd = 25),
-             Group = "G2")
+W <- tibble(
+  x = seq(0, 100, by = 5),
+  y = 3 * x + 2 + rnorm(length(x), mean = 0, sd = 25),
+  Group = "G1"
+)
+W2 <- tibble(
+  x = seq(0, 100, by = 5),
+  y = 5 * x + 12 + rnorm(length(x), mean = 0, sd = 25),
+  Group = "G2"
+)
 
 WW <- bind_rows(W, W2)
 
