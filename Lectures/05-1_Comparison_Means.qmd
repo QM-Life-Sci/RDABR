@@ -57,13 +57,10 @@ shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
 # Housekeeping {background-color="#40666e"}
 
 - Progress Check 1 due Thursday
-    - If you need more time, let me know.
-    - Submit Rmd and HTML
+    - If you need more time, let us know.
+    - Submit qmd and HTML
 - Be thinking about / looking for a data set
-    - Let me know if you want to discuss
-- Change to lecture topic order
-- Change in lecture structure
-
+    - Let us know if you want to discuss
 
 ## Plan for this week
 
@@ -267,10 +264,9 @@ SticklebackPlates |>
   group_by(genotype) |> 
   summarise(Count = length(plates),
             Mean = mean(plates),
+            SD_plates = sd(plates),
             SEM_plates = SEM(plates))
 ```
-
-Means are very different, but $SE_{\overline{plate}}$ is similar for *MM* and *mm*.
 
 
 ## Standard errors appear often
@@ -443,17 +439,22 @@ What is the mean undulation rate and ~95% CI for this sample of flying snakes?
 undulation_rate <- c(0.9, 1.2, 1.2, 1.3, 1.4, 1.4, 1.6, 2.0)
 
 undulation_mean <- mean(undulation_rate)
+undulation_mean
+
 undulation_SEM <- SEM(undulation_rate)
+undulation_SEM
 
-lower <- undulation_mean - 2 * undulation_SEM
-upper <- undulation_mean + 2 * undulation_SEM
+lower_bound <- undulation_mean - 2 * undulation_SEM
+upper_bound <- undulation_mean + 2 * undulation_SEM
 
-c(lower, undulation_mean, upper)
+c(lower_bound, undulation_mean, upper_bound)
 
 ```
 
 
 ## Approximate CI for regression parameter estimates
+
+$$Estimate \pm 2 \cdot Std.~Error$$
 
 ```{r}
 lm(Y ~ X + 1, data = M) |> summary()
@@ -516,7 +517,7 @@ What is the null hypothesis?
 :::
 
 
-## Horned lizard predation
+## Simulated data
 
 Simulate data with ~10% difference in horn length:
 
@@ -541,7 +542,7 @@ print(HL)
 ```
 
 
-## Horned lizard predation
+## Simulated data
 
 ```{r}
 HL |> 
