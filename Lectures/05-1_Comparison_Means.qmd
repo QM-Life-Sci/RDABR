@@ -32,7 +32,7 @@ shade_normal <- function(p, tail = "both", mean = 0, sd = 1) {
   require(tidyverse, quietly = TRUE)
   require(cowplot)
   crit <- qnorm(p, mean, sd)
-  
+
   M <- tibble(x = seq(-4, 4, length = 200),
               y = dnorm(x))
   PP <- ggplot(M, aes(x, y)) +
@@ -190,7 +190,7 @@ SDS <- map(.x = c(10, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500),
              return(tibble(n = .x,
                            SD = sds))
            }
-) |> 
+) |>
   list_rbind()
 
 ggplot(SDS, aes(x = n, y = SD)) +
@@ -260,9 +260,9 @@ Stickleback plate numbers:
 ```{r}
 #| echo: true
 
-SticklebackPlates |> 
-  group_by(genotype) |> 
-  summarise(Count = length(plates),
+SticklebackPlates |>
+  group_by(genotype) |>
+  summarize(Count = length(plates),
             Mean = mean(plates),
             SD_plates = sd(plates),
             SEM_plates = SEM(plates))
@@ -307,14 +307,14 @@ If the standard error is many times the estimate, then the estimate is not very 
 
 ```{r}
 #| echo: true
-#| output-location: slide 
+#| output-location: slide
 
 ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
   geom_point(position = position_jitter(width = 0.2, seed = 423479),
              alpha = 0.25, pch = 16) +
   stat_summary(fun = mean, # <1>
                geom = "point", # <1>
-               size = 3, color = "purple") + 
+               size = 3, color = "purple") +
   stat_summary(fun.data = mean_se, # <2>
                geom = "errorbar", # <3>
                width = 0.1,
@@ -367,7 +367,7 @@ DD |>
   geom_point(position = position_jitter(width = 0.2, seed = 423479),
              alpha = 0.25, pch = 16,
              size = 2) +
-  stat_summary(fun = mean, geom = "point", size = 4, color = "darkred") + 
+  stat_summary(fun = mean, geom = "point", size = 4, color = "darkred") +
   facet_wrap("DataSet", nrow = 2)
 ```
 
@@ -380,14 +380,14 @@ DD |>
 
 $$95\%~CI = \bar{x} \pm 2 \times SEM$$
 
-- Exact calculation: 
+- Exact calculation:
     - Requires a critical $t$-value and appropriate degrees of freedom for the $t$-distribution
     - Coming soon. Approximate for now...
-  
+
 
 ## Confidence intervals
 
-> A confidence interval is a range that we expect, with some level of conﬁdence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
+> A confidence interval is a range that we expect, with some level of confidence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
 
 Our calculation is based on our expectation from sampling the true population distribution *repeatedly.*
 
@@ -407,7 +407,7 @@ DD |>
              alpha = 0.25, pch = 16) +
   stat_summary(fun = mean, # <1>
                geom = "point",# <1>
-               size = 3, color = "firebrick4") + 
+               size = 3, color = "firebrick4") +
   stat_summary(fun.data = mean_cl_normal, # <2>
                geom = "errorbar", # <3>
                width = 0.1,
@@ -493,6 +493,10 @@ lm(Y ~ X + 1, data = M) |> summary()
 
 ![](https://i.imgur.com/Q1ee6FQ.png){fig-align="center" width=90%}
 
+<center>
+*Lanius ludovicianus*
+</center>
+
 
 ## Are longer horns protective against predation?
 
@@ -545,7 +549,7 @@ print(HL)
 ## Simulated data
 
 ```{r}
-HL |> 
+HL |>
   ggplot(aes(Horn_Length)) +
   geom_histogram(bins = 30, fill = "#6695DE") +
   facet_grid(Group ~ .) +
@@ -559,7 +563,7 @@ HL |>
 #| echo: true
 
 HL |>
-  group_by(Group) |> 
+  group_by(Group) |>
   summarize(n = length(Horn_Length),
             Horn_mean = mean(Horn_Length),
             Horn_sd = sd(Horn_Length),
@@ -604,7 +608,7 @@ HL |>
   geom_segment(x = -0.5, y = mu.a, xend = 0.4, yend = mu.a) +
   geom_segment(x = 0.6, y = mu.d, xend = 1.5, yend = mu.d) +
   scale_x_continuous(breaks = c(0,1),labels = c("Alive","Dead"))
- 
+
 ```
 
 
@@ -641,12 +645,12 @@ summary(mod)
 
 coef(mod)
 
-HL |> 
-  group_by(Group) |> 
+HL |>
+  group_by(Group) |>
   summarize(`Horn Length` = mean(Horn_Length),
             `SEM Horn Length` = SEM(Horn_Length),
             Lower = `Horn Length` - 2 * `SEM Horn Length`,
-            Upper = `Horn Length` + 2 * `SEM Horn Length`) |> 
+            Upper = `Horn Length` + 2 * `SEM Horn Length`) |>
   as.data.frame()
 ```
 
