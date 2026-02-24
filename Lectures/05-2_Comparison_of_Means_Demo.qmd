@@ -1,0 +1,44 @@
+---
+title: "Comparison of Two Means"
+format: html
+---
+
+```{r}
+#| echo: false
+#| message: false
+
+library(tidyverse)
+
+SEM <- function(x) {
+  sd(x) / sqrt(length(x))
+}
+
+```
+
+```{r}
+set.seed(3575575)
+
+Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
+Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
+Group <- c(rep("Alive", 150), rep("Dead", 30))
+
+HL <- tibble(Horn_Length = c(Alive, Dead), Group = factor(Group))
+
+HL |>
+  ggplot(aes(Horn_Length)) +
+  geom_histogram(bins = 30, fill = "#6695DE") +
+  facet_grid(Group ~ .) +
+  labs(x = "Horn Length (mm)", y = "Count")
+
+HL |>
+  group_by(Group) |>
+  summarize(
+    n = length(Horn_Length),
+    Horn_mean = mean(Horn_Length),
+    Horn_sd = sd(Horn_Length),
+    Horn_SEM = SEM(Horn_Length)
+  )
+
+mod <- lm(Horn_Length ~ Group, data = HL)
+summary(mod)
+```
