@@ -111,6 +111,7 @@ What will the distribution of sample *means* look like? What will the range be?
 ```{r}
 #| echo: false
 #| warning: false
+#| fig-alt: "Histogram of sample means with a sample size of 20 showing 100 random samples."
 
 ggplot(tibble(sm1), aes(sm1)) +
   geom_histogram(bins = 30, fill = "gold") +
@@ -124,6 +125,7 @@ ggplot(tibble(sm1), aes(sm1)) +
 
 ```{r}
 #| warning: false
+#| fig-alt: "Histogram of sample means with a sample size of 20 showing 1000 random samples."
 
 ggplot(tibble(x = resample_means(x, sample_size = 20, n_means = 1000)),
        aes(x)) +
@@ -138,6 +140,7 @@ ggplot(tibble(x = resample_means(x, sample_size = 20, n_means = 1000)),
 
 ```{r}
 #| warning: false
+#| fig-alt: "Histogram of sample means with a sample size of 20 showing 10000 random samples."
 
 ggplot(tibble(x = resample_means(x, sample_size = 20, n_means = 10000)),
        aes(x)) +
@@ -152,6 +155,7 @@ ggplot(tibble(x = resample_means(x, sample_size = 20, n_means = 10000)),
 
 ```{r}
 #| warning: false
+#| fig-alt: "Histogram of sample means with a sample size of 200 showing 100 random samples."
 
 ggplot(tibble(x = resample_means(x, sample_size = 200, n_means = 100)),
        aes(x)) +
@@ -166,6 +170,7 @@ ggplot(tibble(x = resample_means(x, sample_size = 200, n_means = 100)),
 
 ```{r}
 #| warning: false
+#| fig-alt: "Histogram of sample means with a sample size of 2000 showing 100 random samples."
 
 ggplot(tibble(x = resample_means(x, sample_size = 2000, n_means = 100)),
        aes(x)) +
@@ -179,6 +184,8 @@ ggplot(tibble(x = resample_means(x, sample_size = 2000, n_means = 100)),
 ## Scaling of standard deviation with sample size
 
 ```{r}
+#| fig-alt: "Plot of values for the standard deviation from a set of 100 random samples for different sample sizes."
+
 set.seed(32437)
 SDS <- map(.x = c(10, 100, 200, 300, 400, 500, 750, 1000, 1250, 1500),
            .f = function(.x) {
@@ -226,12 +233,16 @@ How will $SE_{\bar{x}}$ change as $n$ increases?
 
 ## Stickleback plates
 
-![](https://i.imgur.com/Xr68AKa.jpg){fig-align="center"}
+![](https://i.imgur.com/Xr68AKa.jpg){fig-align="center"
+fig-alt="Image of a stickleback fish."}
 
 
 ## Stickleback plates
 
 ```{r}
+#| fig-alt: "Set of histograms showing the distribution of lateral body plates in sticklebacks separately for each genotype."
+
+
 SticklebackPlates <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Stickleback_Plates.csv",
                               show_col_types = FALSE)
 
@@ -308,6 +319,8 @@ If the standard error is many times the estimate, then the estimate is not very 
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Scatterplot of the number of lateral body plates in stickleback versus genotype with means and standard errors overlayed on points."
+
 
 ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
   geom_point(position = position_jitter(width = 0.2, seed = 423479),
@@ -340,6 +353,9 @@ ggplot(SticklebackPlates, aes(x = genotype, y = plates)) +
 . . .
 
 ```{r}
+#| fig-alt: "Four scatterplots in a grid with each plot showing a scatterplot of phenotype versus treatment for two groups. Plots on the left show low variation within each group. Plots on the top show low sample size. Means are overlayed in a red point."
+
+
 mu1 <- 24.3
 mu2 <- 32.5
 
@@ -400,6 +416,8 @@ Our calculation is based on our expectation from sampling the true population di
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Four scatterplots in a grid with each plot showing a scatterplot of phenotype versus treatment for two groups. Plots on the left show low variation within each group. Plots on the top show low sample size. Means and confidence intervals are overlayed in a red point."
+
 
 DD |>
   ggplot(aes(Treatment, Phenotype)) +
@@ -426,7 +444,7 @@ DD |>
 
 Mean undulation rate for *n = 8* [gliding snakes](http://www.flyingsnake.org/){target="_blank"}:
 
-![](http://www.lazerhorse.org/wp-content/uploads/2015/01/Flying-Snake-Chrysopelea.jpg){fig-align="center" width="60%"}
+![](http://www.lazerhorse.org/wp-content/uploads/2015/01/Flying-Snake-Chrysopelea.jpg){fig-align="center" width="60%" fig-alt="Image of a flying snake."}
 
 What is the mean undulation rate and ~95% CI for this sample of flying snakes?
 
@@ -482,7 +500,7 @@ lm(Y ~ X + 1, data = M) |> summary()
 ## Horned lizard predation
 
 
-![](https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg){fig-align="center" width=90%}
+![](https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg){fig-align="center" width=90% fig-alt="Image of a horned lizard."}
 
 <center>
 *Phrynosoma cornutum*
@@ -491,7 +509,7 @@ lm(Y ~ X + 1, data = M) |> summary()
 
 ## Loggerhead shrike
 
-![](https://i.imgur.com/Q1ee6FQ.png){fig-align="center" width=90%}
+![](https://i.imgur.com/Q1ee6FQ.png){fig-align="center" width=90% fig-alt="Image of a loggerhead shrike holding a horned lizard."}
 
 <center>
 *Lanius ludovicianus*
@@ -500,7 +518,7 @@ lm(Y ~ X + 1, data = M) |> summary()
 
 ## Are longer horns protective against predation?
 
-![](https://i.imgur.com/asOgPnC.jpg){fig-align="center" width=80%}
+![](https://i.imgur.com/asOgPnC.jpg){fig-align="center" width=80% fig-alt="Image of a horned lizard impaled on a thorn."}
 
 
 ## Are longer horns protective against predation?
@@ -531,6 +549,7 @@ Simulate data with ~10% difference in horn length:
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "Two histograms stacked vertically showing the distribution of horn length in the alive group (top) and the dead group (bottom) for simulated data."
 
 set.seed(3575575)
 
@@ -549,6 +568,8 @@ print(HL)
 ## Simulated data
 
 ```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead)."
+
 HL |>
   ggplot(aes(Horn_Length)) +
   geom_histogram(bins = 30, fill = "#6695DE") +
@@ -561,6 +582,7 @@ HL |>
 
 ```{r}
 #| echo: true
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). Means for each group are plotted as a horizontal line for each group. Red lines are plotted between the mean line and each data point "
 
 HL |>
   group_by(Group) |>
@@ -676,6 +698,7 @@ IID: Independent and identically distributed
 ```{r}
 #| fig-width: 14
 #| fig-align: center
+#| fig-alt: "Density plot of the distribution of body mass in lowland gorillas."
 
 set.seed(21347)
 n <- 4000
@@ -698,6 +721,7 @@ ggplot() +
 ```{r}
 #| fig-width: 14
 #| fig-align: center
+#| fig-alt: "Density plot of the distribution of body mass in lowland gorillas with separate density plots by sex overlayed in different colors."
 
 set.seed(21347)
 n <- 4000
