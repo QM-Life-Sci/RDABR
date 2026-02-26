@@ -7,6 +7,7 @@ output:
     toc: true
     toc_depth: 4
     toc_float: true
+    embed-resources: true
 ---
 
 ```{r}
@@ -47,7 +48,7 @@ glimpse(stalk)
 Visualize the data set in two different ways by making two different plots:
 
 1. Make a boxplot showing each food type on the x-axis using `geom_boxplot()`. We haven't gone over boxplots, but here is a website with a good overview: [https://www.atlassian.com/data/charts/box-plot-complete-guide](https://www.atlassian.com/data/charts/box-plot-complete-guide){target="_blank"}. See if you can set up the boxplot so that the food source is on the x-axis and eye span on the y-axis.
-2. Plot the raw data (points) for the two groups.
+2. Plot the raw data (points) for the two groups. There are many example of this kind of plot in the lecture slides.
     - For the points, include jitter and transparency.
     - Include a point for the means and error bars standard errors of the mean plotted in a different color (the code in Lecture 05-1 "Plot raw data with summary stats" will help you).
     - Try a few different values for each of these elements (jitter, color, transparency) to find a plot you feel best communicates the structure of the data. You will find that the number of data points you have will affect how much jitter & transparency is most appropriate.
@@ -89,7 +90,13 @@ Describe the distributions within each group and between groups. What do these p
 
 #### Summary statistics
 
-For each food source calculate: the number of observations, mean, standard deviation, variance, and standard error of the mean.
+For each food source calculate: 
+
+- number of observations
+- mean
+- standard deviation
+- variance
+- standard error of the mean
 
 Use `group_by()` and `summarize()` as we have seen in the lecture slides. Remember that there is no SEM function built-in with R. Copy the function from the lecture slides and use it here.
 
@@ -153,7 +160,9 @@ Examine the coefficients in the model summary. Try to reconcile the values in th
 > The intercept is identical to the mean for the corn group. The second row in the coefficients `food_sourceCotton` is the same value as the difference between the mean for Corn and the mean for Cotton. So this row represents the mean difference between Corn and Cotton.
 
 
-We will investigate the other parts of this summary in the coming units. Next, we will use a *t*-test to estimate the difference in means in the two treatments.
+We will investigate the other parts of this summary in the coming units. 
+
+Next, we will use a *t*-test to estimate the difference in means in the two treatments. A *t*-test is a very specific kind of linear model which compares the means of two (and only two) groups. One of the assumptions of a *t*-test is that the variances of the two groups are equal.
 
 By default, the `t.test` function will perform a test that *does not* assume equal variances (called "Welch's Correction"). You may specify equal variances with `var.equal = TRUE`, *if you decide that is appropriate here*. Refer back to to the summaries (mean, sd, variance) you calculated above.
 
@@ -174,7 +183,7 @@ Study the printed output of `t.test()`. Do you find the means for the Corn and C
 `t.test()` is a function that performs a very specific task: carrying out a *t*-test (by default with Welch's correction for unequal variances). A *t*-test is just a special kind of linear model (1 categorical predictor with 2 levels), so we can also fit the same model using `lm()`. There are a few different kinds of *t*-test that you can do with `t.test()`, but all of them are just specific kinds of linear models.
 
 
-#### “Linear” Models
+#### "Linear" Models
 
 When we learned about OLS regression, the interpretation of the slope was "how much does the outcome variable (y) change for a 1 unit increase in the predictor (x)". We used `lm()` to fit those OLS models, and we just used `lm()` to fit a model comparing means (and showed how that it also equivalent to a *t*-test).
 
