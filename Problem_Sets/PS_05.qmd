@@ -26,7 +26,7 @@ Stalk-eyed flies are a group of flies whose eyes are at the ends of long project
 
 Females prefer males with wider eye spans. See the photo below:
 
-![](https://i.imgur.com/7KxZKQF.jpg){fig-align="center"}
+![](https://i.imgur.com/7KxZKQF.jpg){fig-align="center" fig-alt="Photograph of a stalk-eyed fly."}
 
 The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies (*Cyrtodiopsis dalmanni*) were reared on different food sources (`food_source`: corn and cotton). The distance between the eyes in millimeters is recorded as `eye_span`.^[David, P., T. Bjorksten, K. Fowler, and A. Pomiankowski. 2000. Condition-dependent signalling of genetic variation in stalk-eyed flies. *Nature* 406: 186-188.]
 

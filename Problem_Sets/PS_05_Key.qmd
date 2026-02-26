@@ -26,7 +26,7 @@ Stalk-eyed flies are a group of flies whose eyes are at the ends of long project
 
 Females prefer males with wider eye spans. See the photo below:
 
-![](https://i.imgur.com/7KxZKQF.jpg){fig-align="center"}
+![](https://i.imgur.com/7KxZKQF.jpg){fig-align="center" fig-alt="Photograph of a stalk-eyed fly."}
 
 The `Stalkies.csv` data file contains data for an experiment in which male stalk-eyed flies (*Cyrtodiopsis dalmanni*) were reared on different food sources (`food_source`: corn and cotton). The distance between the eyes in millimeters is recorded as `eye_span`.^[David, P., T. Bjorksten, K. Fowler, and A. Pomiankowski. 2000. Condition-dependent signalling of genetic variation in stalk-eyed flies. *Nature* 406: 186-188.]
 
@@ -56,9 +56,17 @@ Visualize the data set in two different ways by making two different plots:
 ```{r}
 # FIXME
 
+#| fig-alt: "A boxplot of Eye span versus Food Source. Eye span is longer on average and less variable on the corn food source compared to the cotton food source."
+
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_boxplot() +
   labs(x = "Food Source", y = "Eye Span (mm)")
+
+```
+
+```{r}
+#FIXME
+#| fig-alt: "A scatterplot of Eye span versus Food Source with means and standard errors overlayed in purple. Eye span is longer on average and less variable on the corn food source compared to the cotton food source."
 
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
   geom_point(position = position_jitter(width = 0.2, seed = 423479),
