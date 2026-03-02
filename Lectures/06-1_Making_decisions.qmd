@@ -10,7 +10,7 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
+    show-slide-number: all
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
@@ -41,14 +41,421 @@ source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lec
 
 # Housekeeping {background-color="#40666e"}
 
-- Problem sets: Try to answer all the questions
 - Progress check: Grading in progress
 - Be thinking about / looking for a data set
-    - Let me know if you want to discuss
+    - Let us know if you want to discuss
 
 
 # What is the process for making decisions through science? {background-color="#40666e"}
 
+
+
+## Goals of statistical inference
+
+```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). A photo of a horned lizard is inlayed on the top right."
+
+set.seed(3575575)
+
+Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
+Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
+Group <- c(rep("Alive", 150),
+           rep("Dead", 30))
+
+HL <- tibble(Horn_Length = c(Alive, Dead),
+             Group = factor(Group))
+
+liz <- image_read("https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg")
+
+img <- ggplot() + background_image(liz) 
+
+P_HL <- HL |>
+  ggplot(aes(Group, Horn_Length)) +
+  geom_point(position = position_jitter(width = 0.2, seed = 423479),
+             alpha = 0.5, size = 3) +
+  theme(text = element_text(size = 20)) +
+  labs(y = "Horn Length (mm)")
+
+P_HL +
+  inset_element(img, left = 0.8, bottom = 0.7, right = 1, top = 1)
+
+```
+
+
+## What is the effect of group on horn length? 
+
+```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line."
+
+mu.a <- mean(HL$Horn_Length[HL$Group == "Alive"])
+mu.d <- mean(HL$Horn_Length[HL$Group == "Dead"])
+
+P_HL + 
+  geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
+               color = "steelblue", linewidth = 2) +
+  geom_segment(x = 1.6, y = mu.d, xend = 2.4, yend = mu.d,
+               color = "steelblue", linewidth = 2) +
+  theme(text = element_text(size = 20)) +
+  labs(y = "Horn Length (mm)")
+ 
+```
+
+
+## What is the effect of group on horn length? 
+
+```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line. The 95% CI for each group is overlayed in red."
+
+P_HL + 
+  geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
+               color = "steelblue", linewidth = 2) +
+  geom_segment(x = 1.6, y = mu.d, xend = 2.4, yend = mu.d,
+               color = "steelblue", linewidth = 2) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1,
+               color = "red", linewidth = 2) + 
+  theme(text = element_text(size = 20)) +
+  labs(y = "Horn Length (mm)")
+
+```
+
+
+## What is the effect of group on horn length? 
+
+```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line that spans the entire plot, showing the difference in means between groups. The effect size estimate is written between the blue lines and is 0.22."
+
+dd <- mu.a - mu.d
+P_HL + 
+  geom_segment(x = 0, y = mu.a, xend = 3, yend = mu.a,
+               color = "steelblue", linewidth = 2) +
+  geom_segment(x = 0, y = mu.d, xend = 3, yend = mu.d,
+               color = "steelblue", linewidth = 2) +
+  theme(text = element_text(size = 20)) +
+  annotate("text", x = 1.5, y = mu.d + 0.5 * dd,
+           label = paste0("Difference:", round(dd, 2), " mm"), 
+           size = 6)
+
+```
+
+
+
+## How is the mean different in alive lizards compared to dead? 
+
+- Live horned lizards: `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1)` mm
+- Dead horned lizards: `r round(mean(HL$Horn_Length[HL$Group == "Dead"]), 1)` mm
+
+. . . 
+ 
+Imagine collecting 180 live horned lizards and randomly assigning 150 to one group and 30 to the other.
+
+. . .
+
+- Do you think they would have the same mean horn length?
+- How different do you think the means would be?
+- How would the variability among individual horn length measurements change your intuition?
+
+
+## How large of a difference do we expect from sampling error?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](https://i.imgur.com/EIfjPa0.jpg){fig-align="center" width=100% fig-alt="Image of two horned lizards being held in human hands."}
+:::
+
+::: {.column width="50%"}
+- Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 2.6)
+- Randomly catch two groups of $n = 150$ and  $n = 30$ from this population
+- How different are the groups?
+:::
+
+::::
+
+
+## How large of a difference do we expect from sampling error?
+
+```{r}
+#| echo: true
+#| eval: false
+
+set.seed(883231)
+
+mu.horn <- 24     # mean
+sd.horn <- 2.6    # standard deviation
+n.iter <- 100000  # number of iterations
+n.samp1 <- 150    # number in first sample
+n.samp2 <- 30     # number in second sample
+sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output  
+
+for (zz in 1:n.iter) {
+  s1 <- rnorm(n.samp1, mu.horn, sd.horn) # sample 1
+  s2 <- rnorm(n.samp2, mu.horn, sd.horn) # sample 2
+  sim.diff[zz, 'dd'] <- mean(s1) - mean(s2) # difference in means
+}
+```
+
+```{r}
+# Do the sampling here and save to Rds file.
+mu.horn <- 24     # mean
+sd.horn <- 2.6    # standard deviation
+n.iter <- 100000  # number of iterations
+n.samp1 <- 150    # number in first sample
+n.samp2 <- 30     # number in second sample
+
+if (FALSE) {
+  set.seed(883231)
+  
+  sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output  
+  
+  for (zz in 1:n.iter) {
+    s1 <- rnorm(n.samp1, mu.horn, sd.horn) # sample 1
+    s2 <- rnorm(n.samp2, mu.horn, sd.horn) # sample 2
+    sim.diff[zz, 'dd'] <- mean(s1) - mean(s2) # difference in means
+  }
+  write_rds(sim.diff, file = "../data/Random_horns.rds")
+}
+
+sim.diff <- readRDS("../data/Random_horns.rds")
+```
+
+
+## Sampling the null distribution
+
+```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
+
+set.seed(34872394)
+dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
+               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
+
+dots |> 
+  ggplot(aes(Horn_Length)) + 
+  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
+  scale_fill_viridis_d() +
+  scale_y_continuous(NULL, breaks = NULL) +
+  scale_x_continuous(limits = c(15, 35)) +
+  labs(x = "Horn Length (mm)")
+```
+
+
+## Sampling the null distribution
+
+```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
+
+dots |> 
+  ggplot(aes(Horn_Length, fill = Group)) + 
+  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
+  scale_fill_viridis_d() +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(legend.position = c(0.8, 0.8)) +
+  scale_x_continuous(limits = c(15, 35)) +
+  labs(x = "Horn Length (mm)")
+
+```
+
+
+## Sampling the null distribution
+
+```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
+
+set.seed(3424)
+dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
+               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
+
+dots |> 
+  ggplot(aes(Horn_Length, fill = Group)) + 
+  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
+  scale_fill_viridis_d() +
+  scale_y_continuous(NULL, breaks = NULL) +
+  scale_x_continuous(limits = c(15, 35)) +
+  theme(legend.position = c(0.8, 0.8)) +
+  labs(x = "Horn Length (mm)")
+```
+
+
+## Sampling the null distribution
+
+```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
+
+set.seed(67566)
+dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
+               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
+
+dots |> 
+  ggplot(aes(Horn_Length, fill = Group)) + 
+  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
+  scale_fill_viridis_d() +
+  scale_y_continuous(NULL, breaks = NULL) +
+  scale_x_continuous(limits = c(15, 35)) +
+  theme(legend.position = c(0.8, 0.8)) +
+  labs(x = "Horn Length (mm)")
+```
+
+
+## How large of a difference do we expect from sampling error?
+
+```{r}
+#| fig-alt: "Histogram of the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution."
+
+sim.diff <- readRDS("../data/Random_horns.rds")
+
+ggplot(sim.diff, aes(x = dd)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  labs(x = "Difference of Means", y = "Count")
+```
+
+
+## How large of a difference do we expect from sampling error?
+
+```{r}
+#| fig-alt: "Three panels of histograms. The right histogram shows the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. Two stacked histograms on the left show the distribution of horn lengths for the alive group (top) and dead group(bottom) with vertical red lines showing the mean."
+
+p1 <- ggplot(sim.diff, aes(x = dd)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  labs(x = "Difference of Means", y = "Count")
+
+HL_mean <- HL |> 
+  group_by(Group) |> 
+  summarize(Mean = mean(Horn_Length)) |> 
+  gather(Value, x, -Group)
+
+p2 <- HL |> 
+  ggplot(aes(Horn_Length)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
+             linewidth = 2, color = "firebrick4") +
+  facet_grid(Group ~ .) +
+  labs(x = "Horn Length (mm)", y = "Count") +
+  theme(legend.position = "none")
+
+plot_grid(p2, p1, ncol = 2)
+```
+
+<center>
+Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 2) - round(mean(HL$Horn_Length[HL$Group == "Dead"]), 2)` mm
+</center>
+
+
+## Goals of Statistical Inference
+
+::: {.incremental}
+
+1. Parameter (i.e., effect) estimation
+    - Given a model, with unknown parameters ($\theta_0$, $\theta_1$, ..., $\theta_k$), how to estimate values of those parameters?
+2. Interval estimation
+    - How to quantify the uncertainty associated with parameter estimates?
+3. Making decisions (i.e., Hypothesis testing)
+    - How to test hypotheses about parameter estimates?
+    - What conclusions can we make from our analysis?
+
+:::
+
+    
+## Hypotheses
+
+**Hypothesis**: a statement that can be either true or false
+
+**Statistical hypothesis**: a hypothesis about about a parameter (or parameters) of a population or process
+
+- Many statistical analyses have the goal of performing a hypothesis test.
+
+
+## Parameter Estimation
+
+```{r}
+#| fig-alt: "Three panels of histograms. The right histogram shows the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. Two stacked histograms on the left show the distribution of horn lengths for the alive group (top) and dead group(bottom) with vertical red lines showing the mean."
+
+p1 <- ggplot(sim.diff, aes(x = dd)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  labs(x = "Difference of Means", y = "Count")
+
+HL_mean <- HL |> 
+  group_by(Group) |> 
+  summarize(Mean = mean(Horn_Length)) |> 
+  gather(Value, x, -Group)
+
+p2 <- HL |> 
+  ggplot(aes(Horn_Length)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
+             linewidth = 2, color = "firebrick4") +
+  facet_grid(Group ~ .) +
+  labs(x = "Horn Length (mm)", y = "Count") +
+  theme(legend.position = "none")
+
+plot_grid(p2, p1, ncol = 2)
+```
+
+<center>
+Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 2) - round(mean(HL$Horn_Length[HL$Group == "Dead"]), 2)` mm
+</center>
+
+
+## Making Decisions {.smaller}
+
+> What is the probability of observing a difference **as big or bigger** than the observed difference *from sampling error alone*? 
+
+The answer to this question is called a *P*-value: *P* = 4/100000 = 0.00004
+
+
+```{r}
+#| fig-align: center
+#| fig-alt: "Histogram showing the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. The +/- value for the observed difference of 2.2 is shown on either side with a vertical red line. The observations that equal or exceed this value are shown in red as points."
+
+set_above <- sim.diff[sim.diff$dd >= dd | sim.diff$dd <= -dd,]
+set_above$y <- 1
+
+p1 <- ggplot(sim.diff, aes(x = dd)) +
+  geom_histogram(bins = 30, fill = "gray50") +
+  geom_vline(xintercept = c(-dd,dd), linewidth = 2, color = "firebrick4") +
+  geom_point(data = set_above, aes(dd, y), size = 3, alpha = 0.8,
+             color = "firebrick4") +
+  labs(x = "Difference of Means", y = "Count") 
+p1
+
+```
+
+
+## Obtaining *P*-values
+
+- Calculate test statistic
+- Determine *P*-value (area under tail(s))
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+```{r}
+#| fig-align: center
+#| fig-height: 7
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 178 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
+
+shade_t(0.025, 178, tail = "both") +
+  theme(text = element_text(size = 30))
+
+```
+
+:::
+
+::: {.column width="50%"}
+
+
+```{r}
+#| fig-align: center
+#| fig-height: 7
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 178 degrees of freedom. The upper tail of the distribution representing 5% of the density is shaded in pink."
+
+shade_t(0.05, 178, tail = "upper") +
+  theme(text = element_text(size = 30))
+
+```
+
+:::
+
+::::
 
 # Distributions and tail probabilities {background-color="#40666e"}
 
@@ -465,95 +872,6 @@ pp
   
 ```
 
-
-## Goals of statistical inference
-
-```{r}
-#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). A photo of a horned lizard is inlayed on the top right."
-
-set.seed(3575575)
-
-Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
-Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
-Group <- c(rep("Alive", 150),
-           rep("Dead", 30))
-
-HL <- tibble(Horn_Length = c(Alive, Dead),
-             Group = factor(Group))
-
-liz <- image_read("https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg")
-
-img <- ggplot() + background_image(liz) 
-
-P_HL <- HL |>
-  ggplot(aes(Group, Horn_Length)) +
-  geom_point(position = position_jitter(width = 0.2, seed = 423479),
-             alpha = 0.5, size = 3) +
-  theme(text = element_text(size = 20)) +
-  labs(y = "Horn Length (mm)")
-
-P_HL +
-  inset_element(img, left = 0.8, bottom = 0.7, right = 1, top = 1)
-
-```
-
-
-## What is the effect of group on horn length? 
-
-```{r}
-#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line."
-
-mu.a <- mean(HL$Horn_Length[HL$Group == "Alive"])
-mu.d <- mean(HL$Horn_Length[HL$Group == "Dead"])
-
-P_HL + 
-  geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
-               color = "steelblue", linewidth = 2) +
-  geom_segment(x = 1.6, y = mu.d, xend = 2.4, yend = mu.d,
-               color = "steelblue", linewidth = 2) +
-  theme(text = element_text(size = 20)) +
-  labs(y = "Horn Length (mm)")
- 
-```
-
-
-## What is the effect of group on horn length? 
-
-```{r}
-#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line. The 95% CI for each group is overlayed in red."
-
-P_HL + 
-  geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
-               color = "steelblue", linewidth = 2) +
-  geom_segment(x = 1.6, y = mu.d, xend = 2.4, yend = mu.d,
-               color = "steelblue", linewidth = 2) +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1,
-               color = "red", linewidth = 2) + 
-  theme(text = element_text(size = 20)) +
-  labs(y = "Horn Length (mm)")
-
-```
-
-
-## What is the effect of group on horn length? 
-
-```{r}
-#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line that spans the entire plot, showing the difference in means between groups. The effect size estimate is written between the blue lines and is 0.22."
-
-dd <- mu.a - mu.d
-P_HL + 
-  geom_segment(x = 0, y = mu.a, xend = 3, yend = mu.a,
-               color = "steelblue", linewidth = 2) +
-  geom_segment(x = 0, y = mu.d, xend = 3, yend = mu.d,
-               color = "steelblue", linewidth = 2) +
-  theme(text = element_text(size = 20)) +
-  annotate("text", x = 1.5, y = mu.d + 0.5 * dd,
-           label = paste0("Effect Size = ", round(dd, 2)),
-           size = 6)
-
-```
-
-
 ## How certain are we of the effect of group?
 
 ```{r}
@@ -621,324 +939,6 @@ cohens_d(Horn_Length ~ Group, data = HL)
 
 - Uses "pooled" standard deviation: sd weighted by the sample size
 
-
-## How is the mean different in alive lizards compared to dead? 
-
-- Live horned lizards: `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1)` mm
-- Dead horned lizards: `r round(mean(HL$Horn_Length[HL$Group == "Dead"]), 1)` mm
-
-. . . 
- 
-Imagine collecting 180 live horned lizards and randomly assigning 150 to one group and 30 to the other.
-
-. . .
-
-- Do you think they would have the same mean horn length?
-- How different do you think the means would be?
-- How would the variability among individual horn length measurements change your intuition?
-
-
-## How large of a difference do we expect from sampling error?
-
-:::: {.columns}
-
-::: {.column width="50%"}
-![](https://i.imgur.com/EIfjPa0.jpg){fig-align="center" width=100% fig-alt="Image of two horned lizards being held in human hands."}
-:::
-
-::: {.column width="50%"}
-- Imagine a distribution of horn lengths for a population of horned lizards (mean = 24, sd = 2.6)
-- Randomly catch two groups of $n = 150$ and  $n = 30$ from this population
-- How different are the groups?
-:::
-
-::::
-
-
-## How large of a difference do we expect from sampling error?
-
-```{r}
-#| echo: true
-#| eval: false
-
-set.seed(883231)
-
-mu.horn <- 24     # mean
-sd.horn <- 2.6    # standard deviation
-n.iter <- 100000  # number of iterations
-n.samp1 <- 150    # number in first sample
-n.samp2 <- 30     # number in second sample
-sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output  
-
-for (zz in 1:n.iter) {
-  s1 <- rnorm(n.samp1, mu.horn, sd.horn) # sample 1
-  s2 <- rnorm(n.samp2, mu.horn, sd.horn) # sample 2
-  sim.diff[zz, 'dd'] <- mean(s1) - mean(s2) # difference in means
-}
-```
-
-```{r}
-# Do the sampling here and save to Rds file.
-mu.horn <- 24     # mean
-sd.horn <- 2.6    # standard deviation
-n.iter <- 100000  # number of iterations
-n.samp1 <- 150    # number in first sample
-n.samp2 <- 30     # number in second sample
-
-if (FALSE) {
-  set.seed(883231)
-  
-  sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output  
-  
-  for (zz in 1:n.iter) {
-    s1 <- rnorm(n.samp1, mu.horn, sd.horn) # sample 1
-    s2 <- rnorm(n.samp2, mu.horn, sd.horn) # sample 2
-    sim.diff[zz, 'dd'] <- mean(s1) - mean(s2) # difference in means
-  }
-  write_rds(sim.diff, file = "../data/Random_horns.rds")
-}
-
-sim.diff <- readRDS("../data/Random_horns.rds")
-```
-
-
-## Sampling the null distribution
-
-```{r}
-#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
-
-set.seed(34872394)
-dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
-               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
-
-dots |> 
-  ggplot(aes(Horn_Length)) + 
-  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
-  scale_y_continuous(NULL, breaks = NULL) +
-  scale_x_continuous(limits = c(15, 35)) +
-  labs(x = "Horn Length (mm)")
-```
-
-
-## Sampling the null distribution
-
-```{r}
-#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
-
-dots |> 
-  ggplot(aes(Horn_Length, fill = Group)) + 
-  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme(legend.position = c(0.8, 0.8)) +
-  scale_x_continuous(limits = c(15, 35)) +
-  labs(x = "Horn Length (mm)")
-
-```
-
-
-## Sampling the null distribution
-
-```{r}
-#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
-
-set.seed(3424)
-dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
-               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
-
-dots |> 
-  ggplot(aes(Horn_Length, fill = Group)) + 
-  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
-  scale_y_continuous(NULL, breaks = NULL) +
-  scale_x_continuous(limits = c(15, 35)) +
-  theme(legend.position = c(0.8, 0.8)) +
-  labs(x = "Horn Length (mm)")
-```
-
-
-## Sampling the null distribution
-
-```{r}
-#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
-
-set.seed(67566)
-dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
-               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
-
-dots |> 
-  ggplot(aes(Horn_Length, fill = Group)) + 
-  geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
-  scale_y_continuous(NULL, breaks = NULL) +
-  scale_x_continuous(limits = c(15, 35)) +
-  theme(legend.position = c(0.8, 0.8)) +
-  labs(x = "Horn Length (mm)")
-```
-
-
-## How large of a difference do we expect from sampling error?
-
-```{r}
-#| fig-alt: "Histogram of the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution."
-
-sim.diff <- readRDS("../data/Random_horns.rds")
-
-ggplot(sim.diff, aes(x = dd)) +
-  geom_histogram(bins = 30, fill = "gray50") +
-  labs(x = "Difference of Means", y = "Count")
-```
-
-
-## How large of a difference do we expect from sampling error?
-
-```{r}
-#| fig-alt: "Three panels of histograms. The right histogram shows the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. Two stacked histograms on the left show the distribution of horn lengths for the alive group (top) and dead group(bottom) with vertical red lines showing the mean."
-
-p1 <- ggplot(sim.diff, aes(x = dd)) +
-  geom_histogram(bins = 30, fill = "gray50") +
-  labs(x = "Difference of Means", y = "Count")
-
-HL_mean <- HL |> 
-  group_by(Group) |> 
-  summarize(Mean = mean(Horn_Length)) |> 
-  gather(Value, x, -Group)
-
-p2 <- HL |> 
-  ggplot(aes(Horn_Length)) +
-  geom_histogram(bins = 30, fill = "gray50") +
-  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
-             linewidth = 2, color = "firebrick4") +
-  facet_grid(Group ~ .) +
-  labs(x = "Horn Length (mm)", y = "Count") +
-  theme(legend.position = "none")
-
-plot_grid(p2, p1, ncol = 2)
-```
-
-<center>
-Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1) - round(mean(HL$Horn_Length[HL$Group == "Dead"]), 1)` mm
-</center>
-
-
-## Goals of Statistical Inference
-
-::: {.incremental}
-
-1. Parameter (i.e., effect) estimation
-    - Given a model, with unknown parameters ($\theta_0$, $\theta_1$, ..., $\theta_k$), how to estimate values of those parameters?
-2. Interval estimation
-    - How to quantify the uncertainty associated with parameter estimates?
-3. Making decisions (i.e., Hypothesis testing)
-    - How to test hypotheses about parameter estimates?
-    - What conclusions can we make from our analysis?
-
-:::
-
-    
-## Hypotheses
-
-**Hypothesis**: a statement that can be either true or false
-
-**Statistical hypothesis**: a hypothesis about about a parameter (or parameters) of a population or process
-
-- Many statistical analyses have the goal of performing a hypothesis test.
-
-
-## How large of a difference do we expect from sampling error?
-
-```{r}
-#| fig-alt: "Three panels of histograms. The right histogram shows the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. Two stacked histograms on the left show the distribution of horn lengths for the alive group (top) and dead group(bottom) with vertical red lines showing the mean."
-
-p1 <- ggplot(sim.diff, aes(x = dd)) +
-  geom_histogram(bins = 30, fill = "gray50") +
-  labs(x = "Difference of Means", y = "Count")
-
-HL_mean <- HL |> 
-  group_by(Group) |> 
-  summarize(Mean = mean(Horn_Length)) |> 
-  gather(Value, x, -Group)
-
-p2 <- HL |> 
-  ggplot(aes(Horn_Length)) +
-  geom_histogram(bins = 30, fill = "gray50") +
-  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
-             linewidth = 2, color = "firebrick4") +
-  facet_grid(Group ~ .) +
-  labs(x = "Horn Length (mm)", y = "Count") +
-  theme(legend.position = "none")
-
-plot_grid(p2, p1, ncol = 2)
-```
-
-<center>
-Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1) - round(mean(HL$Horn_Length[HL$Group == "Dead"]), 1)` mm
-</center>
-
-
-## Making Decisions {.smaller}
-
-> What is the probability of observing a difference **as big or bigger** than the observed difference *from sampling error alone*? 
-
-The answer to this question is called a *P*-value: *P* = 4/100000 = 0.00004
-
-
-```{r}
-#| fig-align: center
-#| fig-alt: "Histogram showing the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. The +/- value for the observed difference of 2.2 is shown on either side with a vertical red line. The observations that equal or exceed this value are shown in red as points."
-
-set_above <- sim.diff[sim.diff$dd >= dd | sim.diff$dd <= -dd,]
-set_above$y <- 1
-
-p1 <- ggplot(sim.diff, aes(x = dd)) +
-  geom_histogram(bins = 30, fill = "gray50") +
-  geom_vline(xintercept = c(-dd,dd), linewidth = 2, color = "firebrick4") +
-  geom_point(data = set_above, aes(dd, y), size = 3, alpha = 0.8,
-             color = "firebrick4") +
-  labs(x = "Difference of Means", y = "Count") 
-p1
-
-```
-
-
-## Obtaining *P*-values
-
-- Calculate test statistic
-- Determine *P*-value (area under tail(s))
-
-:::: {.columns}
-
-::: {.column width="50%"}
-
-```{r}
-#| fig-align: center
-#| fig-height: 7
-#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 178 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
-
-shade_t(0.025, 178, tail = "both") +
-  theme(text = element_text(size = 30))
-
-```
-
-:::
-
-::: {.column width="50%"}
-
-
-```{r}
-#| fig-align: center
-#| fig-height: 7
-#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 178 degrees of freedom. The upper tail of the distribution representing 5% of the density is shaded in pink."
-
-shade_t(0.05, 178, tail = "upper") +
-  theme(text = element_text(size = 30))
-
-```
-
-:::
-
-::::
 
 
 ## Obtaining *P*-values
