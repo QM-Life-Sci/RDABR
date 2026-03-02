@@ -70,6 +70,8 @@ sd5 <- tibble(y = rnorm(100000, 5, 5))
 ## Histograms of random normal values
 
 ```{r echo=FALSE}
+#| fig-alt: "Two histograms side by side. Each shows the distribution of 100,000 values drawn from a normal distribution with a mean of 5. The histogram on the left has a standard deviation of 1 while the histogram on the right has a standard deviation of 5."
+
 p1 <- sd1 |> ggplot(aes(y)) +
   geom_histogram(bins = 50, fill = "forestgreen") +
   labs(y = "Count")
@@ -125,6 +127,7 @@ Compare the values returned by `pnorm()` to the proportions on the previous slid
 ```{r}
 #| echo: true
 #| fig-align: center
+#| fig-alt: "Density plot showing the relative likelihood versus values for a normal distribtution. The tails of the distribution representing 2.5% of the density are shaded in pink."
 
 shade_normal(p = 0.025, tail = "both", mean = 5, sd = 1)
 qnorm(0.025, mean = 5, sd = 1)
@@ -139,6 +142,7 @@ qnorm(0.025, mean = 5, sd = 1)
 ```{r}
 #| echo: true
 #| fig-align: center
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 5 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
 
 shade_t(0.025, df = 5)
 qt(0.025, df = 5)
@@ -154,6 +158,7 @@ Multiply the *SEM* by the *t*-value encompassing 95% for a *t* distribution with
 #| warning: false
 #| fig-height: 5
 #| fig-align: center
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution. Different colored lines show the distribution for different degrees of freedom (2, 5, and 20). A dark blue line shows the density for a normal distribution."
 
 x <- seq(-4, 4, by = 0.01)
 
@@ -199,6 +204,7 @@ qnorm(0.975, 0, 1)
 
 ```{r}
 #| echo: false
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 5 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
 
 shade_t(0.025, 5) +
   ggtitle(TeX("$t$-distribution with df = 5"))
@@ -264,6 +270,8 @@ Our calculation is based on our expectation from sampling the true population di
 ```{r}
 #| echo: true
 #| fig-align: center
+#| fig-alt: "Density plot showing the relative likelihood versus values for the F distribution with 2 and 10 degrees of freedom. The tail of the distribution representing 5% of the density are shaded in pink."
+
 
 shade_F(0.05, df1 = 2, df2 = 10)
 qf(0.05, df1 = 2, df2 = 10, lower.tail = FALSE)
@@ -275,6 +283,7 @@ qf(0.05, df1 = 2, df2 = 10, lower.tail = FALSE)
 ```{r fig.height = 3}
 #| echo: true
 #| fig-align: center
+#| fig-alt: "Density plot showing the relative likelihood versus values for the chi-squared distribution with 2 degrees of freedom. The tail of the distribution representing 5% of the density are shaded in pink."
 
 shade_chisq(0.05, df = 2)
 qchisq(0.05, df = 2, lower.tail = FALSE)
@@ -291,6 +300,7 @@ qchisq(0.05, df = 2, lower.tail = FALSE)
 
 ```{r}
 #| fig-height: 7
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The tails of the distribution representing 2.5% of the density are shaded in pink."
 
 shade_normal(0.025, tail = "both") +
   theme(text = element_text(size = 24))
@@ -302,6 +312,7 @@ shade_normal(0.025, tail = "both") +
 
 ```{r}
 #| fig-height: 7
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The upper tail of the distribution representing 5% of the density is shaded in pink."
 
 shade_normal(0.05, tail = "upper") +
   theme(text = element_text(size = 24))
@@ -317,6 +328,7 @@ shade_normal(0.05, tail = "upper") +
 ```{r}
 #| echo: true
 #| fig-align: center
+#| fig-alt: "Density plot showing the relative likelihood versus values for a normal distribution with a mean of -10 and standard deviation of 2. The upper tail of the distribution representing 34% of the density is shaded in pink."
 
 shade_normal(0.34, tail = "upper", mean = -10, sd = 2)
 ```
@@ -352,6 +364,7 @@ RR <- tibble("values" = rnorm(50,0,1))
 ::: {.column width="40%"}
 
 ```{r}
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution."
 
 shade_normal(0, tail = "both")
 
@@ -372,6 +385,7 @@ RR
 ::: {.column width="40%"}
 
 ```{r}
+#| fig-alt: "Dotplot showing 50 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
 
 ggplot(RR, aes(values)) + 
   geom_dotplot() +
@@ -394,6 +408,8 @@ dnorm(x = 1, mean = 0, sd = 1)
 ```
 
 ```{r}
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. There is a vertical line at the x value of 1 and a dashed horizontal line at the y value 0.242, which is the relative likelihood corresponding to x=1."
+
 M <- tibble(x = seq(-4, 4, length = 200),
             y = dnorm(x))
 
@@ -421,6 +437,7 @@ pnorm(q = 1, mean = 0, sd = 1)
 
 ```{r}
 #| echo: false
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The lower tail for x=1 is shaded in pink."
 
 shade_normal(0.8413447, tail = "lower")
 
@@ -439,6 +456,7 @@ qnorm(p = 0.841, mean = 0, sd = 1)
 
 ```{r}
 #| echo: false
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The lower tail for x=1 is shaded in pink."
 
 pp <- shade_normal(0.8413447, tail = "lower") +
   geom_vline(xintercept = 1) +
@@ -451,6 +469,8 @@ pp
 ## Goals of statistical inference
 
 ```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). A photo of a horned lizard is inlayed on the top right."
+
 set.seed(3575575)
 
 Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
@@ -464,7 +484,6 @@ HL <- tibble(Horn_Length = c(Alive, Dead),
 liz <- image_read("https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg")
 
 img <- ggplot() + background_image(liz) 
-
 
 P_HL <- HL |>
   ggplot(aes(Group, Horn_Length)) +
@@ -482,6 +501,8 @@ P_HL +
 ## What is the effect of group on horn length? 
 
 ```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line."
+
 mu.a <- mean(HL$Horn_Length[HL$Group == "Alive"])
 mu.d <- mean(HL$Horn_Length[HL$Group == "Dead"])
 
@@ -499,6 +520,8 @@ P_HL +
 ## What is the effect of group on horn length? 
 
 ```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line. The 95% CI for each group is overlayed in red."
+
 P_HL + 
   geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
                color = "steelblue", linewidth = 2) +
@@ -515,6 +538,8 @@ P_HL +
 ## What is the effect of group on horn length? 
 
 ```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line that spans the entire plot, showing the difference in means between groups. The effect size estimate is written between the blue lines and is 0.22."
+
 dd <- mu.a - mu.d
 P_HL + 
   geom_segment(x = 0, y = mu.a, xend = 3, yend = mu.a,
@@ -532,6 +557,8 @@ P_HL +
 ## How certain are we of the effect of group?
 
 ```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The effect size lower bound is plotted as a dark blue box, the estimate as a lighter blue box, and the upper bound as the lightest blue box."
+
 ttt <- t.test(Horn_Length ~ Group, data = HL)
 g_mu <- mean(c(mu.a, mu.d))
 ll <- ttt$conf.int[1]
@@ -616,7 +643,7 @@ Imagine collecting 180 live horned lizards and randomly assigning 150 to one gro
 :::: {.columns}
 
 ::: {.column width="50%"}
-![](https://i.imgur.com/EIfjPa0.jpg){fig-align="center" width=100%}
+![](https://i.imgur.com/EIfjPa0.jpg){fig-align="center" width=100% fig-alt="Image of two horned lizards being held in human hands."}
 :::
 
 ::: {.column width="50%"}
@@ -678,6 +705,8 @@ sim.diff <- readRDS("../data/Random_horns.rds")
 ## Sampling the null distribution
 
 ```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
+
 set.seed(34872394)
 dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
                Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
@@ -695,6 +724,8 @@ dots |>
 ## Sampling the null distribution
 
 ```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
+
 dots |> 
   ggplot(aes(Horn_Length, fill = Group)) + 
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
@@ -710,6 +741,8 @@ dots |>
 ## Sampling the null distribution
 
 ```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
+
 set.seed(3424)
 dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
                Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
@@ -728,6 +761,8 @@ dots |>
 ## Sampling the null distribution
 
 ```{r}
+#| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
+
 set.seed(67566)
 dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
                Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
@@ -746,6 +781,7 @@ dots |>
 ## How large of a difference do we expect from sampling error?
 
 ```{r}
+#| fig-alt: "Histogram of the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution."
 
 sim.diff <- readRDS("../data/Random_horns.rds")
 
@@ -758,6 +794,8 @@ ggplot(sim.diff, aes(x = dd)) +
 ## How large of a difference do we expect from sampling error?
 
 ```{r}
+#| fig-alt: "Three panels of histograms. The right histogram shows the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. Two stacked histograms on the left show the distribution of horn lengths for the alive group (top) and dead group(bottom) with vertical red lines showing the mean."
+
 p1 <- ggplot(sim.diff, aes(x = dd)) +
   geom_histogram(bins = 30, fill = "gray50") +
   labs(x = "Difference of Means", y = "Count")
@@ -811,6 +849,8 @@ Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1) - r
 ## How large of a difference do we expect from sampling error?
 
 ```{r}
+#| fig-alt: "Three panels of histograms. The right histogram shows the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. Two stacked histograms on the left show the distribution of horn lengths for the alive group (top) and dead group(bottom) with vertical red lines showing the mean."
+
 p1 <- ggplot(sim.diff, aes(x = dd)) +
   geom_histogram(bins = 30, fill = "gray50") +
   labs(x = "Difference of Means", y = "Count")
@@ -846,6 +886,7 @@ The answer to this question is called a *P*-value: *P* = 4/100000 = 0.00004
 
 ```{r}
 #| fig-align: center
+#| fig-alt: "Histogram showing the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. The +/- value for the observed difference of 2.2 is shown on either side with a vertical red line. The observations that equal or exceed this value are shown in red as points."
 
 set_above <- sim.diff[sim.diff$dd >= dd | sim.diff$dd <= -dd,]
 set_above$y <- 1
@@ -873,6 +914,7 @@ p1
 ```{r}
 #| fig-align: center
 #| fig-height: 7
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 178 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
 
 shade_t(0.025, 178, tail = "both") +
   theme(text = element_text(size = 30))
@@ -887,6 +929,7 @@ shade_t(0.025, 178, tail = "both") +
 ```{r}
 #| fig-align: center
 #| fig-height: 7
+#| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 178 degrees of freedom. The upper tail of the distribution representing 5% of the density is shaded in pink."
 
 shade_t(0.05, 178, tail = "upper") +
   theme(text = element_text(size = 30))
@@ -964,6 +1007,8 @@ Type II error occurs when:
 ## Making Decisions
 
 ```{r}
+#| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Darker colored points and lines denote higher p-values. Different regions of the plot show where an effect is not biologically meaningful, uncertain, or clearly biologically meaningful."
+
 gall <- tribble(
   ~ group, ~ y, ~ x, ~ Effect, ~ P, ~ Significant,
   "g1", 1,  0.01, 0.31,  0.050, "*",
@@ -1045,6 +1090,8 @@ Figure inspired by Ian Dworkin
 Null hypothesis significance testing is often used inappropriately as an all or nothing decision-making tool.
 
 ```{r}
+#| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Red points and lines show significant results while black points and lines are not significant."
+
 nhst.plot <- ggplot(gall, aes(x,y, group = group, color = Significant)) +
   geom_line(linewidth = 3) +
   geom_point(data=gall, aes(Effect,y,color = Significant), size = 5) +
@@ -1126,6 +1173,7 @@ Corollaries proposed by Ioannidis [-@Ioannidis2005-od]:
 This:
 
 ```{r, fig.height=10}
+#| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Darker colored points and lines denote higher p-values. Different regions of the plot show where an effect is not biologically meaningful, uncertain, or clearly biologically meaningful."
 
 dec.plot
 
@@ -1138,6 +1186,7 @@ dec.plot
 Not this:
 
 ```{r, fig.height=10}
+#| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Red points and lines show significant results while black points and lines are not significant."
 
 nhst.plot
 
