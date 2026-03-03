@@ -56,7 +56,6 @@ source(
 # What is the process for making decisions through science? {background-color="#40666e"}
 
 
-
 ## Goals of statistical inference
 
 ```{r}
@@ -122,6 +121,7 @@ P_HL +
 
 ```
 
+
 ## What is the effect of group on horn length?
 
 ```{r}
@@ -156,6 +156,7 @@ P_HL +
 
 ```
 
+
 ## What is the effect of group on horn length?
 
 ```{r}
@@ -182,7 +183,7 @@ P_HL +
     fun.data = mean_cl_normal,
     geom = "errorbar",
     width = 0.1,
-    color = "firebrick4",
+    color = "firebrick",
     linewidth = 2
   ) +
   theme(text = element_text(size = 20)) +
@@ -287,7 +288,6 @@ dots <- tibble(
 dots |>
   ggplot(aes(Horn_Length)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
   scale_y_continuous(NULL, breaks = NULL) +
   scale_x_continuous(limits = c(15, 35)) +
   labs(x = "Horn Length (mm)")
@@ -302,7 +302,7 @@ dots |>
 dots |>
   ggplot(aes(Horn_Length, fill = Group)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
+  scale_fill_manual(values = c("steelblue", "firebrick4")) +
   scale_y_continuous(NULL, breaks = NULL) +
   theme(legend.position = c(0.8, 0.8)) +
   scale_x_continuous(limits = c(15, 35)) +
@@ -325,7 +325,7 @@ dots <- tibble(
 dots |>
   ggplot(aes(Horn_Length, fill = Group)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
+  scale_fill_manual(values = c("steelblue", "firebrick4")) +
   scale_y_continuous(NULL, breaks = NULL) +
   scale_x_continuous(limits = c(15, 35)) +
   theme(legend.position = c(0.8, 0.8)) +
@@ -347,7 +347,7 @@ dots <- tibble(
 dots |>
   ggplot(aes(Horn_Length, fill = Group)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
-  scale_fill_viridis_d() +
+  scale_fill_manual(values = c("steelblue", "firebrick4")) +
   scale_y_continuous(NULL, breaks = NULL) +
   scale_x_continuous(limits = c(15, 35)) +
   theme(legend.position = c(0.8, 0.8)) +
@@ -554,11 +554,11 @@ sd5 <- tibble(y = rnorm(100000, 5, 5))
 
 p1 <- sd1 |>
   ggplot(aes(y)) +
-  geom_histogram(bins = 50, fill = "forestgreen") +
+  geom_histogram(bins = 50, fill = "darkgreen") +
   labs(y = "Count")
 p2 <- sd5 |>
   ggplot(aes(y)) +
-  geom_histogram(bins = 50, fill = "forestgreen") +
+  geom_histogram(bins = 50, fill = "darkgreen") +
   labs(y = "Count")
 
 plot_grid(p1, p2, ncol = 2)
@@ -688,6 +688,7 @@ Multiply the *SEM* by the *t*-value encompassing 95% for a *t* distribution with
 ```{r}
 #| echo: false
 #| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 5 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
+#| fig-align: center
 
 shade_t(0.025, 5) +
   ggtitle(TeX("$t$-distribution with df = 5"))
@@ -915,6 +916,7 @@ Type II error occurs when:
 
 ```{r}
 #| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Darker colored points and lines denote higher p-values. Different regions of the plot show where an effect is not biologically meaningful, uncertain, or clearly biologically meaningful."
+#| fig-align: center
 
 gall <- tribble(
   ~ group, ~ y, ~ x, ~ Effect, ~ P, ~ Significant,
@@ -1032,6 +1034,7 @@ Null hypothesis significance testing is often used inappropriately as an all or 
 
 ```{r}
 #| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Red points and lines show significant results while black points and lines are not significant."
+#| fig-align: center
 
 nhst.plot <- ggplot(gall, aes(x, y, group = group, color = Significant)) +
   geom_line(linewidth = 3) +
