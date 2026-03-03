@@ -1,6 +1,6 @@
 ---
 title: "Unit 6: Making Decisions"
-subtitle: "Tail probabilities, hypothesis testing, and null models"
+subtitle: "Confidence Intervals and Hypothesis Testing"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -122,42 +122,6 @@ P_HL +
 
 ```
 
-
-## What is the effect of group on horn length?
-
-```{r}
-#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line. The 95% CI for each group is overlayed in red."
-
-P_HL +
-  geom_segment(
-    x = 0.6,
-    y = mu.a,
-    xend = 1.4,
-    yend = mu.a,
-    color = "steelblue",
-    linewidth = 2
-  ) +
-  geom_segment(
-    x = 1.6,
-    y = mu.d,
-    xend = 2.4,
-    yend = mu.d,
-    color = "steelblue",
-    linewidth = 2
-  ) +
-  stat_summary(
-    fun.data = mean_cl_normal,
-    geom = "errorbar",
-    width = 0.1,
-    color = "red",
-    linewidth = 2
-  ) +
-  theme(text = element_text(size = 20)) +
-  labs(y = "Horn Length (mm)")
-
-```
-
-
 ## What is the effect of group on horn length?
 
 ```{r}
@@ -191,6 +155,41 @@ P_HL +
   )
 
 ```
+
+## What is the effect of group on horn length?
+
+```{r}
+#| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line. The 95% CI for each group is overlayed in red."
+
+P_HL +
+  geom_segment(
+    x = 0.6,
+    y = mu.a,
+    xend = 1.4,
+    yend = mu.a,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  geom_segment(
+    x = 1.6,
+    y = mu.d,
+    xend = 2.4,
+    yend = mu.d,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  stat_summary(
+    fun.data = mean_cl_normal,
+    geom = "errorbar",
+    width = 0.1,
+    color = "firebrick4",
+    linewidth = 2
+  ) +
+  theme(text = element_text(size = 20)) +
+  labs(y = "Horn Length (mm)")
+
+```
+
 
 
 
@@ -632,9 +631,7 @@ qt(0.025, df = 5)
 ```
 
 
-## Calculating exact confidence intervals
-
-Multiply the *SEM* by the *t*-value encompassing 95% for a *t* distribution with a given degrees of freedom (e.g., *n*-1).
+## The normal & the *t* distribution
 
 ```{r}
 #| echo: false
@@ -685,6 +682,9 @@ qnorm(0.975, 0, 1)
 
 ## Calculating exact confidence intervals
 
+Multiply the *SEM* by the *t*-value encompassing 95% for a *t* distribution with a given degrees of freedom (e.g., *n*-1).
+
+
 ```{r}
 #| echo: false
 #| fig-alt: "Density plot showing the relative likelihood versus values for the t distribution with 5 degrees of freedom. The tails of the distribution representing 2.5% of the density are shaded in pink."
@@ -723,6 +723,13 @@ c(lower_approx, undulation_mean, upper_approx)
 #| echo: true
 
 crit <- qt(0.025, df = 8 - 1, lower.tail = FALSE)
+crit
+```
+
+. . .
+
+```{r}
+#| echo: true
 
 lower <- undulation_mean - crit * undulation_SEM
 upper <- undulation_mean + crit * undulation_SEM
@@ -743,34 +750,6 @@ Our calculation is based on our expectation from sampling the true population di
 - Same sample size, same experimental conditions
 - Same procedures, same analysis
 - [UBC CI Simulator](https://www.zoology.ubc.ca/~whitlock/Kingfisher/CIMean.htm)
-
-
-# Other distributions we will encounter {background-color="#40666e"}
-
-
-## *F* Distribution
-
-```{r}
-#| echo: true
-#| fig-align: center
-#| fig-alt: "Density plot showing the relative likelihood versus values for the F distribution with 2 and 10 degrees of freedom. The tail of the distribution representing 5% of the density are shaded in pink."
-
-shade_F(0.05, df1 = 2, df2 = 10)
-qf(0.05, df1 = 2, df2 = 10, lower.tail = FALSE)
-```
-
-
-## $\chi^2$ Distribution
-
-```{r fig.height = 3}
-#| echo: true
-#| fig-align: center
-#| fig-alt: "Density plot showing the relative likelihood versus values for the chi-squared distribution with 2 degrees of freedom. The tail of the distribution representing 5% of the density are shaded in pink."
-
-shade_chisq(0.05, df = 2)
-qchisq(0.05, df = 2, lower.tail = FALSE)
-```
-
 
 ## Why do we always seem to use 0.05 or 0.025?
 
@@ -805,148 +784,7 @@ shade_normal(0.05, tail = "upper") +
 ::::
 
 
-## We could choose any probability for any distribution
-
-```{r}
-#| echo: true
-#| fig-align: center
-#| fig-alt: "Density plot showing the relative likelihood versus values for a normal distribution with a mean of -10 and standard deviation of 2. The upper tail of the distribution representing 34% of the density is shaded in pink."
-
-shade_normal(0.34, tail = "upper", mean = -10, sd = 2)
-```
-
-
-## The `r`, `d`, `p`, and `q` functions for distributions {.smaller}
-
-Example for a normal distribution (Specify `mean` and `sd` or defaults is standard normal: $\mu = 0$, $\sigma = 1$):
-
-1. `rnorm(n, ...)`: `n` random draws
-1. `dnorm(x, ...)`: Relative likelihood (density) at `x` values
-1. `pnorm(q, ...)`: (Lower) tail probability for a quantile `q`
-1. `qnorm(p, ...)`: Quantile for a given (lower) tail probability `p`
-
-- `lower.tail = FALSE` for the upper tail
-- `log = TRUE` for log-probability
-
-
-## `rnorm(n = 50, mean = 0, sd = 1)`
-
-
-```{r}
-#| echo: true
-
-set.seed(387493)
-RR <- tibble("values" = rnorm(50, 0, 1))
-
-```
-
-
-:::: {.columns}
-
-::: {.column width="40%"}
-
-```{r}
-#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution."
-
-shade_normal(0, tail = "both")
-
-```
-
-:::
-
-::: {.column width="20%"}
-
-```{r}
-
-RR
-
-```
-
-:::
-
-::: {.column width="40%"}
-
-```{r}
-#| fig-alt: "Dotplot showing 50 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
-
-ggplot(RR, aes(values)) +
-  geom_dotplot() +
-  scale_y_continuous(NULL, breaks = NULL) +
-  xlim(c(-4, 4))
-
-```
-
-:::
-
-::::
-
-
-## `dnorm(x = 1, mean = 0, sd = 1)`
-
-```{r}
-#| echo: true
-
-dnorm(x = 1, mean = 0, sd = 1)
-```
-
-```{r}
-#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. There is a vertical line at the x value of 1 and a dashed horizontal line at the y value 0.242, which is the relative likelihood corresponding to x=1."
-
-M <- tibble(x = seq(-4, 4, length = 200), y = dnorm(x))
-
-p <- ggplot(M, aes(x, y)) +
-  geom_line() +
-  geom_hline(yintercept = dnorm(1), linetype = "dashed") +
-  geom_vline(xintercept = 1) +
-  annotate("text", x = 4, y = dnorm(1) + 0.02, label = round(dnorm(1), 4)) +
-  labs(x = "Value", y = "Relative Likelihood") +
-  scale_x_continuous(breaks = -4:4)
-
-p
-
-```
-
-
-## `pnorm(q=1, mean=0, sd=1)`
-
-```{r}
-#| echo: true
-
-pnorm(q = 1, mean = 0, sd = 1)
-
-```
-
-```{r}
-#| echo: false
-#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The lower tail for x=1 is shaded in pink."
-
-shade_normal(0.8413447, tail = "lower")
-
-```
-
-
-## `qnorm(p=0.841, mean=0, sd=1)`
-
-
-```{r}
-#| echo: true
-
-qnorm(p = 0.841, mean = 0, sd = 1)
-
-```
-
-```{r}
-#| echo: false
-#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The lower tail for x=1 is shaded in pink."
-
-pp <- shade_normal(0.8413447, tail = "lower") +
-  geom_vline(xintercept = 1) +
-  scale_x_continuous(breaks = -4:4)
-pp
-
-```
-
-## How certain are we of the effect of group?
+## Confidence interval on a difference
 
 ```{r}
 #| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The effect size lower bound is plotted as a dark blue box, the estimate as a lighter blue box, and the upper bound as the lightest blue box."
@@ -1035,33 +873,9 @@ HL |>
 
 ```
 
+## Obtaining *P*-values based on distributions
 
-## Standardized effect size
-
-- "Raw" effect size = 2.22 mm
-    - Specific to this analysis (original scale)
-- Standardize for comparing analyses
-    - Pearson's correlation (*r*), Cohen's *d*, etc. (more on planning experiments later this semester)
-
-$$d = \frac{\bar{x}_1 - \bar{x}_2}{s_{pooled}}$$
-
-
-## Standardized effect size
-
-Calculate Cohen's $d$ using the `effectsize` package:
-
-```{r}
-#| echo: true
-
-library(effectsize)
-cohens_d(Horn_Length ~ Group, data = HL)
-```
-
-- Uses "pooled" standard deviation: sd weighted by the sample size
-
-
-
-## Obtaining *P*-values
+Linear model: horn length predicted by group
 
 ```{r}
 #| echo: true
@@ -1069,23 +883,6 @@ cohens_d(Horn_Length ~ Group, data = HL)
 summary(lm(Horn_Length ~ Group, data = HL))
 
 ```
-
-
-## One sided or two-sided tests
-
-Data will always be on one side of H~0~ or the other.
-
-**One-sided test** ("one-tailed"):
-
-- Appropriate when we have an *a priori* hypothesis of the direction of change
-
-- You need justification and to be explicit about it, when you report a one-sided test.
-
-**Two-sided test** ("two-tailed"):
-
-- *Appropriate at all other times.*
-- Multiply the one-sided *P* by 2.
-
 
 ## Testing different hypotheses
 
@@ -1112,16 +909,6 @@ Type I error occurs when:
 Type II error occurs when:
 
 - You decide there is not a meaningful effect when in reality there is one.
-
-
-## Power
-
-- Probability that a random sample will lead to a rejection of H~0~
-- Dependent on how different the truth is from the null hypothesis
-- Inversely related to type II errors
-    - High power $\rightarrow$ low type II errors
-    - Low power $\rightarrow$ high type II errors
-- Power analysis will come later in the course
 
 
 ## Making Decisions
@@ -1263,89 +1050,66 @@ nhst.plot <- ggplot(gall, aes(x, y, group = group, color = Significant)) +
 nhst.plot
 ```
 
-
-## Controversy
-
-Philosophical and practical problems have been raised since the 1960's.
-
-- In 1986, the *American Journal of Public Health* it would no longer accept results based on *P*-values (and then backed down 2 years later)
-- *Basic and Applied Social Psychology* banned *P*-values in 2015
-- In 2016, the American Statistical Association published a "Statement on *P*-Values: Context, Process, and Purpose" which critiqued the (mis)use of *P*-values. [@Wasserstein2016-qk]
+# Questions {background-color="#f8c471"}
 
 
-## History
+## The `r`, `d`, `p`, and `q` functions for distributions {.smaller}
 
-- Karl Pearson: Pearson's correlation, $\chi^2$, eugenics
-- Ronald Fisher: Fisher's exact test, "null hypothesis", ANOVA (*F*), eugenics
-- William Gosset: *t* distribution, Student's *t*-tests, Guinness
-- Jerzy Neyman and Egon Pearson: "null hypothesis" testing, confidence intervals, decision theory
+Example for a normal distribution (Specify `mean` and `sd` or defaults is standard normal: $\mu = 0$, $\sigma = 1$):
 
+1. `rnorm(n, ...)`: `n` random draws
+1. `dnorm(x, ...)`: Relative likelihood (density) at `x` values
+1. `pnorm(q, ...)`: (Lower) tail probability for a quantile `q`
+1. `qnorm(p, ...)`: Quantile for a given (lower) tail probability `p`
 
-## History
-
-The modern idea is traced to these statisticians, but has been warped into something different:
-
-- Test statistics (*F*, *t*, $\chi^2$) and Fisher's rule-of-thumb *P* = 0.05 applied to Neyman-Pearson "null hypotheses"
-- H~0~ becomes a straw man hypothesis of no difference or no effect
+- `lower.tail = FALSE` for the upper tail
+- `log = TRUE` for log-probability
 
 
-## Problem with *P*-values
-
-- Originally an informal concept that got co-opted for what became null hypothesis significance testing (NHST)
-- Apparent objectivity but actually arbitrary and dependent on the data collected and not collected
-- Experimental biases (experimenter introduced, sample size)
-- Science-wide publication bias
+## `rnorm(n = 50, mean = 0, sd = 1)`
 
 
-## Science-wide publication bias {.smaller}
+```{r}
+#| echo: true
 
-Corollaries proposed by Ioannidis [-@Ioannidis2005-od]:
+set.seed(387493)
+RR <- tibble("values" = rnorm(50, 0, 1))
 
-1. The smaller the studies conducted in a scientific field, the less likely the research findings are to be true.
-2. The smaller the effect sizes in a scientific field, the less likely the research findings are to be true.
-3. The greater the number and the lesser the selection of tested relationships in a scientific field, the less likely the research findings are to be true.
-4. The greater the flexibility in designs, definitions, outcomes, and analytical modes in a scientific field, the less likely the research findings are to be true.
-5. The greater the financial and other interests and prejudices in a scientific field, the less likely the research findings are to be true.
-6. The hotter a scientific field (with more scientific teams involved), the less likely the research findings are to be true.
+```
 
-
-## How to make decisions
-
-::: {.incremental}
-
-- Always consider the size of the effect on a biological scale and incorporate this into your decision about how meaningful the effect is.
-    - Significance alone may not mean a biological effect is important.
-- Always consider your level uncertainty in your decision and report this clearly and openly.
-    - No decision is made with 100% certainty. Embrace uncertainty and discuss the grey areas.
-
-:::
-
-
-## How to make decisions
 
 :::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="40%"}
 
-This:
+```{r}
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution."
 
-```{r, fig.height=10}
-#| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Darker colored points and lines denote higher p-values. Different regions of the plot show where an effect is not biologically meaningful, uncertain, or clearly biologically meaningful."
-
-dec.plot
+shade_normal(0, tail = "both")
 
 ```
 
 :::
 
-::: {.column width="50%"}
+::: {.column width="20%"}
 
-Not this:
+```{r}
 
-```{r, fig.height=10}
-#| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Red points and lines show significant results while black points and lines are not significant."
+RR
 
-nhst.plot
+```
+
+:::
+
+::: {.column width="40%"}
+
+```{r}
+#| fig-alt: "Dotplot showing 50 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
+
+ggplot(RR, aes(values)) +
+  geom_dotplot() +
+  scale_y_continuous(NULL, breaks = NULL) +
+  xlim(c(-4, 4))
 
 ```
 
@@ -1354,12 +1118,70 @@ nhst.plot
 ::::
 
 
-## Alternative suggested approaches
+## `dnorm(x = 1, mean = 0, sd = 1)`
 
-Preregistration of experimental design and planned analysis
+```{r}
+#| echo: true
 
-1. Report parameter estimates, confidence intervals, and effect sizes
-1. Model selection (later this semester)
+dnorm(x = 1, mean = 0, sd = 1)
+```
+
+```{r}
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. There is a vertical line at the x value of 1 and a dashed horizontal line at the y value 0.242, which is the relative likelihood corresponding to x=1."
+
+M <- tibble(x = seq(-4, 4, length = 200), y = dnorm(x))
+
+p <- ggplot(M, aes(x, y)) +
+  geom_line() +
+  geom_hline(yintercept = dnorm(1), linetype = "dashed") +
+  geom_vline(xintercept = 1) +
+  annotate("text", x = 4, y = dnorm(1) + 0.02, label = round(dnorm(1), 4)) +
+  labs(x = "Value", y = "Relative Likelihood") +
+  scale_x_continuous(breaks = -4:4)
+
+p
+
+```
+
+
+## `pnorm(q=1, mean=0, sd=1)`
+
+```{r}
+#| echo: true
+
+pnorm(q = 1, mean = 0, sd = 1)
+
+```
+
+```{r}
+#| echo: false
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The lower tail for x=1 is shaded in pink."
+
+shade_normal(0.8413447, tail = "lower")
+
+```
+
+
+## `qnorm(p=0.841, mean=0, sd=1)`
+
+
+```{r}
+#| echo: true
+
+qnorm(p = 0.841, mean = 0, sd = 1)
+
+```
+
+```{r}
+#| echo: false
+#| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. The lower tail for x=1 is shaded in pink."
+
+pp <- shade_normal(0.8413447, tail = "lower") +
+  geom_vline(xintercept = 1) +
+  scale_x_continuous(breaks = -4:4)
+pp
+
+```
 
 
 # Questions {background-color="#f8c471"}
