@@ -33,7 +33,9 @@ options(pillar.sigfig = 4)
 
 theme_set(theme_classic(base_size = 20))
 
-source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R")
+source(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R"
+)
 
 
 ```
@@ -44,6 +46,11 @@ source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lec
 - Progress check: Grading in progress
 - Be thinking about / looking for a data set
     - Let us know if you want to discuss
+
+
+## What have you learned about data visualization?
+
+![](images/Sleep.png){fig-alt="Map showing the percentage of high school students who do not sleep enough."}
 
 
 # What is the process for making decisions through science? {background-color="#40666e"}
@@ -59,20 +66,23 @@ set.seed(3575575)
 
 Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
 Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
-Group <- c(rep("Alive", 150),
-           rep("Dead", 30))
+Group <- c(rep("Alive", 150), rep("Dead", 30))
 
-HL <- tibble(Horn_Length = c(Alive, Dead),
-             Group = factor(Group))
+HL <- tibble(Horn_Length = c(Alive, Dead), Group = factor(Group))
 
-liz <- image_read("https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg")
+liz <- image_read(
+  "https://tpwd.texas.gov/huntwild/wild/images/reptiles/horned_lizardlarge.jpg"
+)
 
-img <- ggplot() + background_image(liz) 
+img <- ggplot() + background_image(liz)
 
 P_HL <- HL |>
   ggplot(aes(Group, Horn_Length)) +
-  geom_point(position = position_jitter(width = 0.2, seed = 423479),
-             alpha = 0.5, size = 3) +
+  geom_point(
+    position = position_jitter(width = 0.2, seed = 423479),
+    alpha = 0.5,
+    size = 3
+  ) +
   theme(text = element_text(size = 20)) +
   labs(y = "Horn Length (mm)")
 
@@ -82,7 +92,7 @@ P_HL +
 ```
 
 
-## What is the effect of group on horn length? 
+## What is the effect of group on horn length?
 
 ```{r}
 #| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line."
@@ -90,62 +100,107 @@ P_HL +
 mu.a <- mean(HL$Horn_Length[HL$Group == "Alive"])
 mu.d <- mean(HL$Horn_Length[HL$Group == "Dead"])
 
-P_HL + 
-  geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
-               color = "steelblue", linewidth = 2) +
-  geom_segment(x = 1.6, y = mu.d, xend = 2.4, yend = mu.d,
-               color = "steelblue", linewidth = 2) +
+P_HL +
+  geom_segment(
+    x = 0.6,
+    y = mu.a,
+    xend = 1.4,
+    yend = mu.a,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  geom_segment(
+    x = 1.6,
+    y = mu.d,
+    xend = 2.4,
+    yend = mu.d,
+    color = "steelblue",
+    linewidth = 2
+  ) +
   theme(text = element_text(size = 20)) +
   labs(y = "Horn Length (mm)")
- 
+
 ```
 
 
-## What is the effect of group on horn length? 
+## What is the effect of group on horn length?
 
 ```{r}
 #| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line. The 95% CI for each group is overlayed in red."
 
-P_HL + 
-  geom_segment(x = 0.6, y = mu.a, xend = 1.4, yend = mu.a,
-               color = "steelblue", linewidth = 2) +
-  geom_segment(x = 1.6, y = mu.d, xend = 2.4, yend = mu.d,
-               color = "steelblue", linewidth = 2) +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.1,
-               color = "red", linewidth = 2) + 
+P_HL +
+  geom_segment(
+    x = 0.6,
+    y = mu.a,
+    xend = 1.4,
+    yend = mu.a,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  geom_segment(
+    x = 1.6,
+    y = mu.d,
+    xend = 2.4,
+    yend = mu.d,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  stat_summary(
+    fun.data = mean_cl_normal,
+    geom = "errorbar",
+    width = 0.1,
+    color = "red",
+    linewidth = 2
+  ) +
   theme(text = element_text(size = 20)) +
   labs(y = "Horn Length (mm)")
 
 ```
 
 
-## What is the effect of group on horn length? 
+## What is the effect of group on horn length?
 
 ```{r}
 #| fig-alt: "Scatterplot of Horn Length versus group (alive or dead). The mean for each group is overlayed with a horizontal blue line that spans the entire plot, showing the difference in means between groups. The effect size estimate is written between the blue lines and is 0.22."
 
 dd <- mu.a - mu.d
-P_HL + 
-  geom_segment(x = 0, y = mu.a, xend = 3, yend = mu.a,
-               color = "steelblue", linewidth = 2) +
-  geom_segment(x = 0, y = mu.d, xend = 3, yend = mu.d,
-               color = "steelblue", linewidth = 2) +
+P_HL +
+  geom_segment(
+    x = 0,
+    y = mu.a,
+    xend = 3,
+    yend = mu.a,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  geom_segment(
+    x = 0,
+    y = mu.d,
+    xend = 3,
+    yend = mu.d,
+    color = "steelblue",
+    linewidth = 2
+  ) +
   theme(text = element_text(size = 20)) +
-  annotate("text", x = 1.5, y = mu.d + 0.5 * dd,
-           label = paste0("Difference:", round(dd, 2), " mm"), 
-           size = 6)
+  annotate(
+    "text",
+    x = 1.5,
+    y = mu.d + 0.5 * dd,
+    label = paste0("Difference:", round(dd, 2), " mm"),
+    size = 6
+  )
 
 ```
 
 
 
-## How is the mean different in alive lizards compared to dead? 
+## How is the mean different in alive lizards compared to dead?
 
 - Live horned lizards: `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 1)` mm
 - Dead horned lizards: `r round(mean(HL$Horn_Length[HL$Group == "Dead"]), 1)` mm
 
-. . . 
- 
+. . .
+
 Imagine collecting 180 live horned lizards and randomly assigning 150 to one group and 30 to the other.
 
 . . .
@@ -180,12 +235,12 @@ Imagine collecting 180 live horned lizards and randomly assigning 150 to one gro
 
 set.seed(883231)
 
-mu.horn <- 24     # mean
-sd.horn <- 2.6    # standard deviation
-n.iter <- 100000  # number of iterations
-n.samp1 <- 150    # number in first sample
-n.samp2 <- 30     # number in second sample
-sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output  
+mu.horn <- 24 # mean
+sd.horn <- 2.6 # standard deviation
+n.iter <- 100000 # number of iterations
+n.samp1 <- 150 # number in first sample
+n.samp2 <- 30 # number in second sample
+sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output
 
 for (zz in 1:n.iter) {
   s1 <- rnorm(n.samp1, mu.horn, sd.horn) # sample 1
@@ -196,17 +251,17 @@ for (zz in 1:n.iter) {
 
 ```{r}
 # Do the sampling here and save to Rds file.
-mu.horn <- 24     # mean
-sd.horn <- 2.6    # standard deviation
-n.iter <- 100000  # number of iterations
-n.samp1 <- 150    # number in first sample
-n.samp2 <- 30     # number in second sample
+mu.horn <- 24 # mean
+sd.horn <- 2.6 # standard deviation
+n.iter <- 100000 # number of iterations
+n.samp1 <- 150 # number in first sample
+n.samp2 <- 30 # number in second sample
 
 if (FALSE) {
   set.seed(883231)
-  
-  sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output  
-  
+
+  sim.diff <- tibble(dd = numeric(length = n.iter)) # to hold output
+
   for (zz in 1:n.iter) {
     s1 <- rnorm(n.samp1, mu.horn, sd.horn) # sample 1
     s2 <- rnorm(n.samp2, mu.horn, sd.horn) # sample 2
@@ -225,11 +280,13 @@ sim.diff <- readRDS("../data/Random_horns.rds")
 #| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
 
 set.seed(34872394)
-dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
-               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
+dots <- tibble(
+  Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
+  Group = factor(c(rep("Alive", 150), rep("Dead", 30)))
+)
 
-dots |> 
-  ggplot(aes(Horn_Length)) + 
+dots |>
+  ggplot(aes(Horn_Length)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
   scale_fill_viridis_d() +
   scale_y_continuous(NULL, breaks = NULL) +
@@ -243,8 +300,8 @@ dots |>
 ```{r}
 #| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
 
-dots |> 
-  ggplot(aes(Horn_Length, fill = Group)) + 
+dots |>
+  ggplot(aes(Horn_Length, fill = Group)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
   scale_fill_viridis_d() +
   scale_y_continuous(NULL, breaks = NULL) +
@@ -261,11 +318,13 @@ dots |>
 #| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
 
 set.seed(3424)
-dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
-               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
+dots <- tibble(
+  Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
+  Group = factor(c(rep("Alive", 150), rep("Dead", 30)))
+)
 
-dots |> 
-  ggplot(aes(Horn_Length, fill = Group)) + 
+dots |>
+  ggplot(aes(Horn_Length, fill = Group)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
   scale_fill_viridis_d() +
   scale_y_continuous(NULL, breaks = NULL) +
@@ -281,11 +340,13 @@ dots |>
 #| fig-alt: "Dotplot showing 180 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point. 150 points are randomly assigned to the alive group and 30 to the dead group with different colors showing group membership."
 
 set.seed(67566)
-dots <- tibble(Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
-               Group = factor(c(rep("Alive", 150), rep("Dead", 30))))
+dots <- tibble(
+  Horn_Length = rnorm(180, mean = mu.horn, sd = sd.horn),
+  Group = factor(c(rep("Alive", 150), rep("Dead", 30)))
+)
 
-dots |> 
-  ggplot(aes(Horn_Length, fill = Group)) + 
+dots |>
+  ggplot(aes(Horn_Length, fill = Group)) +
   geom_dotplot(method = "histodot", binwidth = 0.5, stackgroups = TRUE) +
   scale_fill_viridis_d() +
   scale_y_continuous(NULL, breaks = NULL) +
@@ -317,16 +378,20 @@ p1 <- ggplot(sim.diff, aes(x = dd)) +
   geom_histogram(bins = 30, fill = "gray50") +
   labs(x = "Difference of Means", y = "Count")
 
-HL_mean <- HL |> 
-  group_by(Group) |> 
-  summarize(Mean = mean(Horn_Length)) |> 
+HL_mean <- HL |>
+  group_by(Group) |>
+  summarize(Mean = mean(Horn_Length)) |>
   gather(Value, x, -Group)
 
-p2 <- HL |> 
+p2 <- HL |>
   ggplot(aes(Horn_Length)) +
   geom_histogram(bins = 30, fill = "gray50") +
-  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
-             linewidth = 2, color = "firebrick4") +
+  geom_vline(
+    data = HL_mean,
+    aes(xintercept = x, color = Value),
+    linewidth = 2,
+    color = "firebrick4"
+  ) +
   facet_grid(Group ~ .) +
   labs(x = "Horn Length (mm)", y = "Count") +
   theme(legend.position = "none")
@@ -353,7 +418,7 @@ Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 2) - r
 
 :::
 
-    
+
 ## Hypotheses
 
 **Hypothesis**: a statement that can be either true or false
@@ -372,16 +437,20 @@ p1 <- ggplot(sim.diff, aes(x = dd)) +
   geom_histogram(bins = 30, fill = "gray50") +
   labs(x = "Difference of Means", y = "Count")
 
-HL_mean <- HL |> 
-  group_by(Group) |> 
-  summarize(Mean = mean(Horn_Length)) |> 
+HL_mean <- HL |>
+  group_by(Group) |>
+  summarize(Mean = mean(Horn_Length)) |>
   gather(Value, x, -Group)
 
-p2 <- HL |> 
+p2 <- HL |>
   ggplot(aes(Horn_Length)) +
   geom_histogram(bins = 30, fill = "gray50") +
-  geom_vline(data = HL_mean, aes(xintercept = x, color = Value),
-             linewidth = 2, color = "firebrick4") +
+  geom_vline(
+    data = HL_mean,
+    aes(xintercept = x, color = Value),
+    linewidth = 2,
+    color = "firebrick4"
+  ) +
   facet_grid(Group ~ .) +
   labs(x = "Horn Length (mm)", y = "Count") +
   theme(legend.position = "none")
@@ -396,7 +465,7 @@ Observed difference = `r round(mean(HL$Horn_Length[HL$Group == "Alive"]), 2) - r
 
 ## Making Decisions {.smaller}
 
-> What is the probability of observing a difference **as big or bigger** than the observed difference *from sampling error alone*? 
+> What is the probability of observing a difference **as big or bigger** than the observed difference *from sampling error alone*?
 
 The answer to this question is called a *P*-value: *P* = 4/100000 = 0.00004
 
@@ -405,15 +474,20 @@ The answer to this question is called a *P*-value: *P* = 4/100000 = 0.00004
 #| fig-align: center
 #| fig-alt: "Histogram showing the difference in means for 100,000 simulations of two groups that are drawn from the same normal distribution. The +/- value for the observed difference of 2.2 is shown on either side with a vertical red line. The observations that equal or exceed this value are shown in red as points."
 
-set_above <- sim.diff[sim.diff$dd >= dd | sim.diff$dd <= -dd,]
+set_above <- sim.diff[sim.diff$dd >= dd | sim.diff$dd <= -dd, ]
 set_above$y <- 1
 
 p1 <- ggplot(sim.diff, aes(x = dd)) +
   geom_histogram(bins = 30, fill = "gray50") +
-  geom_vline(xintercept = c(-dd,dd), linewidth = 2, color = "firebrick4") +
-  geom_point(data = set_above, aes(dd, y), size = 3, alpha = 0.8,
-             color = "firebrick4") +
-  labs(x = "Difference of Means", y = "Count") 
+  geom_vline(xintercept = c(-dd, dd), linewidth = 2, color = "firebrick4") +
+  geom_point(
+    data = set_above,
+    aes(dd, y),
+    size = 3,
+    alpha = 0.8,
+    color = "firebrick4"
+  ) +
+  labs(x = "Difference of Means", y = "Count")
 p1
 
 ```
@@ -479,10 +553,12 @@ sd5 <- tibble(y = rnorm(100000, 5, 5))
 ```{r echo=FALSE}
 #| fig-alt: "Two histograms side by side. Each shows the distribution of 100,000 values drawn from a normal distribution with a mean of 5. The histogram on the left has a standard deviation of 1 while the histogram on the right has a standard deviation of 5."
 
-p1 <- sd1 |> ggplot(aes(y)) +
+p1 <- sd1 |>
+  ggplot(aes(y)) +
   geom_histogram(bins = 50, fill = "forestgreen") +
   labs(y = "Count")
-p2 <- sd5 |> ggplot(aes(y)) +
+p2 <- sd5 |>
+  ggplot(aes(y)) +
   geom_histogram(bins = 50, fill = "forestgreen") +
   labs(y = "Count")
 
@@ -534,7 +610,7 @@ Compare the values returned by `pnorm()` to the proportions on the previous slid
 ```{r}
 #| echo: true
 #| fig-align: center
-#| fig-alt: "Density plot showing the relative likelihood versus values for a normal distribtution. The tails of the distribution representing 2.5% of the density are shaded in pink."
+#| fig-alt: "Density plot showing the relative likelihood versus values for a normal distributions. The tails of the distribution representing 2.5% of the density are shaded in pink."
 
 shade_normal(p = 0.025, tail = "both", mean = 5, sd = 1)
 qnorm(0.025, mean = 5, sd = 1)
@@ -578,7 +654,8 @@ sim <- tibble(df = c(2, 5, 20)) |>
 
 norm <- tibble(
   x = x,
-  y = dnorm(x, 0, 1))
+  y = dnorm(x, 0, 1)
+)
 
 pal <- palette()[2:4]
 
@@ -587,8 +664,7 @@ ggplot() +
   geom_line(data = sim, aes(x, y, color = Parameters), linewidth = 1.5) +
   scale_color_manual(values = pal, name = "Degrees of\nFreedom") +
   labs(x = "t", y = "Relative Likelihood") +
-  theme(legend.position = "inside",
-        legend.position.inside = c(0.85, 0.75))
+  theme(legend.position = "inside", legend.position.inside = c(0.85, 0.75))
 ```
 
 
@@ -660,7 +736,7 @@ c(lower, undulation_mean, upper)
 
 ## Repeated experiments
 
-> A confidence interval is a range that we expect, with some level of conﬁdence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
+> A confidence interval is a range that we expect, with some level of confidence, to include the true value of a population parameter such as the mean. [@Curran-Everett2009-zz]
 
 Our calculation is based on our expectation from sampling the true population distribution *repeatedly.*
 
@@ -678,7 +754,6 @@ Our calculation is based on our expectation from sampling the true population di
 #| echo: true
 #| fig-align: center
 #| fig-alt: "Density plot showing the relative likelihood versus values for the F distribution with 2 and 10 degrees of freedom. The tail of the distribution representing 5% of the density are shaded in pink."
-
 
 shade_F(0.05, df1 = 2, df2 = 10)
 qf(0.05, df1 = 2, df2 = 10, lower.tail = FALSE)
@@ -747,7 +822,7 @@ Example for a normal distribution (Specify `mean` and `sd` or defaults is standa
 
 1. `rnorm(n, ...)`: `n` random draws
 1. `dnorm(x, ...)`: Relative likelihood (density) at `x` values
-1. `pnorm(q, ...)`: (Lower) tail probability for a quantile `q` 
+1. `pnorm(q, ...)`: (Lower) tail probability for a quantile `q`
 1. `qnorm(p, ...)`: Quantile for a given (lower) tail probability `p`
 
 - `lower.tail = FALSE` for the upper tail
@@ -761,7 +836,7 @@ Example for a normal distribution (Specify `mean` and `sd` or defaults is standa
 #| echo: true
 
 set.seed(387493)
-RR <- tibble("values" = rnorm(50,0,1))
+RR <- tibble("values" = rnorm(50, 0, 1))
 
 ```
 
@@ -794,7 +869,7 @@ RR
 ```{r}
 #| fig-alt: "Dotplot showing 50 random draws from the normal distribution. Points are stacked vertically when there is more than one value at the same point"
 
-ggplot(RR, aes(values)) + 
+ggplot(RR, aes(values)) +
   geom_dotplot() +
   scale_y_continuous(NULL, breaks = NULL) +
   xlim(c(-4, 4))
@@ -817,14 +892,13 @@ dnorm(x = 1, mean = 0, sd = 1)
 ```{r}
 #| fig-alt: "Density plot showing the relative likelihood versus values for the normal distribution. There is a vertical line at the x value of 1 and a dashed horizontal line at the y value 0.242, which is the relative likelihood corresponding to x=1."
 
-M <- tibble(x = seq(-4, 4, length = 200),
-            y = dnorm(x))
+M <- tibble(x = seq(-4, 4, length = 200), y = dnorm(x))
 
 p <- ggplot(M, aes(x, y)) +
   geom_line() +
   geom_hline(yintercept = dnorm(1), linetype = "dashed") +
   geom_vline(xintercept = 1) +
-  annotate("text", x = 4, y = dnorm(1) + 0.02, label = round(dnorm(1),4)) +
+  annotate("text", x = 4, y = dnorm(1) + 0.02, label = round(dnorm(1), 4)) +
   labs(x = "Value", y = "Relative Likelihood") +
   scale_x_continuous(breaks = -4:4)
 
@@ -869,7 +943,7 @@ pp <- shade_normal(0.8413447, tail = "lower") +
   geom_vline(xintercept = 1) +
   scale_x_continuous(breaks = -4:4)
 pp
-  
+
 ```
 
 ## How certain are we of the effect of group?
@@ -884,31 +958,77 @@ uu <- ttt$conf.int[2]
 
 HL |>
   ggplot(aes(Group, Horn_Length)) +
-  geom_rect(xmin = 0, xmax = 2.2,
-            ymin = g_mu - 0.5 * uu, ymax = g_mu + 0.5 * uu,
-            fill = "lightblue") +
-  geom_rect(xmin = 0, xmax = 2.2, ymin = mu.d,
-            ymax = mu.a, fill = "steelblue") +
-  geom_rect(xmin = 0, xmax = 2.2,
-            ymin = g_mu - 0.5 * ll, ymax = g_mu + 0.5 * ll,
-            fill = "navy") +
-  geom_segment(y = g_mu - 0.5 * ll, yend = g_mu + 0.5 * ll,
-               x = 2.23, xend = 2.23, color = "navy", linewidth = 2) +
-  annotate("text", x = 2.33, y = mu.d + 0.5 * dd,
-           label = paste0("Lower \n", round(ll, 2)),
-           size = 4) +
-  geom_segment(y = mu.d, yend = mu.a,
-               x = 2.43, xend = 2.43, color = "steelblue", linewidth = 2) +
-  annotate("text", x = 2.53, y = mu.d + 0.5 * dd,
-           label = paste0("Effect\nSize\n", round(dd, 2)),
-           size = 4) +
-  geom_segment(y = g_mu - 0.5 * uu, yend = g_mu + 0.5 * uu,
-               x = 2.63, xend = 2.63, color = "lightblue", linewidth = 2) +
-  annotate("text", x = 2.73, y = mu.d + 0.5 * dd,
-           label = paste0("Upper \n", round(uu, 2)),
-           size = 4) +
-  geom_point(position = position_jitter(width = 0.2, seed = 423479),
-             alpha = 1/2, size = 3) +
+  geom_rect(
+    xmin = 0,
+    xmax = 2.2,
+    ymin = g_mu - 0.5 * uu,
+    ymax = g_mu + 0.5 * uu,
+    fill = "lightblue"
+  ) +
+  geom_rect(
+    xmin = 0,
+    xmax = 2.2,
+    ymin = mu.d,
+    ymax = mu.a,
+    fill = "steelblue"
+  ) +
+  geom_rect(
+    xmin = 0,
+    xmax = 2.2,
+    ymin = g_mu - 0.5 * ll,
+    ymax = g_mu + 0.5 * ll,
+    fill = "navy"
+  ) +
+  geom_segment(
+    y = g_mu - 0.5 * ll,
+    yend = g_mu + 0.5 * ll,
+    x = 2.23,
+    xend = 2.23,
+    color = "navy",
+    linewidth = 2
+  ) +
+  annotate(
+    "text",
+    x = 2.33,
+    y = mu.d + 0.5 * dd,
+    label = paste0("Lower \n", round(ll, 2)),
+    size = 4
+  ) +
+  geom_segment(
+    y = mu.d,
+    yend = mu.a,
+    x = 2.43,
+    xend = 2.43,
+    color = "steelblue",
+    linewidth = 2
+  ) +
+  annotate(
+    "text",
+    x = 2.53,
+    y = mu.d + 0.5 * dd,
+    label = paste0("Effect\nSize\n", round(dd, 2)),
+    size = 4
+  ) +
+  geom_segment(
+    y = g_mu - 0.5 * uu,
+    yend = g_mu + 0.5 * uu,
+    x = 2.63,
+    xend = 2.63,
+    color = "lightblue",
+    linewidth = 2
+  ) +
+  annotate(
+    "text",
+    x = 2.73,
+    y = mu.d + 0.5 * dd,
+    label = paste0("Upper \n", round(uu, 2)),
+    size = 4
+  ) +
+  geom_point(
+    position = position_jitter(width = 0.2, seed = 423479),
+    alpha = 1 / 2,
+    size = 3
+  ) +
   expand_limits(x = c(0, 3)) +
   theme(text = element_text(size = 20)) +
   labs(y = "Horn Length (mm)")
@@ -1014,11 +1134,11 @@ gall <- tribble(
   "g1", 1,  0.01, 0.31,  0.050, "*",
   "g1", 1,  0.31, 0.31,  0.050, "*",
   "g1", 1,  0.61, 0.31,  0.050, "*",
-  
+
   "g2", 2,  0.08, 0.10,  0.008, "*",
   "g2", 2,  0.10, 0.10,  0.008, "*",
   "g2", 2,  0.12, 0.10,  0.008, "*",
-  
+
   "g3", 3,  0.64, 0.72,  0.001, "*",
   "g3", 3,  0.72, 0.72,  0.001, "*",
   "g3", 3,  0.80, 0.72,  0.001, "*",
@@ -1026,23 +1146,23 @@ gall <- tribble(
   "g4", 4,  0.00, 0.31,  0.310, "NS",
   "g4", 4,  0.31, 0.31,  0.310, "NS",
   "g4", 4,  0.62, 0.31,  0.310, "NS",
-  
+
   "g5", 5, -0.18, 0.09,  0.700, "NS",
   "g5", 5,  0.09, 0.09,  0.700, "NS",
   "g5", 5,  0.36, 0.09,  0.700, "NS",
-  
+
   "g6", 6,  0.32, 0.47,  0.005, "NS",
   "g6", 6,  0.32, 0.47,  0.005, "NS",
   "g6", 6,  0.32, 0.47,  0.005, "NS",
-  
+
   "g7", 7,  0.04, 0.40,  0.020, "*",
   "g7", 7,  0.44, 0.40,  0.020, "*",
   "g7", 7,  0.84, 0.40,  0.020, "*",
-  
+
   "g8", 8,  0.10, 0.18,  0.010, "*",
   "g8", 8,  0.18, 0.18,  0.010, "*",
   "g8", 8,  0.26, 0.18,  0.010, "*",
-  
+
   "g9", 9, -0.05, 0.44,  0.200, "NS",
   "g9", 9,  0.44, 0.44,  0.200, "NS",
   "g9", 9,  0.93, 0.44,  0.200, "NS"
@@ -1051,31 +1171,65 @@ gall <- tribble(
 bks <- -log10(c(0.001, 0.01, 0.05, 0.2, 0.5))
 lbs <- c(0.001, 0.01, 0.05, 0.2, 0.5)
 
-dec.plot <- ggplot(gall, aes(x,y, group = group, color = -log10(P))) +
-  geom_rect(xmin = -0.4, xmax = 0.2, ymin = 0, ymax = 12,
-            fill = "lightgoldenrod", color = "lightgoldenrod") +
-  geom_rect(xmin = 0.2, xmax = 0.5, ymin = 0, ymax = 12,
-            fill = "grey", color = "grey") +
-  geom_rect(xmin = 0.5, xmax = 1.5, ymin = 0, ymax = 12,
-            fill = "thistle", color = "thistle") +
+dec.plot <- ggplot(gall, aes(x, y, group = group, color = -log10(P))) +
+  geom_rect(
+    xmin = -0.4,
+    xmax = 0.2,
+    ymin = 0,
+    ymax = 12,
+    fill = "lightgoldenrod",
+    color = "lightgoldenrod"
+  ) +
+  geom_rect(
+    xmin = 0.2,
+    xmax = 0.5,
+    ymin = 0,
+    ymax = 12,
+    fill = "grey",
+    color = "grey"
+  ) +
+  geom_rect(
+    xmin = 0.5,
+    xmax = 1.5,
+    ymin = 0,
+    ymax = 12,
+    fill = "thistle",
+    color = "thistle"
+  ) +
   geom_vline(xintercept = 0, linetype = "dotted", color = "grey30") +
   geom_line(linewidth = 3) +
-  geom_point(data=gall, aes(Effect,y,color = -log10(P)), size = 5) +
+  geom_point(data = gall, aes(Effect, y, color = -log10(P)), size = 5) +
   xlim(c(-0.2, 1)) +
   ylab("Experiment") +
   xlab("Standardized Effect Size") +
-  scale_color_gradient(breaks = bks, labels = lbs,
-                       low = "black", high = "red", name = "P-value") +
-  annotate("text", x = 0, y = 10.5, label = "Not Biologicaly\nMeaningful",
-           size = 6) +
-  annotate("text", x = 0.35, y = 10.5, label = "Uncertain",
-           size = 6) +
-  annotate("text", x = 0.75, y = 10.5,
-           label = "Clearly Biologicaly\nMeaningful",
-           size = 6) +
-  ylim(c(1,11)) +
-  theme(axis.text.y = element_blank(), text = element_text(size = 20),
-        axis.ticks.y = element_blank())
+  scale_color_gradient(
+    breaks = bks,
+    labels = lbs,
+    low = "black",
+    high = "red",
+    name = "P-value"
+  ) +
+  annotate(
+    "text",
+    x = 0,
+    y = 10.5,
+    label = "Not Biologically\nMeaningful",
+    size = 6
+  ) +
+  annotate("text", x = 0.35, y = 10.5, label = "Uncertain", size = 6) +
+  annotate(
+    "text",
+    x = 0.75,
+    y = 10.5,
+    label = "Clearly Biologically\nMeaningful",
+    size = 6
+  ) +
+  ylim(c(1, 11)) +
+  theme(
+    axis.text.y = element_blank(),
+    text = element_text(size = 20),
+    axis.ticks.y = element_blank()
+  )
 
 dec.plot
 ```
@@ -1092,16 +1246,19 @@ Null hypothesis significance testing is often used inappropriately as an all or 
 ```{r}
 #| fig-alt: "Figure showing the estimated effect size and 95% confidence interval along the x axis for different experiments along the y axis. Red points and lines show significant results while black points and lines are not significant."
 
-nhst.plot <- ggplot(gall, aes(x,y, group = group, color = Significant)) +
+nhst.plot <- ggplot(gall, aes(x, y, group = group, color = Significant)) +
   geom_line(linewidth = 3) +
-  geom_point(data=gall, aes(Effect,y,color = Significant), size = 5) +
+  geom_point(data = gall, aes(Effect, y, color = Significant), size = 5) +
   geom_vline(xintercept = 0, linetype = "dotted", color = "grey30") +
-  scale_color_manual(values = c("red","black"))+
+  scale_color_manual(values = c("red", "black")) +
   ylab("Experiment") +
   xlab("Standardized Effect Size") +
-  theme(axis.text.y = element_blank())  +
-  theme(axis.text.y = element_blank(), text = element_text(size = 20),
-        axis.ticks.y = element_blank())
+  theme(axis.text.y = element_blank()) +
+  theme(
+    axis.text.y = element_blank(),
+    text = element_text(size = 20),
+    axis.ticks.y = element_blank()
+  )
 
 nhst.plot
 ```
@@ -1201,7 +1358,7 @@ nhst.plot
 
 Preregistration of experimental design and planned analysis
 
-1. Report parameter estimates, confidence intervals, and effect sizes 
+1. Report parameter estimates, confidence intervals, and effect sizes
 1. Model selection (later this semester)
 
 
