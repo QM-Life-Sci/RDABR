@@ -109,7 +109,7 @@ Make a histogram of the differences.
 
 #| fig-alt: "A histogram of the difference between groups for 10,000 simulations."
 
-ggplot(tibble(d), aes(d)) +
+ggplot(data = tibble(d), aes(d)) +
   geom_histogram(bins = 30)
 ```
 
@@ -130,7 +130,7 @@ There are a few examples in the slides for Unit 6 that show you how to add a ver
 ggplot(tibble(d), aes(d)) +
   geom_histogram(bins = 30) +
   geom_vline(
-    xintercept = c(d_obs, abs(d_obs)),
+    xintercept = c(d_obs, -d_obs),
     color = "hotpink",
     linewidth = 2
   )
