@@ -42,7 +42,7 @@ We can use simulations to explore how statistical models behave under controlled
 
 Start by generating two sets of n = 20 random numbers drawn from normal distributions. Set the means to 5 in one set and 6 in the other. Both of the standard deviations are 0.9. Call these vectors `x1` and `x2`. There will be 40 total observations between the two sets.
 
-I have set the seed for you, so that our answers will match.
+We have set the seed for you, so that our answers will match.
 
 ```{r}
 set.seed(4578)
@@ -83,11 +83,11 @@ d[1] <- d_obs
 
 # Run the randomization
 for (ii in 2:iters) {
-    # Iterate from 2 to iters
-    x_shuffled <- sample(x, replace = FALSE) # Shuffle all the elements of x
-    x1s <- x_shuffled[1:20] # Assign 1-20 to x1s
-    x2s <- x_shuffled[21:40] # Assign 11-40 to x2s
-    d[ii] <- mean(x1s) - mean(x2s) # Assign the difference of means to the iith position of d
+  # Iterate from 2 to iters
+  x_shuffled <- sample(x, replace = FALSE) # Shuffle all the elements of x
+  x1s <- x_shuffled[1:20] # Assign 1-20 to x1s
+  x2s <- x_shuffled[21:40] # Assign 11-40 to x2s
+  d[ii] <- mean(x1s) - mean(x2s) # Assign the difference of means to the iith position of d
 }
 ```
 
@@ -157,7 +157,7 @@ Finally, fit a linear model where `x` is predicted by the new grouping variable.
 
 This is the same linear model that we used in PS 5.
 
-Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grpx2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
+Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grp2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
 
 >
 
@@ -251,12 +251,12 @@ What are the slope and the intercept for the OLS regression line?
 >
 
 
-What is you interpretation of the intercept of the regression in biological terms?
+What is you interpretation of the *intercept* of the regression in biological terms?
 
 >
 
 
-What is you interpretation of the slope of the regression in mathematical terms?
+What is your interpretation of the *slope* of the regression in mathematical terms (i.e., "For a 1 unit increase in _____, _____ increases by _____.")?
 
 >
 
@@ -272,5 +272,14 @@ Is a slope of 10.6 likely to be observed by chance for these data?
 
 
 Is proportion of black coloring a good predictor of age in lions?
+
+>
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 >
