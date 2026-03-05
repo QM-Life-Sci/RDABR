@@ -192,14 +192,19 @@ library(tidyverse)
 
 set.seed(15)
 
-dd <- tibble(Tx_Group = rep(c("control", "high"), each = 10),
-       Replicate = c(rep(c(1, 2), each = 5),
-                     rep(c(1, 2), each = 5)),
-       Productivity = c(rnorm(n = 10, mean = 5, sd = 2),
-                        rnorm(n = 10, mean = 8, sd = 2))
-       )
+dd <- tibble(
+  Tx_Group = rep(c("control", "high"), each = 10),
+  Replicate = c(rep(c(1, 2), each = 5), rep(c(1, 2), each = 5)),
+  Productivity = c(
+    rnorm(n = 10, mean = 5, sd = 2),
+    rnorm(n = 10, mean = 8, sd = 2)
+  )
+)
 
-ggplot(data = dd, aes(x = Tx_Group, y = Productivity, color = factor(Replicate))) +
+ggplot(
+  data = dd,
+  aes(x = Tx_Group, y = Productivity, color = factor(Replicate))
+) +
   geom_point()
 
 
@@ -274,8 +279,12 @@ Take the following code chunk and make the code more readable by adding spaces a
 
 ```{r}
 # FIXME
-M1<-data.frame(x=11:20,y=c(20:11),l=letters[1:10])
-M2 <- tibble(ID=seq(1,100,1),x=rnorm(100,10,5),y=8.4*x+rnorm(100,0,1))
+M1 <- data.frame(x = 11:20, y = c(20:11), l = letters[1:10])
+M2 <- tibble(
+  ID = seq(1, 100, 1),
+  x = rnorm(100, 10, 5),
+  y = 8.4 * x + rnorm(100, 0, 1)
+)
 ```
 
 What is `letters`?
@@ -283,5 +292,14 @@ What is `letters`?
 >
 
 Explain how `y` is constructed in `M2`.
+
+>
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 >

@@ -23,7 +23,7 @@ theme_set(theme_classic())
 
 ## Stalk-eyed flies
 
-Stalk-eyed flies are a group of flies whose eyes are at the ends of long projections ("stalks") on either side of their head. Shortly after emerging from the pupa, these flies ingest air through their mouth and pump it into these stalks to elongate them ([watch this amazing process here](https://www.youtube.com/watch?v=ZGdfIX5x8XM){target="_blank"}). 
+Stalk-eyed flies are a group of flies whose eyes are at the ends of long projections ("stalks") on either side of their head. Shortly after emerging from the pupa, these flies ingest air through their mouth and pump it into these stalks to elongate them ([watch this amazing process here](https://www.youtube.com/watch?v=ZGdfIX5x8XM){target="_blank"}).
 
 Females prefer males with wider eye spans. See the photo below:
 
@@ -39,7 +39,6 @@ Load the `Stalkies.csv` file and explicitly mutate `food_source` into a factor. 
 
 ```{r}
 
-
 ```
 
 Visualize the data set in two different ways by making two different plots:
@@ -54,18 +53,17 @@ Visualize the data set in two different ways by making two different plots:
 
 ```{r}
 
-
 ```
 
 Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show? How does the information provided by the boxplot differ from the information conveyed by the second plot.
 
-> 
+>
 
 
 
 #### Summary statistics
 
-For each food source calculate: 
+For each food source calculate:
 
 - number of observations
 - mean
@@ -77,12 +75,11 @@ Use `group_by()` and `summarize()` as we have seen in the lecture slides. Rememb
 
 ```{r}
 
-
 ```
 
 How do the number of observations, mean, standard deviation, variance, and SEM compare? Do they match your intuition above?
 
-> 
+>
 
 
 
@@ -92,12 +89,11 @@ Calculate approximate 95% confidence intervals for the mean eye span for each gr
 
 ```{r}
 
-
 ```
 
 What are the approximate 95% confidence intervals for the mean eye span for flies raised on corn and cotton? What is your hypothesis for whether the means differ or not? How confident are you in your hypothesis?
 
-> 
+>
 
 
 #### Tests of means
@@ -111,12 +107,11 @@ Finally we can fit the linear model where eye span is modeled by food source.
 
 ```{r}
 
-
 ```
 
 Examine the coefficients in the model summary. Try to reconcile the values in the `Estimate` column for the rows: `(Intercept)` and `food_sourceCotton` with the means you calculated above.
 
-> 
+>
 
 
 
@@ -130,12 +125,11 @@ Perform a *t*-test using the formula method to specify the groups to test. The f
 
 ```{r}
 
-
 ```
 
 Study the printed output of `t.test()`. Do you find the means for the Corn and Cotton groups? Do these match your calculation above?
 
-> 
+>
 
 
 
@@ -152,14 +146,13 @@ Start by examining the different values for `food_source` with `levels()`. This 
 
 ```{r}
 
-
 ```
 
 The order in which the levels are printed is the default order for determining what is the base level (i.e., Intercept) for the comparison.
 
 What is the base level? Relate this to the summary table you created above.
 
-> 
+>
 
 
 
@@ -181,21 +174,28 @@ Next we want to create a new column in the stalk-eyed flies data that has 0 wher
 
 ```{r}
 
-
 ```
 
 Fit a linear model where `eye_span` is predicted by `food01`. Remember that an intercept is assumed by default (equivalent to `+ 1`). Assign the model to an object and print out the summary.
 
 ```{r}
 
-
 ```
 
 What values do you find for `(Intercept)` and `food01`? Compare these values to the parameter estimates in your original linear model with `food_source` as a categorical variable. Also compare the other values in the summary (standard errors, etc.).
 
-> 
+>
 
 
 The conversion from factors to 0 and 1 is carried out automatically when you use `lm()` with factors. Internally, the variable is converted to 0 and 1. Additionally, a column of all 1s is created for the intercept. Later in the course we will see how R uses 0 and 1 to encode factors with more than 2 levels.
 
 The idea of adding *linear* combinations of either continuous or categorical variables is where the name "linear model" comes from. Later we will see how this idea can be extended to include any combination of any number of continuous and categorical predictors.
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
+>

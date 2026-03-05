@@ -54,8 +54,8 @@ head(x)
 cor(x[, "V1"], x[, "V2"])
 
 P <- ggplot(as_tibble(x), aes(V1, V2)) +
-    geom_point(alpha = 0.25, color = "firebrick") +
-    coord_equal()
+  geom_point(alpha = 0.25, color = "firebrick") +
+  coord_equal()
 
 ggMarginal(P, type = "histogram", fill = "firebrick")
 ```
@@ -104,13 +104,13 @@ Y <- 2.3 * X + rnorm(n, mean = 1, sd = 1)
 M <- tibble(X, Y)
 
 ggplot(M, aes(X, Y)) +
-    geom_smooth(
-        formula = y ~ x,
-        method = "lm",
-        se = FALSE,
-        color = "darkorange"
-    ) +
-    geom_point(color = "navy", size = 3)
+  geom_smooth(
+    formula = y ~ x,
+    method = "lm",
+    se = FALSE,
+    color = "darkorange"
+  ) +
+  geom_point(color = "navy", size = 3)
 
 fm <- lm(Y ~ X + 1, data = M)
 summary(fm)
@@ -307,3 +307,12 @@ How do the slopes compare between females and males for **skull width**? Does th
 
 
 In the coming weeks, we will learn how to test whether there is a difference in the slopes between males and females.
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
+>
