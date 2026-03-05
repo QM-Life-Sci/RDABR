@@ -752,6 +752,7 @@ Our calculation is based on our expectation from sampling the true population di
 - Same procedures, same analysis
 - [UBC CI Simulator](https://www.zoology.ubc.ca/~whitlock/Kingfisher/CIMean.htm)
 
+
 ## Why do we always seem to use 0.05 or 0.025?
 
 5% is a "special" number - the arbitrary threshold for statistical significance
@@ -1052,6 +1053,7 @@ nhst.plot <- ggplot(gall, aes(x, y, group = group, color = Significant)) +
 
 nhst.plot
 ```
+
 
 # Questions {background-color="#f8c471"}
 
