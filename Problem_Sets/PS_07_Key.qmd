@@ -50,6 +50,8 @@ Copy your code from PS 6 to import the `LionAges.csv` and make a scatterplot of 
 Add an OLS regression line to your plot using `geom_smooth()` following the examples in the lecture slides and PC 1.
 
 ```{r}
+#| fig-alt: "A scatterplot of lion age versus the proportion black on the nose. A best fit regression line is overlaid."
+
 # FIXME
 
 LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
@@ -73,6 +75,8 @@ fm <- lm(age ~ proportion.black, data = LA)
 Pass the `lm()` object to the `check_model()` function. This will print a 5-panel figure of diagnostics. You can use the "Zoom" button in the Plots panel to make the image larger.
 
 ```{r}
+#| fig-alt: "A set of 5 plots displaying the model diagnostics for posterior predictive check, linearity, homogeneity of variance, influential observations, and normality of residuals."
+
 # FIXME
 
 check_model(fm)
@@ -122,6 +126,9 @@ What do these checks report? Do the results agree with the disagnostic plots?
 In class we made a plot using `geom_label()`, with the observation numbers plotted instead of points. Adapt that plot here to identify the influential observation. Include the code you wrote above to also draw the OLS regression line on the plot.
 
 ```{r}
+#| fig-alt: "A scatterplot of lion age versus the proportion black on the nose. A best fit regression line is overlaid. Points are displayed with their index number."
+
+
 # FIXME
 
 LA |>
@@ -174,6 +181,9 @@ summary(fm)
 Pass the fitted model to `check_model()` as above to plot the regression diagnostics.
 
 ```{r}
+#| fig-alt: "A set of 5 plots displaying the model diagnostics for posterior predictive check, linearity, homogeneity of variance, influential observations, and normality of residuals."
+
+
 # FIXME
 
 check_model(fm)
@@ -220,6 +230,9 @@ stalk <- augment(fm, stalk)
 Finally, plot a histogram of the *residuals* for the fitted model. Color by food source and facet the plot by food source.
 
 ```{r}
+#| fig-alt: "A set of two histograms stacked vertically showing the distribution of residuals for the corn and cotton food source."
+
+
 # FIXME
 
 ggplot(stalk, aes(.resid, fill = food_source)) +

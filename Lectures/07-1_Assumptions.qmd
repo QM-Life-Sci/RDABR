@@ -140,7 +140,7 @@ ssPlot <- function(
 
 ## Data to work with: Swallowtail Butterflies
 
-![](http://www.pyrgus.de/bilder1/papilionidae/machaon_im2023.jpg){fig-align="center"}
+![](http://www.pyrgus.de/bilder1/papilionidae/machaon_im2023.jpg){fig-align="center" fig-alt="Photo of a swallotail butterfly on a plant."}
 
 - 2 Sub-species, 2 sexes
 - Forewing and hindwing areas
@@ -182,6 +182,9 @@ STB <- STB |>
 ```
 
 ```{r}
+#| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area."
+
+
 ggplot(STB, aes(Forewing_area, Hindwing_area)) +
   geom_point()
 ```
@@ -190,6 +193,9 @@ ggplot(STB, aes(Forewing_area, Hindwing_area)) +
 ## Plotting with IDs labeled
 
 ```{r}
+#| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area. Points are labeled with their index number."
+
+
 ggplot(STB, aes(Forewing_area, Hindwing_area, label = ID)) +
   geom_label()
 ```
@@ -230,6 +236,8 @@ Many `slice_...()` functions.
 ```{r}
 #| echo: false
 #| fig-align: center
+#| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area."
+
 
 STB <- read_csv(
   "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
@@ -255,6 +263,9 @@ STB$Forewing_area[176]
 ## Replacing values: `replace()`
 
 ```{r}
+#| fig-alt: "Scatterplot of hingwing area versus forewing area. The extreme value has been replaced to be correct. There is a clear positive relationship."
+
+
 STB_correct <- STB |>
   mutate(
     Forewing_area = replace(Forewing_area, Forewing_area == 55.23, 5.523)
@@ -293,6 +304,7 @@ Every model has *assumptions* that must be met to ensure an unbiased analysis
 
 ```{r}
 #| echo: false
+#| fig-alt: "Scatterplot of age plotted against proportion black. The line of best fit is plotted. Vertical lines connect the each point to the line, showing the residual value. The mean of x and mean of y is plotted as a circle."
 
 LA <- read_csv(
   "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
@@ -329,7 +341,7 @@ print(l[[2]] + scale_x_continuous(limits = c(0, 1)))
 
 ## Problematic residuals
 
-![](https://openintro-ims.netlify.app/inf-model-slr_files/figure-html/fig-whatCanGoWrongWithLinearModel-1.png){fig-align="center" width=100%}
+![](https://openintro-ims.netlify.app/inf-model-slr_files/figure-html/fig-whatCanGoWrongWithLinearModel-1.png){fig-align="center" width=100% fig-alt="Grid of images showing problematic residual patterns. The set of images on the top are y versus x and the set on the bottom are corresponding residuals versus predicted y."}
 
 From [Introduction to Modern Statistics](https://openintro-ims.netlify.app/) (Çetinkaya-Rundel and Hardin, 2021)
 
@@ -349,6 +361,8 @@ summary(fm)
 ## Checking residuals
 
 ```{r}
+#| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area. The line of best fit is overlaid."
+
 ggplot(STB, aes(Forewing_area, Hindwing_area)) +
   geom_point() +
   geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
@@ -378,6 +392,7 @@ str(STB)
 ```{r}
 #| echo: true
 #| output-location: slide
+#| fig-alt: "A set of 5 plots displaying the model diagnostics for posterior predictive check, linearity, homogeneity of variance, influential observations, and normality of residuals."
 
 library(performance)
 library(see)
@@ -389,6 +404,8 @@ check_model(fm)
 ## Posterior predictive check
 
 ```{r}
+#| fig-alt: "The plot showing the posterior predictive check. The observed density plot for hindwing area is a green line. Several model-predicted lines are overlaid in blue. These largely overlap with the green line."
+
 PP <- plot(check_model(fm, panel = FALSE))
 PP[[1]]
 ```
@@ -396,6 +413,8 @@ PP[[1]]
 ## Linearity
 
 ```{r}
+#| fig-alt: "Linearity check showing the plot of Residuals versus Fitted values. A dashed horizontal line is at zero. The points are in blue and fall along a curved green line."
+
 PP[[2]]
 ```
 
@@ -403,6 +422,9 @@ PP[[2]]
 ## Homogeneity of variance
 
 ```{r}
+#| fig-alt: "Homogeneity of variance check showing the square root of the standard residuals versus the fitted values. Blue points fall along the green fitted line. These form a v for low values and then a curve."
+
+
 PP[[3]]
 ```
 
@@ -410,6 +432,9 @@ PP[[3]]
 ## Influential observations
 
 ```{r}
+#| fig-alt: "Influential observations check showing Standard residuals vs Leverage. Two horizontal green lines show where points should fall. The fitted green line shows a sigmoid pattern with most points falling within the lines and one red extreme value."
+
+
 PP[[4]]
 ```
 
@@ -417,6 +442,9 @@ PP[[4]]
 ## Normality of residuals
 
 ```{r}
+#| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points cross this line diagonally."
+
+
 PP[[5]]
 ```
 
