@@ -10,12 +10,12 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
+    show-slide-number: all
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
 knitr:
-  opts_chunk: 
+  opts_chunk:
     echo: true
 ---
 
@@ -144,7 +144,7 @@ for (ii in 1:iter) {
   x1 <- rnorm(n = 10, mean = 0, sd = 1)
   x2 <- rnorm(n = 10, mean = 0, sd = 1)
   d[ii] <- mean(x1) - mean(x2)
-  
+
   fm <- t.test(x1, x2, var.equal = TRUE)
   P[ii] <- fm$p.value
 }
@@ -167,8 +167,8 @@ ggplot(tibble(d), aes(d)) +
 
 What proportion of *P*-values are less than or equal to 0.05?
 
-. . . 
- 
+. . .
+
 ```{r}
 sum(P <= 0.05) / iter
 ```
@@ -191,9 +191,10 @@ When there is *no difference* in group means:
 #| echo: false
 
 sds <- cbind(c(1, 1, 1, 1), c(1, 2, 4, 16))
-knitr::kable(as_tibble(sds, .name_repair = "unique") |> 
-               rename(`Group 1` = `...1`,
-                      `Group 2` = `...2`))
+knitr::kable(
+  as_tibble(sds, .name_repair = "unique") |>
+    rename(`Group 1` = `...1`, `Group 2` = `...2`)
+)
 ```
 
 - *t*-test assuming equal variances
@@ -216,18 +217,13 @@ set.seed(82346)
 t_tester <- function(m1, m2, sd1, sd2, ss = 10, niter = 100000) {
   ps <- logical(length = niter)
   for (jj in 1:niter) {
-    fm <- t.test(rnorm(ss, m1, sd1),
-                 rnorm(ss, m2, sd2),
-                 var.equal = TRUE)
+    fm <- t.test(rnorm(ss, m1, sd1), rnorm(ss, m2, sd2), var.equal = TRUE)
     ps[jj] <- fm$p.value < 0.05
   }
   return(mean(ps))
 }
 
-D <- tibble(m1 = 0,
-            m2 = 0,
-            sd1 = c(1, 1, 1, 1),
-            sd2 = c(1, 2, 4, 16))
+D <- tibble(m1 = 0, m2 = 0, sd1 = c(1, 1, 1, 1), sd2 = c(1, 2, 4, 16))
 ```
 
 
@@ -236,8 +232,7 @@ D <- tibble(m1 = 0,
 ```{r}
 #| cache: true
 
-pmap_dbl(.l = D,
-         .f = t_tester)
+pmap_dbl(.l = D, .f = t_tester)
 ```
 
 - Equal standard deviation: ~5%
@@ -258,95 +253,20 @@ set.seed(234978)
 t_tester_welch <- function(m1, m2, sd1, sd2, ss = 10, niter = 100000) {
   ps <- logical(length = niter)
   for (jj in 1:niter) {
-    mod <- t.test(rnorm(ss, m1, sd1),
-                  rnorm(ss, m2, sd2),
-                  var.equal = FALSE)
+    mod <- t.test(rnorm(ss, m1, sd1), rnorm(ss, m2, sd2), var.equal = FALSE)
     ps[jj] <- mod$p.value < 0.05
   }
   return(mean(ps))
 }
 
-pmap_dbl(.l = D, # reuse D
-         .f = t_tester_welch)
+pmap_dbl(
+  .l = D, # reuse D
+  .f = t_tester_welch
+)
 ```
 
 
 # Questions {background-color="#f8c471"}
-
-
-# Data Integrity {background-color="#40666e"}
-
-
-## Goals for curating data
-
-- More than just no errors
-- [FAIR](https://www.go-fair.org/fair-principles/): Findable, Accessible, Interoperable, Reusable
-- Have a traceable path for all changes to data
-    - Similar to code giving a step-by-step set of repeatable analyses
-
-
-## Isolating raw data from analysis
-
-- Separate data cleaning/preparation from analysis
-    - Clean once, analyze often
-- Read raw data
-    - Process / fix
-- Write cleaned data to a new file (e.g., `Processed_data` directory)
-    - Read into analysis code
-
-
-## Finding and fixing errors
-
-- Develop a plan for data entry
-- Data exploration and initial plotting
-- Check your lab notebook and/or data sheet
-
-Two options for errors:
-
-1. Fix in the original data
-2. Fix in code and re-export
-
-
-## Some examples
-
-![](./images/M_co_go.png){fig-align="center"}
-
-
-## Fix in code and re-export
-
-
-
-## Locating errors
-
-```{r}
-#| echo: false
-#| fig-align: center
-
-STB <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv", show_col_types = FALSE) |> 
-  mutate(ID = 1:n(),
-         Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)) |> 
-  relocate(ID)
-
-ggplot(STB, aes(Forewing_area, Hindwing_area)) +
-  geom_point(size = 3, color = "darkgreen")
-```
-
-
-```{r}
-STB |> arrange(desc(Forewing_area)) |> slice(1:5)
-STB$Forewing_area[176]
-```
-
-
-## Replacing values: `replace()`
-
-```{r}
-STB_correct <- STB |> 
-  mutate(Forewing_area = replace(Forewing_area, Forewing_area == 55.23, 5.523))
-
-ggplot(STB_correct, aes(Forewing_area, Hindwing_area)) +
-  geom_point(size = 3, color = "darkgreen")
-```
 
 
 ## Joining data
@@ -365,7 +285,7 @@ ggplot(STB_correct, aes(Forewing_area, Hindwing_area)) +
 - Compartmentalize data sets
 - Join them together via one or more columns containing values that connect one data set to each other
 
-Relations are always built between pairs of tables. 
+Relations are always built between pairs of tables.
 
 - What column(s) uniquely defines these relationships?
 
@@ -378,49 +298,56 @@ Relations are always built between pairs of tables.
 wren_surv <- read_csv(
   "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/wren_female_surv.csv",
   show_col_types = FALSE,
-  col_types = "-cn-nc") |> 
-  rename(longevity = long_years) |> 
-  arrange(ID, longevity) |> 
-  group_by(ID) |> 
-  summarise(final_obs_year = max(year),
-            longevity = max(longevity),
-            sex = sex[1])
+  col_types = "-cn-nc"
+) |>
+  rename(longevity = long_years) |>
+  arrange(ID, longevity) |>
+  group_by(ID) |>
+  summarize(
+    final_obs_year = max(year),
+    longevity = max(longevity),
+    sex = sex[1]
+  )
 
 wren_repro <- read_csv(
   "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/wren_female_repro.csv",
   show_col_types = FALSE,
-  col_types = "-cnnn-n-") |> 
-  rename(n_offspring = offspring_inde,
-         senescent = final_breed) |> 
+  col_types = "-cnnn-n-"
+) |>
+  rename(n_offspring = offspring_inde, senescent = final_breed) |>
   mutate(mass = rnorm(n(), mean = 10.5, sd = 1) |> round(digits = 1))
 ```
 
 ```{r}
 #| echo: false
 
-wren_surv |> 
-  slice_head(n = 5) |> 
-  gt() |> 
-  tab_header("Survival") |> 
+wren_surv |>
+  slice_head(n = 5) |>
+  gt() |>
+  tab_header("Survival") |>
   data_color(
     columns = ID,
     rows = ID == "543774-MMY",
-    palette = c("hotpink")) |> 
+    palette = c("hotpink")
+  ) |>
   tab_style(
     style = cell_text(weight = "bold"),
-    locations = cells_body(columns = ID))
+    locations = cells_body(columns = ID)
+  )
 
-wren_repro |> 
-  slice_head(n = 5) |> 
-  gt() |> 
-  tab_header("Reproductive Success") |> 
+wren_repro |>
+  slice_head(n = 5) |>
+  gt() |>
+  tab_header("Reproductive Success") |>
   data_color(
     columns = ID,
     rows = ID == "543774-MMY",
-    palette = c("hotpink")) |> 
+    palette = c("hotpink")
+  ) |>
   tab_style(
     style = cell_text(weight = "bold"),
-    locations = cells_body(columns = ID))
+    locations = cells_body(columns = ID)
+  )
 
 ```
 
@@ -434,11 +361,11 @@ names(wren_surv)
 names(wren_repro)
 ```
 
-- `join_`s will use column names to merge data frames (tibbles). 
+- `join_`s will use column names to merge data frames (tibbles).
 - Can join on non-matching names -- easier to `rename()` columns
 
 
-## Set Operations 
+## Set Operations
 
 ```{r}
 intersect(names(wren_surv), names(wren_repro))
@@ -453,11 +380,10 @@ union(names(wren_surv), names(wren_repro))
 
 ::: {.incremental}
 
-- `left_join(df1, df2)` and `right_join(df1, df2)`
+- `left_join(df1, df2)`
     - Merge one into the other by a subset of rows
-    - `left_join(df1, df2)` equals `right_join(df2, df1)`
-- `full_join()`: all rows, keep all values
-- `inner_join()`: only matching rows
+- `full_join()`
+    - Merge all rows, keep all values
 
 :::
 
@@ -474,29 +400,33 @@ union(names(wren_surv), names(wren_repro))
 ```{r}
 #| echo: false
 
-wren_surv |> 
-  slice_head(n = 5) |> 
-  gt() |> 
-  tab_header("Survival") |> 
+wren_surv |>
+  slice_head(n = 5) |>
+  gt() |>
+  tab_header("Survival") |>
   data_color(
     columns = ID,
     rows = ID == "543774-MMY",
-    palette = c("hotpink")) |> 
+    palette = c("hotpink")
+  ) |>
   tab_style(
     style = cell_text(weight = "bold"),
-    locations = cells_body(columns = ID))
+    locations = cells_body(columns = ID)
+  )
 
-wren_repro |> 
-  slice_head(n = 5) |> 
-  gt() |> 
-  tab_header("Reproductive Success") |> 
+wren_repro |>
+  slice_head(n = 5) |>
+  gt() |>
+  tab_header("Reproductive Success") |>
   data_color(
     columns = ID,
     rows = ID == "543774-MMY",
-    palette = c("hotpink")) |> 
+    palette = c("hotpink")
+  ) |>
   tab_style(
     style = cell_text(weight = "bold"),
-    locations = cells_body(columns = ID))
+    locations = cells_body(columns = ID)
+  )
 
 ```
 
@@ -614,9 +544,11 @@ WR |> filter(ID == "574717-YOO")
 ```{r}
 #| echo: false
 
-LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
-  rename(Age = age,
-         `Proportion Black` = proportion.black)
+LA <- read_csv(
+  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+  show_col_types = FALSE
+) |>
+  rename(Age = age, `Proportion Black` = proportion.black)
 ```
 
 ```{r}
@@ -630,15 +562,17 @@ datasummary_skim(LA)
 ```{r}
 #| echo: false
 
-HL <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/HornedLizards.csv", show_col_types = FALSE) |> 
-  drop_na() |> 
-  rename(`Horn Length` = horn_length,
-         Group = group) |> 
+HL <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/HornedLizards.csv",
+  show_col_types = FALSE
+) |>
+  drop_na() |>
+  rename(`Horn Length` = horn_length, Group = group) |>
   mutate(Group = if_else(Group == "alive", "Alive", "Dead"))
 ```
 
 ```{r}
-datasummary_balance(~ Group, data = HL)
+datasummary_balance(~Group, data = HL)
 ```
 
 
@@ -646,12 +580,12 @@ datasummary_balance(~ Group, data = HL)
 
 ```{r}
 fm <- lm(Age ~ `Proportion Black`, data = LA)
-modelsummary(list("OLS" = fm),
-             estimate = "{estimate} ({conf.low}, {conf.high})",
-             statistic = c("s.e. = {std.error}", 
-                           "t = {statistic}",
-                           "p = {p.value}"),
-             gof_omit = ".*")
+modelsummary(
+  list("OLS" = fm),
+  estimate = "{estimate} ({conf.low}, {conf.high})",
+  statistic = c("s.e. = {std.error}", "t = {statistic}", "p = {p.value}"),
+  gof_omit = ".*"
+)
 ```
 
 
@@ -660,12 +594,13 @@ modelsummary(list("OLS" = fm),
 
 ```{r}
 fm <- lm(`Horn Length` ~ Group, data = HL)
-modelsummary(list("Horn Length ~ Group" = fm),
-             estimate = "{estimate} ({conf.low}, {conf.high})",
-             statistic = c("t = {statistic}",
-                           "p = {p.value}"),
-             gof_omit = ".*",
-             fmt = 2)
+modelsummary(
+  list("Horn Length ~ Group" = fm),
+  estimate = "{estimate} ({conf.low}, {conf.high})",
+  statistic = c("t = {statistic}", "p = {p.value}"),
+  gof_omit = ".*",
+  fmt = 2
+)
 ```
 
 
@@ -682,4 +617,3 @@ Where we are headed...
 
 
 # Questions {background-color="#f8c471"}
-

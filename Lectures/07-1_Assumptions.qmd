@@ -1,6 +1,6 @@
 ---
-title: "Unit 7: Data Organization and Wrangling"
-subtitle: "Assumptions of models"
+title: "Unit 7: Assumptions of models"
+subtitle: "Data wrangling"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -10,12 +10,12 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
+    show-slide-number: all
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
 knitr:
-  opts_chunk: 
+  opts_chunk:
     echo: true
 ---
 
@@ -27,52 +27,82 @@ library(tidyverse)
 
 theme_set(theme_classic(base_size = 20))
 
-ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE,
-                   xlab = NULL, ylab = NULL) {
+ssPlot <- function(
+  X,
+  Y,
+  b,
+  do.plot = TRUE,
+  do.labels = TRUE,
+  xlab = NULL,
+  ylab = NULL
+) {
   require(latex2exp)
   n <- length(X)
   pred <- (X * b + (mean(Y) - b * mean(X)))
-  SSy <- sum((Y - pred) ^ 2)
-  
+  SSy <- sum((Y - pred)^2)
+
   M <- tibble(X, Y, pred)
-  
-  if (is.null(xlab)) xlab <- "X"
-  if (is.null(ylab)) ylab <- "Y"
-  
+
+  if (is.null(xlab)) {
+    xlab <- "X"
+  }
+  if (is.null(ylab)) {
+    ylab <- "Y"
+  }
+
   if (do.plot) {
     p <- ggplot() +
-      geom_point(data = tibble(X = mean(X), Y = mean(Y)),
-                 aes(X, Y), color = "navy", size = 7, pch = 1) +
-      geom_abline(slope = b, intercept = mean(Y) - b * mean(X),
-                  color = "navy", linewidth = 1) +
-      geom_segment(data = M, aes(x = X, xend = X, y = Y, yend = pred),
-                   color = "firebrick", linewidth = 1) +
+      geom_point(
+        data = tibble(X = mean(X), Y = mean(Y)),
+        aes(X, Y),
+        color = "navy",
+        size = 7,
+        pch = 1
+      ) +
+      geom_abline(
+        slope = b,
+        intercept = mean(Y) - b * mean(X),
+        color = "navy",
+        linewidth = 1
+      ) +
+      geom_segment(
+        data = M,
+        aes(x = X, xend = X, y = Y, yend = pred),
+        color = "firebrick",
+        linewidth = 1
+      ) +
       geom_point(data = M, aes(x = X, y = Y), size = 3) +
       labs(x = xlab, y = ylab)
-    
+
     v1 <- round(b, 2)
     v2 <- round(SSy, 2)
-    
+
     ll1 <- glue::glue("$\\theta_1 = {v1}$")
     ll2 <- glue::glue("$\\SS = {v2}$")
-    
+
     xpos <- min(X) + 0.15 * diff(range(X))
     ypos <- min(Y) + 0.8 * diff(range(Y))
-    
-    if(do.labels) {
+
+    if (do.labels) {
       p <- p +
-        annotate(geom = "text",
-                 label = TeX(ll1, output = "character"),
-                 x = xpos, y = ypos,
-                 parse = TRUE,
-                 hjust = 0,
-                 size = 9) +
-        annotate(geom = "text",
-                 label = TeX(ll2, output = "character"),
-                 x = xpos, y = ypos * 0.96,
-                 parse = TRUE,
-                 hjust = 0,
-                 size = 9)
+        annotate(
+          geom = "text",
+          label = TeX(ll1, output = "character"),
+          x = xpos,
+          y = ypos,
+          parse = TRUE,
+          hjust = 0,
+          size = 9
+        ) +
+        annotate(
+          geom = "text",
+          label = TeX(ll2, output = "character"),
+          x = xpos,
+          y = ypos * 0.96,
+          parse = TRUE,
+          hjust = 0,
+          size = 9
+        )
     }
   } else {
     p <- NULL
@@ -85,322 +115,8 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE,
 
 # Housekeeping {background-color="#40666e"}
 
-
-# Data organization {background-color="#40666e"}
-
-
-## File organization
-
-R's Working directory model means that we need to be aware of where files are stored.
-
-Possible directory structure:
-
-```
-  /Project
-    /Raw_Data
-    /Processed_Data
-    /Analysis
-    /Plots
-```
-
-Some examples...
-
-
-## Data organization: file structure
-
-  - Raw Data
-    - raw data (read-only, backup, don't edit/overwrite)
-  - Processed Data
-    - intermediate and final R data sets (any data produced by a script)
-  - Analysis
-  - Plots
-  - ReadMe and/or ProjectNotes file
-    - Driving questions and purposes of the project
-    - Metadata & instructions for reproducing all analyses and plots
-    - Entries and notes for each time you work on the analysis
-
-
-## Data storage: general suggestions
-
-- Think about how to store your data *before* you start
-    - Sometimes it is difficult to change things later
-- Keep everything: Disk space is cheap
-    - Google Drive, OneDrive, Dropbox, etc.
-    - Iterate file names (*better* -- use version control)
-- Create a data dictionary in your metadata folder (explanations of what your columns represent)
-    - "Body mass in grams, measured to nearest 0.1 g."
-- Be consistent
-    - File names, variable names, file formats, etc.
-
-
-## Data storage: data files
-
-See [Broman and Woo: Data Organization in Spreadsheets](https://kbroman.org/dataorg/)
-
-- Store data in rectangular format
-    - **No empty cells**, no merged cells, repeat values if necessary
-    - Each unique **observation unit** is a row
-- Use only one header row
-- R is case sensitive so keep column headers in a case structure  (snake_case, dot.case, CamelCase)
-    - No spaces or units in column names, e.g., `body_mass` or `BodyMass` but not "Body Mass" or "Body Mass (g)"
-
-
-## Data storage: data files
-
-See [Broman and Woo: Data Organization in Spreadsheets](https://kbroman.org/dataorg/)
-
-- Use `NA` for missing data (not -9, -9999, or some variation of that)
-- Use words, not highlighting or color for metadata
-    - Have a "Notes" column
-- Store dates as three separate columns (`Year`, `Month`, `Day`)
-    - Combine them programmatically
-    - Excel does very weird things with dates
-
-
-## Examples: bad and good
-
-![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_1.png){fig-align="center"}
-
-
-## Examples: bad and good
-
-![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_2.png){fig-align="center"}
-
-
-## Data storage and relational data
-
--  Strive for relational data to keep your file sizes small 
-    - Store data as smaller units (hierarchical and by type) and link through code
-    - Share identifiers so that you can match and merge data across files
-- Use coding to join by shared IDs
-    - Avoid confusion and repetition of data
-    - Great for large, interconnected data sets, especially those that can change
-    - Data management systems play well with data in this format (e.g., Tidy, databases)
-
-
-## Data Storage and Relational Data
-
-- Avoid "monolithic" files with redundant data
-- Relate smaller data files to each other by *keys*
-- Join files together for analysis
-
-:::: {.columns}
-
-::: {.column width="50%"}
-![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_1.png){fig-align="center"}
-:::
-
-::: {.column width="50%"}
-![](https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/main/images/Excel_3.png){fig-align="center"}
-:::
-
-::::
-
-
-# Working with columns of data {background-color="#40666e"}
-
-
-## Data to work with: Swallowtail Butterflies
-
-![](http://www.pyrgus.de/bilder1/papilionidae/machaon_im2023.jpg){fig-align="center"}
-
-- 2 Sub-species, 2 sexes
-- Forewing and hindwing areas
-- Tail length
-
-
-## Data to work with: Swallowtail Butterflies
-
-```{r}
-STB <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv", show_col_types = FALSE)
-glimpse(STB)
-
-STB |> count(Species, Sex)
-```
-
-
-## Selecting columns and rows
-
-- `$`: One column
-- `[ , ]`: [Rows, Columns]
-- `select()`: Columns
-- `filter()` and `slice()`: Rows
-
-
-## Selecting
-
-```{r}
-STB$Forewing_area[1:5]
-
-STB[1:5, "Forewing_area"]
-```
-
-. . .
-
-```{r}
-STB |> select(Species:Sex) |> slice(1:5)
-```
-
-. . .
-
-```{r}
-STB |> select(Species, Forewing_area) |> slice(1:5)
-```
-
-
-## `select()` verbs
-
-```{r}
-STB |> select(starts_with("Sp")) |> head()
-```
-
-. . .
-
-```{r}
-STB |> select(ends_with("area")) |> head()
-```
-
-. . .
-
-```{r}
-STB |> select(contains("wing_area")) |> head()
-```
-
-
-## Creating and modifying: `mutate()`
-
-Mutate single columns:
-
-```{r}
-#| output: false
-STB |> mutate(Species = factor(Species))
-STB |> mutate(log_Forewing_area = log10(Forewing_area),
-              log_Hindwing_area = log10(Hindwing_area))
-```
-
-. . .
-
-`log10()` transformation across all numeric columns:
-
-```{r}
-STB |> mutate(across(where(is.numeric), log10)) |> slice(1:5)
-```
-
-
-## Splitting
-
-```{r}
-STB |> separate(col = "Species",
-                into = c("Genus", "Species", "Subspecies"),
-                sep = " ") |> slice(1:5)
-```
-
-. . .
-
-```{r}
-STB |> separate(col = "Species",
-                into = c("Genus", "Species", NA),
-                sep = " ") |> slice(1:5)
-```
-
-Also: `str_split()`
-
-
-## Combining
-
-```{r}
-STB |> unite(col = "Spp_Sex", Species:Sex, sep = "_") |> slice(1:5)
-```
-
-Also: `paste()`, `paste0()`, `glue` package
-
-
-## "Wide" data
-
-- Each row is an experimental unit (sample, individual, etc.)
-- Many columns contain data (usually numeric)
-- How you should enter and store data
-
-```{r}
-#| echo: false
-
-STB |> slice(1:10)
-```
-
-
-## "Long" data
-
-- Only one column has numeric data
-- Useful for plotting and other activities
-
-```{r}
-#| echo: false
-
-STB |> 
-  mutate(ID = 1:n()) |> 
-  relocate(ID) |> 
-  select(ID, Species, Sex, contains("area")) |> 
-  pivot_longer(cols = contains("area"),
-               names_to = "Measurement",
-               values_to = "Area") |> 
-  mutate(Measurement = str_remove(Measurement, "_area")) |> 
-  slice(1:10)
-```
-
-
-## Pivoting: moving from wide to long and long to wide
-
-- Longer - `pivot_longer()`
-    - Convert multiple columns into rows
-    - ~99% of use cases
-- Wider - `pivot_wider()`
-    - Convert rows into multiple columns
-    - ~1% of use cases
-
-
-## Pivoting to long format
-
-```{r}
-STB_long <- STB |> 
-  mutate(ID = 1:n()) |> # <1>
-  relocate(ID) |> # <2>
-  select(ID, Species, Sex, contains("area")) |>  # <3>
-  pivot_longer(cols = contains("area"), # <4>
-               names_to = "Measurement", # <5>
-               values_to = "Area") |> # <6>
-  mutate(Measurement = str_remove(Measurement, "_area")) # <7>
-STB_long
-```
-1. Create a new `ID` column with the numbers 1 to the number of rows (`n()`)
-2. Move the new `ID` column to the first position
-3. Select the identifier columns and "area" columns
-4. Choose the columns to pivot
-5. New column name to hold old column names
-6. New column name for old values
-7. Remove "_area" from new `Measurement` column
-
-
-## Why long format?
-
-Many plots work better with long data:
-
-```{r}
-#| output-location: slide
-#| fig-align: center
-
-STB_long |> 
-  mutate(Species = str_replace(Species, "Papilio machaon", "P. m. "),
-         Sex = if_else(Sex == "female", "Female", "Male")) |> 
-  ggplot(aes(x = Measurement, y = Area, color = Sex)) +
-  geom_point(position = position_jitter(width = 0.25, seed = 2377),
-             size = 2) +
-  facet_grid(Species ~ .) +
-  scale_color_manual(values = c("blue3", "darkgreen")) +
-  theme(strip.text = element_text(face = "italic"))
-```
-
-
-# Questions {background-color="#f8c471"}
+- PC 1 Key
+- Micropublication Data / topic due Tuesday after Spring Break
 
 
 # Common issues with data {background-color="#40666e"}
@@ -422,6 +138,27 @@ STB_long |>
 - `max()` and `min()`, `which.max()` and `which.min()`
 
 
+## Data to work with: Swallowtail Butterflies
+
+![](http://www.pyrgus.de/bilder1/papilionidae/machaon_im2023.jpg){fig-align="center"}
+
+- 2 Sub-species, 2 sexes
+- Forewing and hindwing areas
+- Tail length
+
+
+## Data to work with: Swallowtail Butterflies
+
+```{r}
+STB <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
+  show_col_types = FALSE
+)
+glimpse(STB)
+
+STB |> count(Species, Sex)
+```
+
 ## Unique values and counts
 
 ```{r}
@@ -436,9 +173,11 @@ STB |> count(Species, Sex)
 ```{r}
 #| echo: false
 
-STB <- STB |> 
-  mutate(ID = 1:n(),
-         Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)) |> 
+STB <- STB |>
+  mutate(
+    ID = 1:n(),
+    Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)
+  ) |>
   relocate(ID)
 ```
 
@@ -486,6 +225,46 @@ STB |> slice_max(Forewing_area)
 Many `slice_...()` functions.
 
 
+## Locating errors
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+STB <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
+  show_col_types = FALSE
+) |>
+  mutate(
+    ID = 1:n(),
+    Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)
+  ) |>
+  relocate(ID)
+
+ggplot(STB, aes(Forewing_area, Hindwing_area)) +
+  geom_point(size = 3, color = "darkgreen")
+```
+
+
+```{r}
+STB |> arrange(desc(Forewing_area)) |> slice(1:5)
+STB$Forewing_area[176]
+```
+
+
+## Replacing values: `replace()`
+
+```{r}
+STB_correct <- STB |>
+  mutate(
+    Forewing_area = replace(Forewing_area, Forewing_area == 55.23, 5.523)
+  )
+
+ggplot(STB_correct, aes(Forewing_area, Hindwing_area)) +
+  geom_point(size = 3, color = "darkgreen")
+```
+
+
 # Questions {background-color="#f8c471"}
 
 
@@ -515,12 +294,35 @@ Every model has *assumptions* that must be met to ensure an unbiased analysis
 ```{r}
 #| echo: false
 
-LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
-  rename(Age = age,
-         `Proportion Black` = proportion.black)
-fm <- lm(Age ~ `Proportion Black`, data = LA)
-l <- ssPlot(X = LA$`Proportion Black`, Y = LA$Age, b = coef(fm)[2],
-       xlab = "Proportion Black", ylab = "Age", do.labels = FALSE)
+LA <- read_csv(
+  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+  show_col_types = FALSE
+) |>
+  rename(
+    Age = age,
+    `
+Proportion
+Black
+` = proportion.black
+  )
+fm <- lm(
+  Age ~ `
+Proportion
+Black
+`,
+  data = LA
+)
+l <- ssPlot(
+  X = LA$`
+Proportion
+Black
+`,
+  Y = LA$Age,
+  b = coef(fm)[2],
+  xlab = "Proportion Black",
+  ylab = "Age",
+  do.labels = FALSE
+)
 print(l[[2]] + scale_x_continuous(limits = c(0, 1)))
 ```
 
@@ -652,6 +454,41 @@ check_model(fm2)
 ```
 
 
+## Posterior predictive check
+
+```{r}
+PP <- plot(check_model(fm2, panel = FALSE))
+PP[[1]]
+```
+
+## Linearity
+
+```{r}
+PP[[2]]
+```
+
+
+## Homogeneity of variance
+
+```{r}
+PP[[3]]
+```
+
+
+## Influential observations
+
+```{r}
+PP[[4]]
+```
+
+
+## Normality of residuals
+
+```{r}
+PP[[5]]
+```
+
+
 ## Assumptions when comparing means
 
 - Observations are independent
@@ -670,15 +507,21 @@ check_model(fm2)
 #| echo: false
 #| fig-align: center
 
-Kung <- read_delim("https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv", delim = ";", show_col_types = FALSE) |> 
-  filter(male == 1 & height > 100) |> 
+Kung <- read_delim(
+  "https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv",
+  delim = ";",
+  show_col_types = FALSE
+) |>
+  filter(male == 1 & height > 100) |>
   rename(mass = weight)
 
 ggplot(Kung, aes(height, mass)) +
   geom_point(color = "darkblue") +
-  labs(x = "Height (cm)",
-       y = "Body Mass (kg)",
-       title = "Mass and Height in Male !Kung")
+  labs(
+    x = "Height (cm)",
+    y = "Body Mass (kg)",
+    title = "Mass and Height in Male !Kung"
+  )
 ```
 
 
@@ -698,11 +541,12 @@ summary(fm1)
 
 ggplot(Kung, aes(height, mass)) +
   geom_point(color = "darkblue") +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
-              color = "hotpink") +
-  labs(x = "Height (cm)",
-       y = "Body Mass (kg)",
-       title = "Mass and Height in Male !Kung")
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "hotpink") +
+  labs(
+    x = "Height (cm)",
+    y = "Body Mass (kg)",
+    title = "Mass and Height in Male !Kung"
+  )
 ```
 
 
@@ -711,13 +555,6 @@ ggplot(Kung, aes(height, mass)) +
 ```{r}
 PP <- plot(check_model(fm1, panel = FALSE))
 PP[[2]]
-```
-
-
-## Model check: Variance
-
-```{r}
-PP[[3]]
 ```
 
 
@@ -748,14 +585,16 @@ $$ \log_{10}(Mass) \sim 3 \times \log_{10}(Height) $$
 
 ggplot(Kung, aes(height, mass)) +
   geom_point(color = "darkblue") +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
-              color = "hotpink") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "hotpink") +
   scale_x_log10() + # <1>
   scale_y_log10() + # <1>
-  labs(x = "log10 Height (cm)",
-       y = "log10 Body Mass (kg)",
-       title = "Mass and Height in Male !Kung")
+  labs(
+    x = "log10 Height (cm)",
+    y = "log10 Body Mass (kg)",
+    title = "Mass and Height in Male !Kung"
+  )
 ```
+
 1. Convert x and y axes to log~10~.
 
 Note: no change to `geom_smooth()`.
@@ -764,9 +603,8 @@ Note: no change to `geom_smooth()`.
 ## Transform and re-fit
 
 ```{r}
-Kung <- Kung |> 
-  mutate(log10_mass = log10(mass),
-         log10_height = log10(height))
+Kung <- Kung |>
+  mutate(log10_mass = log10(mass), log10_height = log10(height))
 fm2 <- lm(log10_mass ~ log10_height, data = Kung)
 summary(fm2)
 ```
@@ -780,13 +618,6 @@ PP[[2]]
 ```
 
 
-## Model check: Variance
-
-```{r}
-PP[[3]]
-```
-
-
 ## Model check: Residuals
 
 ```{r}
@@ -795,4 +626,3 @@ PP[[5]]
 
 
 # Questions {background-color="#f8c471"}
-
