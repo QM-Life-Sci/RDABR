@@ -478,6 +478,8 @@ summary(fm2)
 ## Model check
 
 ```{r}
+#| fig-alt: "A set of 5 plots displaying the model diagnostics for posterior predictive check, linearity, homogeneity of variance, influential observations, and normality of residuals."
+
 check_model(fm2)
 ```
 
@@ -485,6 +487,8 @@ check_model(fm2)
 ## Posterior predictive check
 
 ```{r}
+#| fig-alt: "The plot showing the posterior predictive check. The observed density plot for hindwing area is a green line. Several model-predicted lines are overlaid in blue. These largely overlap with the green line."
+
 PP <- plot(check_model(fm2, panel = FALSE))
 PP[[1]]
 ```
@@ -492,6 +496,8 @@ PP[[1]]
 ## Linearity
 
 ```{r}
+#| fig-alt: "Linearity check showing the plot of Residuals versus Fitted values. A dashed horizontal line is at zero. Blue points are scattered along the green fitted line. The fitted line is roughly horizontal."
+
 PP[[2]]
 ```
 
@@ -499,6 +505,8 @@ PP[[2]]
 ## Homogeneity of variance
 
 ```{r}
+#| fig-alt: "Homogeneity of variance check showing the square root of the standard residuals versus the fitted values. Blue points are scattered along the green fitted line. The fitted line is roughly horizontal."
+
 PP[[3]]
 ```
 
@@ -506,6 +514,8 @@ PP[[3]]
 ## Influential observations
 
 ```{r}
+#| fig-alt: "Influential observations check showing Standard residuals vs Leverage. Two horizontal dashed green lines show where points should fall. The fitted green line shows horizontal line and all points fall within the dashed green lines."
+
 PP[[4]]
 ```
 
@@ -513,6 +523,9 @@ PP[[4]]
 ## Normality of residuals
 
 ```{r}
+#| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points fall nicely along the line."
+
+
 PP[[5]]
 ```
 
@@ -534,6 +547,7 @@ PP[[5]]
 ```{r}
 #| echo: false
 #| fig-align: center
+#| fig-alt: "Scatterplot of Body Mass versus Height for Male !Kung. There is a positive relationship." 
 
 Kung <- read_delim(
   "https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv",
@@ -566,6 +580,7 @@ summary(fm1)
 ```{r}
 #| echo: false
 #| fig-align: center
+#| fig-alt: "Scatterplot of Body Mass versus Height for Male !Kung. There is a positive relationship. A line of best fit is overlaid." 
 
 ggplot(Kung, aes(height, mass)) +
   geom_point(color = "darkblue") +
@@ -581,6 +596,8 @@ ggplot(Kung, aes(height, mass)) +
 ## Model check: Linearity
 
 ```{r}
+#| fig-alt: "Linearity check showing the plot of Residuals versus Fitted values. A dashed horizontal line is at zero. Blue points are scattered along the green fitted line. The fitted line is somewhat sigmoidal."
+
 PP <- plot(check_model(fm1, panel = FALSE))
 PP[[2]]
 ```
@@ -589,6 +606,9 @@ PP[[2]]
 ## Model check: Residuals
 
 ```{r}
+#| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points fall nicely along the line."
+
+
 PP[[5]]
 ```
 
@@ -610,6 +630,7 @@ $$ \log_{10}(Mass) \sim 3 \times \log_{10}(Height) $$
 ```{r}
 #| output-location: slide
 #| fig-align: center
+#| fig-alt: "Scatterplot of log 10 Body Mass versus log 10 Height for Male !Kung. There is a positive relationship. A line of best fit is overlaid." 
 
 ggplot(Kung, aes(height, mass)) +
   geom_point(color = "darkblue") +
@@ -641,6 +662,8 @@ summary(fm2)
 ## Model check: Linearity
 
 ```{r}
+#| fig-alt: "Linearity check showing the plot of Residuals versus Fitted values. A dashed horizontal line is at zero. Blue points are scattered along the green fitted line. The fitted line is somewhat sigmoidal but less so than the previous check."
+
 PP <- plot(check_model(fm2, panel = FALSE))
 PP[[2]]
 ```
@@ -649,6 +672,8 @@ PP[[2]]
 ## Model check: Residuals
 
 ```{r}
+#| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points fall nicely along the line."
+
 PP[[5]]
 ```
 
