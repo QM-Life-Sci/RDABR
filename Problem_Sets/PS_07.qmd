@@ -15,6 +15,14 @@ format:
 #| message: false
 #| warning: false
 
+library(tidyverse)
+library(performance)
+library(see)
+library(broom)
+library(readxl)
+library(cowplot)
+
+theme_set(theme_classic())
 ```
 
 ## Setup
@@ -61,22 +69,19 @@ We'll go through the diagnostics one-by-one.
 
 What does the "Posterior Predictive Check" represent? Do you see any problems with it?
 
->
-
+> 
 
 What does the "Linearity" panel check? Do you see any problems with it?
 
->
-
+> 
 
 What does the "Homogeneity of Variance" panel check? Do you see any problems with it?
 
->
-
+> 
 
 What does the "Influential Observations" panel check? Do you see any problems with it?
 
->
+> 
 
 
 Finally, run the three additional checks:
@@ -89,10 +94,9 @@ Finally, run the three additional checks:
 
 ```
 
-What do these checks report? Do the results agree with the disagnostic plots?
+What do these checks report? Do the results agree with the diagnostic plots?
 
->
-
+> 
 
 In class we made a plot using `geom_label()`, with the observation numbers plotted instead of points. Adapt that plot here to identify the influential observation. Include the code you wrote above to also draw the OLS regression line on the plot.
 
@@ -100,9 +104,9 @@ In class we made a plot using `geom_label()`, with the observation numbers plott
 
 ```
 
-What does it mean to say that point #30 has a lot of influence on the regression as compared to, for example point #17?
+What does it mean to say that point #30 has a lot of *influence* on the regression as compared to, for example point #17?
 
->
+> 
 
 
 Filter out observation #30 by whatever method you want. Then refit the model and print the summary.
@@ -113,7 +117,107 @@ Filter out observation #30 by whatever method you want. Then refit the model and
 
 Compare the summaries for the original model with all the data points and the new model with the outlier removed. How much do the coefficients change? Does dropping one data point change your conclusions about the ability to predict age from proportion of black in the nose?
 
+> 
+
+## Waist Circumference and Serum Triglycerides
+
+Cardiovascular disease is a leading cause of mortality in the United States. Dyslipidemia, in particular elevated serum triglycerides, is a well-established  risk factor for cardiovascular disease.
+
+High serum triglycerides is associated with general metabolic dysregulation (insulin resistance, high blood pressure, Type 2 diabetes, and other physiological changes) and is one of the diagnostic criteria for "metabolic syndrome" (Grundy et al., 2004)^[Grundy, SM and others. (2004). Definition of metabolic syndrome: Report of the National Heart, Lung, and Blood Institute/American Heart Association conference on scientific issues related to definition. *Circulation* 109: 433-438.].
+
+Visceral adipose tissue releases free fatty acids into circulation, leading to elevated serum triglycerides. Waist circumference is a easy-to-measure clinical measure of visceral adiposity.
+
+In this question we want to explore the association between waist circumference and triglyceride levels and see whether triglyceride levels can be predicted from waist circumference. Because waist circumference is easy and free to measure, being able to predict serum triglycerides waist circumference would be beneficial.
+
+The file `NHANES_Triglycerides.xlsx` is an Excel file that contains data with several body measurement and laboratory results from the [National Health and Nutrition Examination Survey ("NHANES")](https://wwwn.cdc.gov/nchs/nhanes/Default.aspx) in 2017-2018.
+
+The columns in this data set are:
+
+- `ID`: Participant's ID
+- `Age`: Age in years
+- `Sex`: Self-reported sex
+- `BMI`: Body mass index in kg/m^2^
+- `Waist`: Waist circumference in cm
+- `Triglycerides`: Serum triglycerides in mg/dL
+
+Use the function `read_excel()` from the package `readxl` to load the data and select only the self-reported females from the dataset.
+
+```{r}
+
+```
+
+To explore the data, make two histograms, one for waist circumference and one for triglycerides.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+What can you infer from the distributions of waist circumference and for triglycerides? Do these variable appear to be roughly normally distributed? do you have any concerns about using these data in a linear model?
+
 >
+
+Now explore the relationship between these variables by making a scatterplot of triglycerides versus waist circumference. Choose a color and size for your points and add informative axis labels.
+
+
+```{r}
+
+```
+
+Perform an OLS regression predicting triglycerides from waist circumference.
+
+```{r}
+
+```
+
+Use `check_model` to check the diagnostics for your model.
+
+```{r}
+
+```
+
+Do you have any concerns about whether these data meet the assumptions for OLS regression? If any diagnostics are concerning, explain what the problem appears to be.
+
+>
+
+
+Transformations are often used to help meet the assumptions of our statistical tests. Let's try a log transformation of the triglycerides variable to see how this affects the model.
+
+Create a new column that holds the (natural) log of triglycerides. Remake the scatterplot and perform the OLS regression this time with the log transformed variable.
+
+```{r}
+
+```
+
+Now get the model summary and perform the diagnostics using check_model on this new regression.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+Compare the diagnostics for the log transformed data versus un-transformed. Which model would you recommend or not? Use specific diagnostic results to support your answer.
+
+>
+
+
+Finally, using your plot above as a starter, make a publication-ready scatter plot of the log transformed triglycerides versus waist circumference.
+
+- Add color and transparency as you see fit.
+- Also add a line of best fit and choose a color for the line.
+- Add informative axis labels.
+
+```{r}
+
+
+```
+
 
 
 ## Stalk-eyed flies
@@ -133,16 +237,17 @@ Pass the fitted model to `check_model()` as above to plot the regression diagnos
 
 ```{r}
 
+
 ```
 
 What do you notice is different about these diagnostic plots compared to the one above?
 
->
+> 
 
 
 What can you conclude about the utility of diagnostic plots when the predictor is a categorical variable?
 
->
+> 
 
 
 Run the same 3 additional checks as above.
@@ -153,7 +258,7 @@ Run the same 3 additional checks as above.
 
 What do these results show?
 
->
+> 
 
 
 Let's further investigate. In the chunk below, add a column to your stalk-eyed fly tibble with the residuals. There are a few ways to access the residuals:
@@ -174,4 +279,15 @@ Finally, plot a histogram of the *residuals* for the fitted model. Color by food
 
 What do you notice about the residuals? Does this agree with the diagnostics above?
 
+> 
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
 >
+
+
