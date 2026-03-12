@@ -191,7 +191,7 @@ Tri <- read_excel("../data/NHANES_Triglycerides.xlsx") |>
   filter(Sex == "Female")
 ```
 
-To explore the data, make a histogram for waist circumference and one for triglycerides. 
+To explore the data, make two histograms, one for waist circumference and one for triglycerides.
 
 ```{r}
 ggplot(Tri, aes(Waist)) +
@@ -207,9 +207,9 @@ ggplot(Tri, aes(Triglycerides)) +
 
 What can you infer from the distributions of waist circumference and for triglycerides? Do these variable appear to be roughly normally distributed? do you have any concerns about using these data in a linear model?
 
-> 
+>
 
-Now explore the relationship between these variables by making a scatterplot of triglycerides versus waist circumference. Choose a color and size for your points and add informative labels. 
+Now explore the relationship between these variables by making a scatterplot of triglycerides versus waist circumference. Choose a color and size for your points and add informative axis labels.
 
 
 ```{r}
@@ -232,12 +232,14 @@ Use `check_model` to check the diagnostics for your model.
 check_model(fm1)
 ```
 
-Do you have any concerns about whether these data meet the assumptions for OLS regression? What specific diagnostics are concerning or not?
+Do you have any concerns about whether these data meet the assumptions for OLS regression? If any diagnostics are concerning, explain what the problem appears to be.
 
-> 
+>
 
 
-Transformations are often used to help meet the assumptions of our statistical tests. Let's try a log transformation of the triglycerides variable to see how this affects our model. Create a new column that holds the log of triglycerides. Remake the scatterplot and perform the OLS regression this time with the log transformed variable. 
+Transformations are often used to help meet the assumptions of our statistical tests. Let's try a log transformation of the triglycerides variable to see how this affects the model.
+
+Create a new column that holds the (natural) log of triglycerides. Remake the scatterplot and perform the OLS regression this time with the log transformed variable.
 
 ```{r}
 Tri <- Tri |> mutate(log_Tri = log(Triglycerides))
@@ -248,7 +250,7 @@ ggplot(Tri, aes(x = Waist, y = log_Tri)) +
 fm2 <- lm(log_Tri ~ Waist, data = Tri)
 ```
 
-Now get the model summary and perform the diagnostics using check_model on this new regression. 
+Now get the model summary and perform the diagnostics using check_model on this new regression.
 
 ```{r}
 #| fig-height: 10
@@ -260,12 +262,16 @@ check_model(fm2)
 summary(fm2)
 ```
 
-Compare the diagnositcs for the log transformed data versus not. Which model would you recommend or not? Use specific diagnositc results to support your answer. 
+Compare the diagnostics for the log transformed data versus un-transformed. Which model would you recommend or not? Use specific diagnostic results to support your answer.
 
 >
 
 
-Finally, make a publication-ready scatter plot of the log transformed triglycerides versus waist circumference. Add color and transparency as you see fit. Also add a line of best fit and choose a color for the line. Add informative labels. 
+Finally, using your plot above as a starter, make a publication-ready scatter plot of the log transformed triglycerides versus waist circumference.
+
+- Add color and transparency as you see fit.
+- Also add a line of best fit and choose a color for the line.
+- Add informative axis labels.
 
 ```{r}
 ggplot(Tri, aes(x = Waist, y = log_Tri)) +
