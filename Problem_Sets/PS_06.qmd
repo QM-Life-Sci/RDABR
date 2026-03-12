@@ -157,7 +157,7 @@ Finally, fit a linear model where `x` is predicted by the new grouping variable.
 
 This is the same linear model that we used in PS 5.
 
-Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grp2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
+Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grpx2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
 
 >
 

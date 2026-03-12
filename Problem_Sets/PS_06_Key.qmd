@@ -194,7 +194,7 @@ summary(fm)
 
 This is the same linear model that we used in PS 5.
 
-Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grp2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
+Compare the hypothesis test for the difference in means between `x1` and `x2` for the linear model (the `Grpx2` coefficient, SE, *t*-value, and *P*-value). Are they similar or different? If they are similar, but not exactly the same, what do you think might explain this discrepancy?
 
 > They are very close but not exact. For the linear model the *P*-value is 0.000126, and for the randomization it was 0.0003. For that, we only used 10000 iterations. Maybe more iterations would be more exact. Also we didn't do exactly the same test, so it's not realistic to find an exact match. If we chose another seed, we would get slightly different results, but still very close to the linear model.
 
