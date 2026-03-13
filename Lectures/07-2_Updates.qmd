@@ -1,0 +1,39 @@
+---
+title: "Unit 7: Housekeeping"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: all
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+knitr:
+  opts_chunk:
+    echo: true
+---
+
+
+# Question {background-color="#40666e"}
+
+Would you rather have eyes on your hands or ears on your feet?
+
+
+# Housekeeping {background-color="#40666e"}
+
+- PC 1 Key
+- Micropublication Data / topic due Tuesday after Spring Break
+    - We will not have internet during the break
+    - Sign up if you want to discuss (next Monday or Tuesday)
+
+![](images/QR.jpg){fig-align="center" fig-alt="QR Code"}
+
+# Complete vs. Incomplete {background-color="#40666e"}
+
+
+# Questions {background-color="#f8c471"}
