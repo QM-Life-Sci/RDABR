@@ -28,86 +28,86 @@ library(tidyverse)
 theme_set(theme_classic(base_size = 20))
 
 ssPlot <- function(
-  X,
-  Y,
-  b,
-  do.plot = TRUE,
-  do.labels = TRUE,
-  xlab = NULL,
-  ylab = NULL
+    X,
+    Y,
+    b,
+    do.plot = TRUE,
+    do.labels = TRUE,
+    xlab = NULL,
+    ylab = NULL
 ) {
-  require(latex2exp)
-  n <- length(X)
-  pred <- (X * b + (mean(Y) - b * mean(X)))
-  SSy <- sum((Y - pred)^2)
+    require(latex2exp)
+    n <- length(X)
+    pred <- (X * b + (mean(Y) - b * mean(X)))
+    SSy <- sum((Y - pred)^2)
 
-  M <- tibble(X, Y, pred)
+    M <- tibble(X, Y, pred)
 
-  if (is.null(xlab)) {
-    xlab <- "X"
-  }
-  if (is.null(ylab)) {
-    ylab <- "Y"
-  }
-
-  if (do.plot) {
-    p <- ggplot() +
-      geom_point(
-        data = tibble(X = mean(X), Y = mean(Y)),
-        aes(X, Y),
-        color = "navy",
-        size = 7,
-        pch = 1
-      ) +
-      geom_abline(
-        slope = b,
-        intercept = mean(Y) - b * mean(X),
-        color = "navy",
-        linewidth = 1
-      ) +
-      geom_segment(
-        data = M,
-        aes(x = X, xend = X, y = Y, yend = pred),
-        color = "firebrick",
-        linewidth = 1
-      ) +
-      geom_point(data = M, aes(x = X, y = Y), size = 3) +
-      labs(x = xlab, y = ylab)
-
-    v1 <- round(b, 2)
-    v2 <- round(SSy, 2)
-
-    ll1 <- glue::glue("$\\theta_1 = {v1}$")
-    ll2 <- glue::glue("$\\SS = {v2}$")
-
-    xpos <- min(X) + 0.15 * diff(range(X))
-    ypos <- min(Y) + 0.8 * diff(range(Y))
-
-    if (do.labels) {
-      p <- p +
-        annotate(
-          geom = "text",
-          label = TeX(ll1, output = "character"),
-          x = xpos,
-          y = ypos,
-          parse = TRUE,
-          hjust = 0,
-          size = 9
-        ) +
-        annotate(
-          geom = "text",
-          label = TeX(ll2, output = "character"),
-          x = xpos,
-          y = ypos * 0.96,
-          parse = TRUE,
-          hjust = 0,
-          size = 9
-        )
+    if (is.null(xlab)) {
+        xlab <- "X"
     }
-  } else {
-    p <- NULL
-  }
-  return(list(SSy, p))
+    if (is.null(ylab)) {
+        ylab <- "Y"
+    }
+
+    if (do.plot) {
+        p <- ggplot() +
+            geom_point(
+                data = tibble(X = mean(X), Y = mean(Y)),
+                aes(X, Y),
+                color = "navy",
+                size = 7,
+                pch = 1
+            ) +
+            geom_abline(
+                slope = b,
+                intercept = mean(Y) - b * mean(X),
+                color = "navy",
+                linewidth = 1
+            ) +
+            geom_segment(
+                data = M,
+                aes(x = X, xend = X, y = Y, yend = pred),
+                color = "firebrick",
+                linewidth = 1
+            ) +
+            geom_point(data = M, aes(x = X, y = Y), size = 3) +
+            labs(x = xlab, y = ylab)
+
+        v1 <- round(b, 2)
+        v2 <- round(SSy, 2)
+
+        ll1 <- glue::glue("$\\theta_1 = {v1}$")
+        ll2 <- glue::glue("$\\SS = {v2}$")
+
+        xpos <- min(X) + 0.15 * diff(range(X))
+        ypos <- min(Y) + 0.8 * diff(range(Y))
+
+        if (do.labels) {
+            p <- p +
+                annotate(
+                    geom = "text",
+                    label = TeX(ll1, output = "character"),
+                    x = xpos,
+                    y = ypos,
+                    parse = TRUE,
+                    hjust = 0,
+                    size = 9
+                ) +
+                annotate(
+                    geom = "text",
+                    label = TeX(ll2, output = "character"),
+                    x = xpos,
+                    y = ypos * 0.96,
+                    parse = TRUE,
+                    hjust = 0,
+                    size = 9
+                )
+        }
+    } else {
+        p <- NULL
+    }
+    return(list(SSy, p))
 }
 
 ```
@@ -151,8 +151,8 @@ ssPlot <- function(
 
 ```{r}
 STB <- read_csv(
-  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
-  show_col_types = FALSE
+    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
+    show_col_types = FALSE
 )
 glimpse(STB)
 
@@ -174,19 +174,18 @@ STB |> count(Species, Sex)
 #| echo: false
 
 STB <- STB |>
-  mutate(
-    ID = 1:n(),
-    Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)
-  ) |>
-  relocate(ID)
+    mutate(
+        ID = 1:n(),
+        Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)
+    ) |>
+    relocate(ID)
 ```
 
 ```{r}
 #| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area."
 
-
 ggplot(STB, aes(Forewing_area, Hindwing_area)) +
-  geom_point()
+    geom_point()
 ```
 
 
@@ -195,9 +194,8 @@ ggplot(STB, aes(Forewing_area, Hindwing_area)) +
 ```{r}
 #| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area. Points are labeled with their index number."
 
-
 ggplot(STB, aes(Forewing_area, Hindwing_area, label = ID)) +
-  geom_label()
+    geom_label()
 ```
 
 
@@ -238,19 +236,18 @@ Many `slice_...()` functions.
 #| fig-align: center
 #| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area."
 
-
 STB <- read_csv(
-  "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
-  show_col_types = FALSE
+    "https://raw.githubusercontent.com/QM-Life-Sci/RDABR/refs/heads/main/data/Swallowtail.csv",
+    show_col_types = FALSE
 ) |>
-  mutate(
-    ID = 1:n(),
-    Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)
-  ) |>
-  relocate(ID)
+    mutate(
+        ID = 1:n(),
+        Forewing_area = replace(Forewing_area, Forewing_area == 5.523, 55.23)
+    ) |>
+    relocate(ID)
 
 ggplot(STB, aes(Forewing_area, Hindwing_area)) +
-  geom_point(size = 3, color = "darkgreen")
+    geom_point(size = 3, color = "darkgreen")
 ```
 
 
@@ -265,14 +262,13 @@ STB$Forewing_area[176]
 ```{r}
 #| fig-alt: "Scatterplot of hingwing area versus forewing area. The extreme value has been replaced to be correct. There is a clear positive relationship."
 
-
 STB_correct <- STB |>
-  mutate(
-    Forewing_area = replace(Forewing_area, Forewing_area == 55.23, 5.523)
-  )
+    mutate(
+        Forewing_area = replace(Forewing_area, Forewing_area == 55.23, 5.523)
+    )
 
 ggplot(STB_correct, aes(Forewing_area, Hindwing_area)) +
-  geom_point(size = 3, color = "darkgreen")
+    geom_point(size = 3, color = "darkgreen")
 ```
 
 
@@ -307,33 +303,33 @@ Every model has *assumptions* that must be met to ensure an unbiased analysis
 #| fig-alt: "Scatterplot of age plotted against proportion black. The line of best fit is plotted. Vertical lines connect the each point to the line, showing the residual value. The mean of x and mean of y is plotted as a circle."
 
 LA <- read_csv(
-  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
-  show_col_types = FALSE
+    "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+    show_col_types = FALSE
 ) |>
-  rename(
-    Age = age,
-    `
+    rename(
+        Age = age,
+        `
 Proportion
 Black
 ` = proportion.black
-  )
+    )
 fm <- lm(
-  Age ~ `
+    Age ~ `
 Proportion
 Black
 `,
-  data = LA
+    data = LA
 )
 l <- ssPlot(
-  X = LA$`
+    X = LA$`
 Proportion
 Black
 `,
-  Y = LA$Age,
-  b = coef(fm)[2],
-  xlab = "Proportion Black",
-  ylab = "Age",
-  do.labels = FALSE
+    Y = LA$Age,
+    b = coef(fm)[2],
+    xlab = "Proportion Black",
+    ylab = "Age",
+    do.labels = FALSE
 )
 print(l[[2]] + scale_x_continuous(limits = c(0, 1)))
 ```
@@ -364,8 +360,8 @@ summary(fm)
 #| fig-alt: "Scatterplot of hingwing area versus forewing area. There is a postive relationship with one extreme value with a very large forewing area. The line of best fit is overlaid."
 
 ggplot(STB, aes(Forewing_area, Hindwing_area)) +
-  geom_point() +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
+    geom_point() +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
 ```
 
 
@@ -424,7 +420,6 @@ PP[[2]]
 ```{r}
 #| fig-alt: "Homogeneity of variance check showing the square root of the standard residuals versus the fitted values. Blue points fall along the green fitted line. These form a v for low values and then a curve."
 
-
 PP[[3]]
 ```
 
@@ -434,7 +429,6 @@ PP[[3]]
 ```{r}
 #| fig-alt: "Influential observations check showing Standard residuals vs Leverage. Two horizontal green lines show where points should fall. The fitted green line shows a sigmoid pattern with most points falling within the lines and one red extreme value."
 
-
 PP[[4]]
 ```
 
@@ -443,7 +437,6 @@ PP[[4]]
 
 ```{r}
 #| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points cross this line diagonally."
-
 
 PP[[5]]
 ```
@@ -525,7 +518,6 @@ PP[[4]]
 ```{r}
 #| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points fall nicely along the line."
 
-
 PP[[5]]
 ```
 
@@ -547,23 +539,23 @@ PP[[5]]
 ```{r}
 #| echo: false
 #| fig-align: center
-#| fig-alt: "Scatterplot of Body Mass versus Height for Male !Kung. There is a positive relationship." 
+#| fig-alt: "Scatterplot of Body Mass versus Height for Male !Kung. There is a positive relationship."
 
 Kung <- read_delim(
-  "https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv",
-  delim = ";",
-  show_col_types = FALSE
+    "https://raw.githubusercontent.com/rmcelreath/rethinking/refs/heads/master/data/Howell1.csv",
+    delim = ";",
+    show_col_types = FALSE
 ) |>
-  filter(male == 1 & height > 100) |>
-  rename(mass = weight)
+    filter(male == 1 & height > 100) |>
+    rename(mass = weight)
 
 ggplot(Kung, aes(height, mass)) +
-  geom_point(color = "darkblue") +
-  labs(
-    x = "Height (cm)",
-    y = "Body Mass (kg)",
-    title = "Mass and Height in Male !Kung"
-  )
+    geom_point(color = "darkblue") +
+    labs(
+        x = "Height (cm)",
+        y = "Body Mass (kg)",
+        title = "Mass and Height in Male !Kung"
+    )
 ```
 
 
@@ -580,16 +572,16 @@ summary(fm1)
 ```{r}
 #| echo: false
 #| fig-align: center
-#| fig-alt: "Scatterplot of Body Mass versus Height for Male !Kung. There is a positive relationship. A line of best fit is overlaid." 
+#| fig-alt: "Scatterplot of Body Mass versus Height for Male !Kung. There is a positive relationship. A line of best fit is overlaid."
 
 ggplot(Kung, aes(height, mass)) +
-  geom_point(color = "darkblue") +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "hotpink") +
-  labs(
-    x = "Height (cm)",
-    y = "Body Mass (kg)",
-    title = "Mass and Height in Male !Kung"
-  )
+    geom_point(color = "darkblue") +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "hotpink") +
+    labs(
+        x = "Height (cm)",
+        y = "Body Mass (kg)",
+        title = "Mass and Height in Male !Kung"
+    )
 ```
 
 
@@ -607,7 +599,6 @@ PP[[2]]
 
 ```{r}
 #| fig-alt: "Normality of residuals check showing Quantile deviations versus standard normal quantiles. The green horizontal line at zero is the reference. The blue points fall nicely along the line."
-
 
 PP[[5]]
 ```
@@ -630,18 +621,18 @@ $$ \log_{10}(Mass) \sim 3 \times \log_{10}(Height) $$
 ```{r}
 #| output-location: slide
 #| fig-align: center
-#| fig-alt: "Scatterplot of log 10 Body Mass versus log 10 Height for Male !Kung. There is a positive relationship. A line of best fit is overlaid." 
+#| fig-alt: "Scatterplot of log 10 Body Mass versus log 10 Height for Male !Kung. There is a positive relationship. A line of best fit is overlaid."
 
 ggplot(Kung, aes(height, mass)) +
-  geom_point(color = "darkblue") +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "hotpink") +
-  scale_x_log10() + # <1>
-  scale_y_log10() + # <1>
-  labs(
-    x = "log10 Height (cm)",
-    y = "log10 Body Mass (kg)",
-    title = "Mass and Height in Male !Kung"
-  )
+    geom_point(color = "darkblue") +
+    geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "hotpink") +
+    scale_x_log10() + # <1>
+    scale_y_log10() + # <1>
+    labs(
+        x = "log10 Height (cm)",
+        y = "log10 Body Mass (kg)",
+        title = "Mass and Height in Male !Kung"
+    )
 ```
 
 1. Convert x and y axes to log~10~.
@@ -653,7 +644,7 @@ Note: no change to `geom_smooth()`.
 
 ```{r}
 Kung <- Kung |>
-  mutate(log10_mass = log10(mass), log10_height = log10(height))
+    mutate(log10_mass = log10(mass), log10_height = log10(height))
 fm2 <- lm(log10_mass ~ log10_height, data = Kung)
 summary(fm2)
 ```
