@@ -60,27 +60,27 @@ What can we learn from Picasso?
 
 ## Guernica (1937)
 
-![](./images/Picasso_3.png){fig-align="center"}
+![](./images/Picasso_3.png){fig-align="center" fig-alt="Image of Picasso work Guernica."}
 
 
 ## The Weeping Woman (1937)
 
-![](./images/Picasso_4.png){fig-align="center"}
+![](./images/Picasso_4.png){fig-align="center" fig-alt="Image of Picasso work The Weeping Woman"}
 
 
 ## Self-portrait Facing Death (1972)
 
-![](./images/Picasso_5.png){fig-align="center"}
+![](./images/Picasso_5.png){fig-align="center" fig-alt="Image of Picasso work Self-portrait Facing Death"}
 
 
 ## Untitled (1894)
 
-![](./images/Picasso_1.png){fig-align="center"}
+![](./images/Picasso_1.png){fig-align="center" fig-alt="Image of Picasso work Untitled"}
 
 
 ## Untitled (1894)
 
-![](./images/Picasso_2.png){fig-align="center"}
+![](./images/Picasso_2.png){fig-align="center" fig-alt="Image of Picasso work Untitled"}
 
 
 ## Learn the most correct way first
@@ -94,7 +94,7 @@ Experiment and Practice
 :::
 :::
 
-![](./images/Picasso_6.png){fig-align="center"}
+![](./images/Picasso_6.png){fig-align="center" fig-alt="Image of a Picasso sketch from his notebook."}
 
 
 ## Gradations of worries
@@ -156,6 +156,8 @@ for (ii in 1:iter) {
 ```{r}
 #| echo: false
 #| fig-align: center
+#| fig-alt: "Histogram of the difference in means from simulated data. The distribution is centered on zero and ranges from approximately -2 to 2"
+
 
 ggplot(tibble(d), aes(d)) +
   geom_histogram(bins = 30, fill = "navy") +
@@ -383,6 +385,8 @@ modelsummary(
 ## `modelplot()`
 
 ```{r}
+#| fig-alt: "Plot of the model term versus the coefficient estimate and 95% confidence interval."
+
 modelplot(fm)
 ```
 
@@ -398,7 +402,7 @@ modelplot(fm)
 
 ## Joining data
 
-![](./images/Malurus_cyaneus.jpg){fig-align="center"}
+![](./images/Malurus_cyaneus.jpg){fig-align="center" fig-alt="Photo of a male and female supurb fairywren."}
 
 
 - ~30 years of breeding data for ~1900 female Superb Fairywrens (*Malurus cyaneus*)
