@@ -1,6 +1,6 @@
 ---
-title: "Unit 8: Summarizing data and models"
-subtitle: "Data Integrity"
+title: "Unit 8: Summarizing models"
+subtitle: "Joining Data"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -35,13 +35,13 @@ theme_set(theme_classic(base_size = 20))
 
 # Housekeeping {background-color="#40666e"}
 
-- PS 8 due after Spring Break
+- PS 8 due after Spring Break (4/2)
 - PC 2 after Spring break
-    - Submit questions for discussion/review before Tuesday 4/1
-    - No class meeting on Thursday 4/3
+    - Submit questions for discussion/review by midnight Monday 3/30 and midnight 4/1
+    - PC 2 available Tuesday 3/31
 
 
-# Plan {background-color="#40666e"}
+## Plan
 
 - Why diagnostics? Checking assumptions
 - Errors in data and how to fix them
@@ -269,6 +269,133 @@ pmap_dbl(
 # Questions {background-color="#f8c471"}
 
 
+# Summarizing data and describing linear models {background-color="#40666e"}
+
+
+## What information to include about the data?
+
+::: {.incremental}
+
+- Structure of the experimental design
+    - Groups, sub-groups, etc
+    - Number of measures per individual/unit
+- Total number of observations (per group)
+    - Initial group sizes and final group sizes
+- Means and standard deviations or standard errors
+
+:::
+
+
+## What information to include about the model?
+
+::: {.incremental}
+
+- What would someone need to know in order to reproduce the analysis if they had the data?
+    - Ideally they have your code and data
+- Find examples in the literature or in this class
+- Give the model a name ("linear model", "OLS regression", "*t*-test") and also describe what it does
+    - "...OLS regression where age (years) is predicted by proportion of black coloration of the nose (range: 0.0 to 1.0)"
+    - "...*t*-test comparing the means of eye-span (mm) between stalk-eyed flies raised on corn vs. those raised on cotton"
+- Software, packages, versions
+
+:::
+
+
+## Model summaries: many options in R
+
+- `stargazer`, `sjPlot`, `flextable`
+- `knitr`, `kableExtra`, `gt`
+
+. . .
+
+[`modelsummary` works well](https://modelsummary.com/)^[Also install `estimatr`]
+
+- Summary tables for observations: `datasummary_skim()`, `datasummary_balance()`, `datasummary_correlation()`, `datasummary_crosstab()`
+- Summaries for linear (and other) models: `modelsummary()`
+- Coefficient plots: `modelplot()`
+- `output = `: save directly to file (docx, html, etc.)
+
+
+## `datasummary_skim()`
+
+```{r}
+#| echo: false
+
+LA <- read_csv(
+  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+  show_col_types = FALSE
+) |>
+  rename(Age = age, `Proportion Black` = proportion.black)
+```
+
+```{r}
+library(modelsummary)
+datasummary_skim(LA)
+```
+
+
+## `datasummary_balance()`
+
+```{r}
+#| echo: false
+
+HL <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/HornedLizards.csv",
+  show_col_types = FALSE
+) |>
+  drop_na() |>
+  rename(`Horn Length` = horn_length, Group = group) |>
+  mutate(Group = if_else(Group == "alive", "Alive", "Dead"))
+```
+
+```{r}
+datasummary_balance(~Group, data = HL)
+```
+
+
+## `modelsummary()`
+
+```{r}
+fm <- lm(Age ~ `Proportion Black`, data = LA)
+modelsummary(
+  list("OLS" = fm),
+  estimate = "{estimate} ({conf.low}, {conf.high})",
+  statistic = c("s.e. = {std.error}", "t = {statistic}", "p = {p.value}"),
+  gof_omit = ".*"
+)
+```
+
+
+## `modelsummary()`
+
+```{r}
+fm <- lm(`Horn Length` ~ Group, data = HL)
+modelsummary(
+  list("Horn Length ~ Group" = fm),
+  estimate = "{estimate} ({conf.low}, {conf.high})",
+  statistic = c("t = {statistic}", "p = {p.value}"),
+  gof_omit = ".*",
+  fmt = 2
+)
+```
+
+
+## `modelplot()`
+
+```{r}
+modelplot(fm)
+```
+
+
+# Combining Datasets {background-color="#40666e"}
+
+## Thinking about storing data
+
+- Reduce redundancy
+    - One big file vs. several smaller files
+- Combine data programmatically
+
+
 ## Joining data
 
 ![](./images/Malurus_cyaneus.jpg){fig-align="center"}
@@ -376,23 +503,22 @@ union(names(wren_surv), names(wren_repro))
 - Join will use `ID` by default
 
 
-## Kinds of joins in `dplyr`
+## Joins in `dplyr` (`tidyverse`)
 
 ::: {.incremental}
 
 - `left_join(df1, df2)`
     - Merge one into the other by a subset of rows
 - `full_join()`
-    - Merge all rows, keep all values
-
+    - Merge all rows, keep all values, add NA as needed
+- Others but these are the only two you need
 :::
 
 
 ## Thinking about what you want to keep
 
-- Keep only rows in `df2` than match `df1`, duplicating information?
-- Keep all the rows in `df2`, adding `NA`s for missing data?
-- Keep only rows that match?
+- Keep only rows in `df2` that match `df1`, duplicating information
+- Keep all the rows in both `df1` and `df2`, adding `NA`s for missing data
 
 
 ## Fairywren data
@@ -490,130 +616,6 @@ WR
 WR <- full_join(wren_repro, wren_surv, by = join_by(ID))
 WR |> filter(ID == "574717-YOO")
 ```
-
-
-# Summarizing data and describing linear models {background-color="#40666e"}
-
-
-## What information to include about the data?
-
-::: {.incremental}
-
-- Structure of the experimental design
-    - Groups, sub-groups, etc
-    - Number of measures per individual/unit
-- Total number of observations (per group)
-    - Initial group sizes and final group sizes
-- Means and standard deviations or standard errors
-
-:::
-
-
-## What information to include about the model?
-
-::: {.incremental}
-
-- What would someone need to know in order to reproduce the analysis if they had the data?
-    - Ideally they have your code and data
-- Find examples in the literature or in this class
-- Give the model a name ("linear model", "OLS regression", "*t*-test") and also describe what it does
-    - "...OLS regression where age (years) is predicted by proportion of black coloration of the nose (range: 0.0 to 1.0)"
-    - "...*t*-test comparing the means of eye-span (mm) between stalk-eyed flies raised on corn vs. those raised on cotton"
-- Software, packages, versions
-
-:::
-
-
-## Model summaries: many options in R
-
-- `stargazer`, `sjPlot`, `flextable`
-- `knitr`, `kableExtra`, `gt`
-
-. . .
-
-[`modelsummary` works well](https://modelsummary.com/)^[Also install `estimatr`]
-
-- Summary tables for observations: `datasummary_skim()`, `datasummary_balance()`, `datasummary_correlation()`, `datasummary_crosstab()`
-- Summaries for linear (and other) models: `modelsummary()`
-- Coefficient plots: `modelplot()`
-- `output = `: save directly to file (docx, html, etc.)
-
-
-## `datasummary_skim()`
-
-```{r}
-#| echo: false
-
-LA <- read_csv(
-  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
-  show_col_types = FALSE
-) |>
-  rename(Age = age, `Proportion Black` = proportion.black)
-```
-
-```{r}
-library(modelsummary)
-datasummary_skim(LA)
-```
-
-
-## `datasummary_balance()`
-
-```{r}
-#| echo: false
-
-HL <- read_csv(
-  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/HornedLizards.csv",
-  show_col_types = FALSE
-) |>
-  drop_na() |>
-  rename(`Horn Length` = horn_length, Group = group) |>
-  mutate(Group = if_else(Group == "alive", "Alive", "Dead"))
-```
-
-```{r}
-datasummary_balance(~Group, data = HL)
-```
-
-
-## `modelsummary()`
-
-```{r}
-fm <- lm(Age ~ `Proportion Black`, data = LA)
-modelsummary(
-  list("OLS" = fm),
-  estimate = "{estimate} ({conf.low}, {conf.high})",
-  statistic = c("s.e. = {std.error}", "t = {statistic}", "p = {p.value}"),
-  gof_omit = ".*"
-)
-```
-
-
-
-## `modelsummary()`
-
-```{r}
-fm <- lm(`Horn Length` ~ Group, data = HL)
-modelsummary(
-  list("Horn Length ~ Group" = fm),
-  estimate = "{estimate} ({conf.low}, {conf.high})",
-  statistic = c("t = {statistic}", "p = {p.value}"),
-  gof_omit = ".*",
-  fmt = 2
-)
-```
-
-
-## `modelplot()`
-
-```{r}
-modelplot(fm)
-```
-
-
-# RMarkdown / Quarto Markdown {background-color="#40666e"}
-
-Where we are headed...
 
 
 # Questions {background-color="#f8c471"}
