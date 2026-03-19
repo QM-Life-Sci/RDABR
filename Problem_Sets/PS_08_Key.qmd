@@ -22,6 +22,7 @@ library(modelsummary)
 theme_set(theme_classic())
 ```
 
+
 ## Joins
 
 You have three files that contain data on field observation of four vertebrates:
@@ -32,6 +33,7 @@ You have three files that contain data on field observation of four vertebrates:
 
 Ultimately we want to have a single tibble with all the observations, but including the information about species and their conservation status. To accomplish this, we will need to join them together.
 
+
 ### Activity
 
 Import each of the files into a separate tibble. Examine the structure of each (how many observations, what the columns are, etc.)
@@ -40,7 +42,10 @@ Import each of the files into a separate tibble. Examine the structure of each (
 # FIXME
 
 Spp <- read_csv("../data/Spp_species.csv", show_col_types = FALSE)
-Cons <- read_csv("../data/Spp_conservation_status.csv", show_col_types = FALSE)
+Cons <- read_csv(
+  "../data/Spp_conservation_status.csv",
+  show_col_types = FALSE
+)
 Occ <- read_csv("../data/Spp_occurrences.csv", show_col_types = FALSE)
 
 glimpse(Spp)
@@ -72,7 +77,7 @@ glimpse(Spp_Cons_Occ)
 
 Check the structure of the final tibble to see if your prediction was true. If not, see if you can figure out what happened.
 
-Theoretically, you could also have a fourth file with information about the `observer`s. 
+Theoretically, you could also have a fourth file with information about the `observer`s.
 
 At what step would it be most logical to join the observer information and to which data set would you join it?
 
@@ -87,7 +92,7 @@ In the data, but `species_id` and `occurrence_id` are integers. Can you think of
 
 ## Figures, tables, captions, and writing about analyses.
 
-We now want to get some practice 
+We now want to get some practice
 
 Packages to install:
 
@@ -102,7 +107,7 @@ Packages to install:
 
 Pick one of the analyses that we have been using as our examples, either the OLS regression example (lion noses) or the comparison of two means (stalk-eyed flies). You have already made plots of the data, summarized the observation, carried out the linear models and run the diagnostics in previous problem sets.
 
-Below I copied several code chunks from the `Manuscript_Template.qmd` file. Replace then demo code with your code to make a figure or figures and one or more tables and summaries.
+Below we copied several code chunks from the `Manuscript_Template.qmd` file. Replace then demo code with your code to make a figure or figures and one or more tables and summaries.
 
 Copy code you already wrote to import the data, make the plots, run the model, etc. There is no need to start over. As you work your way through, make note of the chunk options (`#|`). These are mostly self-explanatory, but the [Quarto Guide](https://quarto.org/docs/guide/) has all the details.
 
@@ -143,20 +148,24 @@ Write a sentence or two describing the plot that includes a cross-reference to y
 #| fig-width: 6
 #| fig-cap: "Eyespan measured in stalk-eyed flies raised on two different food treatments: corn and cotton. The gray points are individual observations (jittered to remove overplotting), and the purple points are group means with +1 SEM error bars."
 
-stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |> 
+stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |>
   mutate(food_source = factor(food_source))
 
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_point(position = position_jitter(width = 0.2, seed = 423479),
-             size = 2, alpha = 0.25, pch = 16) +
-  stat_summary(fun = mean,
-               geom = "point",
-               size = 3, color = "purple") + 
-  stat_summary(fun.data = mean_se,
-               geom = "errorbar",
-               width = 0.1,
-               linewidth = 1,
-               color = "purple") +
+  geom_point(
+    position = position_jitter(width = 0.2, seed = 423479),
+    size = 2,
+    alpha = 0.25,
+    pch = 16
+  ) +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "purple") +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1,
+    linewidth = 1,
+    color = "purple"
+  ) +
   labs(x = "Food Source", y = "Eye Span (mm)")
 ```
 
@@ -176,16 +185,21 @@ Make a data table of your choosing. This can be just a table of the raw data or 
 #| message: false
 #| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
 
-datasummary_skim(LA |> 
-                   rename(`Age (y)` = age,
-                          `Proportion Black` = proportion.black),
-                 fun_numeric = list(n = N,
-                                    `Missing Pct.` = PercentMissing,
-                                    Mean = Mean, SD = SD,
-                                    Min = Min, Median = Median,
-                                    Max = Max),
-                 output = "tinytable",
-                 type = "numeric")
+datasummary_skim(
+  LA |>
+    rename(`Age (y)` = age, `Proportion Black` = proportion.black),
+  fun_numeric = list(
+    n = N,
+    `Missing Pct.` = PercentMissing,
+    Mean = Mean,
+    SD = SD,
+    Min = Min,
+    Median = Median,
+    Max = Max
+  ),
+  output = "tinytable",
+  type = "numeric"
+)
 ```
 
 
@@ -196,8 +210,7 @@ datasummary_skim(LA |>
 #| message: false
 #| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
 
-datasummary_balance(~ food_source,
-                    data = stalk)
+datasummary_balance(~food_source, data = stalk)
 ```
 
 
@@ -211,13 +224,13 @@ Create a results table for the linear model using `modelsummary()`.
 #| tbl-cap: "Summary statistical table for the linear model predicting lion age by proportion of black nose coloration."
 
 fm_LA <- lm(age ~ proportion.black, data = LA)
-modelsummary(list("Age ~ Proportion Black" = fm_LA),
-             estimate = "{estimate} ({conf.low}, {conf.high})",
-             statistic = c("t = {statistic}",
-                           "df = {df.error}",
-                           "p = {p.value}"),
-             gof_omit = ".*",
-             fmt = 2)
+modelsummary(
+  list("Age ~ Proportion Black" = fm_LA),
+  estimate = "{estimate} ({conf.low}, {conf.high})",
+  statistic = c("t = {statistic}", "df = {df.error}", "p = {p.value}"),
+  gof_omit = ".*",
+  fmt = 2
+)
 ```
 
 ```{r}
@@ -227,16 +240,15 @@ modelsummary(list("Age ~ Proportion Black" = fm_LA),
 #| message: false
 #| tbl-cap: "Summary statistical table for the linear model predicting eyespan in stalk-eyed flies by food source."
 
-
 fm_stalk <- lm(eye_span ~ food_source, data = stalk)
 
-modelsummary(list("Eyespan ~ Food Source" = fm_stalk),
-             estimate = "{estimate} ({conf.low}, {conf.high})",
-             statistic = c("t = {statistic}",
-                           "df = {df.error}",
-                           "p = {p.value}"),
-             gof_omit = ".*",
-             fmt = 2)
+modelsummary(
+  list("Eyespan ~ Food Source" = fm_stalk),
+  estimate = "{estimate} ({conf.low}, {conf.high})",
+  statistic = c("t = {statistic}", "df = {df.error}", "p = {p.value}"),
+  gof_omit = ".*",
+  fmt = 2
+)
 
 ```
 
@@ -274,14 +286,14 @@ Write your statistics methods:
 
 > To determine the extent to which lion age can be predicted from an image of the nose (@fig-LAscatter; n = `r nrow(LA)`), we fit a linear model in which lion age is modeled by proportion of black coloration in the nose: age ~ proportion black.
 
-> To determine the effect of rearing diet on eyespan in stalk-eyed flies, we used a linear model comparing mean eyespan in two diet treatments (@fig-fig-Stalkscatter): corn and cotton. 
+> To determine the effect of rearing diet on eyespan in stalk-eyed flies, we used a linear model comparing mean eyespan in two diet treatments (@fig-fig-Stalkscatter): corn and cotton.
 
 
 Write your data summary results (n, mean, SEM/sd, etc.):
 
 > The mean age of lions in the sample was 4.3 y (sd = 2.7; range: 1.1 - 13.1) and the mean proportion of black coloration was 0.3 (sd = 0.2; range: 0.1 - 0.8), summarized in @tbl-LA.
 
-> The observed data are summariezed in @tbl-stalk. Mean eyespan in the corn treatment (n = `r nrow(stalk |> filter(food_source == "Corn"))`) was 2.0 mm (sd = 0.1). In the cotton (n = `r nrow(stalk |> filter(food_source == "Cotton"))`) treatment it was 1.5 mm (sd = 0.3). The mean difference between the treatments was 0.5 mm (SE = 0.1), with corn larger than cotton.
+> The observed data are summarized in @tbl-stalk. Mean eyespan in the corn treatment (n = `r nrow(stalk |> filter(food_source == "Corn"))`) was 2.0 mm (sd = 0.1). In the cotton (n = `r nrow(stalk |> filter(food_source == "Cotton"))`) treatment it was 1.5 mm (sd = 0.3). The mean difference between the treatments was 0.5 mm (SE = 0.1), with corn larger than cotton.
 
 
 Write your statistical results:
@@ -289,4 +301,3 @@ Write your statistical results:
 > Results of the linear model predicting lion's age from proportion black in the nose showed a significant positive slope in which age increases 10.65 y (95% CI: 7.6 - 13.7) for each unit of increase in proportion black (t~30~ = 7.05; P < 0.001; @tbl-model_summary_LA; @fig-model_plot_LA).
 
 > Results of the linear model predicting eyespan by diet treatment showed a significant difference in mean eyespan between the two groups (t~43~ = 7.9; P < 0.001; @tbl-model_summary_stalk). Flies raised in cotton have eyespan, on average, 0.5 mm narrower than those raised on corn (95% CI of the difference: 0.37 - 0.63; @fig-model_plot_stalk).
-
