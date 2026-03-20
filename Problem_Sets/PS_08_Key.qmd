@@ -123,6 +123,7 @@ For cross-references (i.e., automatically writing "Figure 1" or "Table 1"), one 
 #| fig-height: 5
 #| fig-width: 6
 #| fig-cap: "Scatterplot of lion age (y) vs. the proportion of black coloration in the lion's nose (range 0-1). The gray line shows the ordinary least squares regression."
+#| fig_alt: "Scatterplot of lion age vs. the proportion of black coloration in the lion's nose."
 
 LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
 
@@ -147,6 +148,7 @@ Write a sentence or two describing the plot that includes a cross-reference to y
 #| fig-height: 5
 #| fig-width: 6
 #| fig-cap: "Eyespan measured in stalk-eyed flies raised on two different food treatments: corn and cotton. The gray points are individual observations (jittered to remove overplotting), and the purple points are group means with +1 SEM error bars."
+#| fig-alt: "Scatterplot showing eyespan measured in stalk-eyed flies raised on two different food treatments: corn and cotton."
 
 stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |>
   mutate(food_source = factor(food_source))
@@ -260,6 +262,7 @@ Create a model plot for the linear model using `modelplot()`.
 #| warning: false
 #| message: false
 #| fig-cap: "Coefficient plot for the linear model predicting lion age by proportion of black nose coloration."
+#| fig-alt: "Coefficient plot for the linear model predicting lion age by proportion of black nose coloration."
 
 modelplot(fm_LA)
 
@@ -272,6 +275,7 @@ modelplot(fm_LA)
 #| warning: false
 #| message: false
 #| fig-cap: "Coefficient plot for the linear model predicting eyespan in stalk-eyed flies by food source."
+#| fig-alt: "Coefficient plot for the linear model predicting eyespan in stalk-eyed flies by food source."
 
 modelplot(fm_stalk)
 
