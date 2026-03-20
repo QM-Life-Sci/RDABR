@@ -277,7 +277,7 @@ Maybe again later in the semester
 
 - We (unfortunately) use human terms to describe LLMs: "intelligence", "learn", "understand", "think", "know", "hallucinate"
 - LLMs generate responses based on probabilities (what character/word comes next?), which are derived from their training data.
-- [Large Language Models explained briefly (YouTube)](https://www.youtube.com/watch?v=LPZh9BOjkQs){target="_blank"}
+- [Large Language Models explained briefly](https://umsystem.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=b263e287-0f89-4f12-bcb9-b413017c9822){target="_blank"}
 
 
 :::{.callout-note}
