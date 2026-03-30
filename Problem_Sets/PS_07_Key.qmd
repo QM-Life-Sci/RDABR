@@ -207,7 +207,7 @@ ggplot(Tri, aes(Triglycerides)) +
 
 What can you infer from the distributions of waist circumference and for triglycerides? Do these variable appear to be roughly normally distributed? do you have any concerns about using these data in a linear model?
 
->
+> For waist circumference, the mean appears to be a bit less than 100 with a range from ~60 to ~160. There is some skew to the right with a few high values but it is not too severe. For triglycerides, the mean appears to be near 100 with a range from 0 to over 600. There is a stronger skew to the right with a few very high values that probably pull the mean out. There should be some concern using these data in a linear model because of this skew. 
 
 Now explore the relationship between these variables by making a scatterplot of triglycerides versus waist circumference. Choose a color and size for your points and add informative axis labels.
 
@@ -234,7 +234,7 @@ check_model(fm1)
 
 Do you have any concerns about whether these data meet the assumptions for OLS regression? If any diagnostics are concerning, explain what the problem appears to be.
 
->
+> Yes, I have some concerns. One concern is the posterior predictive check, where the distributions appear pretty different from the observed data and there is a lack of overlap as a result. In addition, the normality of residuals deviates pretty strongly from a horizontal line, likely because of the strong skew we noted previously. 
 
 
 Transformations are often used to help meet the assumptions of our statistical tests. Let's try a log transformation of the triglycerides variable to see how this affects the model.
@@ -264,7 +264,7 @@ summary(fm2)
 
 Compare the diagnostics for the log transformed data versus un-transformed. Which model would you recommend or not? Use specific diagnostic results to support your answer.
 
->
+> The diagnostics are improved for the log transformed data. In particular the two checks we discussed previously have improved by a lot. The posterior predictive check now overlaps the observed data well and the normality of residuals looks as expected with a flat line. I would recommend proceeding with the log-transformed data for the model because of these improved diagnostics. 
 
 
 Finally, using your plot above as a starter, make a publication-ready scatter plot of the log transformed triglycerides versus waist circumference.
