@@ -106,12 +106,6 @@ For cross-references (i.e., automatically writing "Figure 1" or "Table 1"), one 
 #| fig-width: 10
 #| fig-cap: "Scelerisque vitae sodales sapien sed lobortis mauris . Lorem erat condimentum platea risus non porta tortor nam libero. Accumsan varius magnis habitasse senectus egestas torquent porttitor praesent condimentum phasellus turpis class praesent."
 
-set.seed(361263)
-
-tibble(x = runif(200), y = 2 * x + rnorm(200)) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_point()
-
 ```
 
 Write a sentence or two describing the plot that includes a cross-reference to your figure.
@@ -130,19 +124,6 @@ Make a data table of your choosing. This can be just a table of the raw data or 
 #| message: false
 #| tbl-cap: "Habitant aliquet fames sociosqu curae mi massa in libero montes egestas."
 
-set.seed(873624)
-
-n <- 100
-d <- tibble(
-  Group = factor(rep(letters[1:5], each = n)),
-  Count = rpois(5 * n, lambda = 3)
-)
-
-dd_tab <- table(d)
-
-row.names(dd_tab) <- paste("Group", letters[1:5])
-
-knitr::kable(dd_tab, booktabs = TRUE)
 ```
 
 
