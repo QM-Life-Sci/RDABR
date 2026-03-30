@@ -194,12 +194,16 @@ Tri <- read_excel("../data/NHANES_Triglycerides.xlsx") |>
 To explore the data, make two histograms, one for waist circumference and one for triglycerides.
 
 ```{r}
+#| fig-alt: "A histogram of waist circumference."
+
 ggplot(Tri, aes(Waist)) +
   geom_histogram(bins = 30) +
   labs(x = "Waist Circumference (cm)")
 ```
 
 ```{r}
+#| fig-alt: "A histogram of triglycerides."
+
 ggplot(Tri, aes(Triglycerides)) +
   geom_histogram(bins = 30) +
   labs(x = "Serum Triglycerides (mg/dL)")
@@ -213,8 +217,11 @@ Now explore the relationship between these variables by making a scatterplot of 
 
 
 ```{r}
+#| fig-alt: "A scatterplot of triglycerides versus waist circumference."
+
+
 ggplot(Tri, aes(x = Waist, y = Triglycerides)) +
-  geom_point() +
+  geom_point(color = "steelblue", size = 2) +
   labs(x = "Waist Circumference (cm)", y = "Serum Triglycerides (mg/dL)")
 ```
 
@@ -228,6 +235,7 @@ Use `check_model` to check the diagnostics for your model.
 
 ```{r}
 #| fig-height: 10
+#| fig-alt: "A set of 5 plots displaying the model diagnostics for posterior predictive check, linearity, homogeneity of variance, influential observations, and normality of residuals."
 
 check_model(fm1)
 ```
@@ -242,6 +250,8 @@ Transformations are often used to help meet the assumptions of our statistical t
 Create a new column that holds the (natural) log of triglycerides. Remake the scatterplot and perform the OLS regression this time with the log transformed variable.
 
 ```{r}
+#| fig-alt: "A scatterplot of log(triglycerides) versus waist circumference."
+
 Tri <- Tri |> mutate(log_Tri = log(Triglycerides))
 
 ggplot(Tri, aes(x = Waist, y = log_Tri)) +
@@ -254,6 +264,8 @@ Now get the model summary and perform the diagnostics using check_model on this 
 
 ```{r}
 #| fig-height: 10
+#| fig-alt: "A set of 5 plots displaying the model diagnostics for posterior predictive check, linearity, homogeneity of variance, influential observations, and normality of residuals."
+
 
 check_model(fm2)
 ```
@@ -274,6 +286,8 @@ Finally, using your plot above as a starter, make a publication-ready scatter pl
 - Add informative axis labels.
 
 ```{r}
+#| fig-alt: "A scatterplot of log Serum Triglycerides versus Waist circumference). A line of best fit is overlaid on the points."
+
 ggplot(Tri, aes(x = Waist, y = log_Tri)) +
   geom_point(color = "#7B1818", alpha = 0.5) +
   geom_smooth(
