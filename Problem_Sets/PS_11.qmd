@@ -41,13 +41,11 @@ Using the code you wrote (or the code from the key), load the `NeandertalBrainSi
 
 ```{r}
 
-
 ```
 
 Copy the code you wrote for making a scatterplot of the data to remind yourself of the patterns.
 
 ```{r}
-
 
 ```
 
@@ -61,7 +59,6 @@ Copy your model code from PS 10 and fit the models:
 
 ```{r}
 
-
 ```
 
 We had left off at this point: fitting the models but not deciding which was the best fit to the data.
@@ -73,34 +70,33 @@ Use the `aictab()` function from the `AICcmodavg` to generate the AICc model com
 
 ```{r}
 
-
 ```
 
 Notice that the values of AICc are negative. This can happen and is not a problem at all or a sign that something has gone wrong. You have to think a little harder about what "lower" means (in this case *more negative*). The interpretation stays the same -- lower AICc is better.
 
 Which model has the lowest AICc value?
 
-> 
+>
 
 
 What is the difference (Delta-AICc) between the best and 2nd best model?
 
-> 
+>
 
 
 Overall, what is your interpretation of the `Delta_AICc` column?
 
-> 
+>
 
 
 Interpret the model weights in the `AICCWt` column. Remember that model weights can be interpreted as a probability that the model in that row is the best model for out-of-sample prediction.
 
-> 
+>
 
 
-If these were your data, how would you proceed in the "Results" and "Discussion" sections of your maunscript?
+If these were your data, how would you proceed in the "Results" and "Discussion" sections of your manuscript?
 
-> 
+>
 
 
 ### Cross-validation
@@ -109,27 +105,26 @@ Follow the example in the lecture slides to carry out leave-one-out cross valida
 
 ```{r}
 
-
 ```
 
 What are the RMSE values for the three models?
 
-> 
+>
 
 
 What is your interpretation of the LOO cross-validation model comparison?
 
-> 
+>
 
 
 Considering both the AICc table and the cross-validation, do the results agree or disagree? Why or why not?
 
-> 
+>
 
 
 What do you interpret about the possible differences in brain scaling vs. body size in Recent humans vs. Neandertals based on these analyses?
 
-> 
+>
 
 
 ## Repeatability: Intraclass correlation coefficient
@@ -151,7 +146,6 @@ Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so tha
 
 ```{r}
 
-
 ```
 
 Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
@@ -168,11 +162,13 @@ Change `eval: false` to `eval: true`. You might need to change the name `WSF` to
 ```{r}
 #| eval: false
 
-WSF_wide <- WSF |> 
-  pivot_wider(id_cols = Specimen,
-              values_from = Femur_length,
-              names_from = Measurement,
-              names_prefix = "Measurement_")
+WSF_wide <- WSF |>
+  pivot_wider(
+    id_cols = Specimen,
+    values_from = Femur_length,
+    names_from = Measurement,
+    names_prefix = "Measurement_"
+  )
 WSF_wide |> head()
 ```
 
@@ -196,28 +192,26 @@ Using the "wide" data, plot the pairs of observations as a scatterplot. We have 
 
 ```{r}
 
-
 ```
 
 
 Based on your plot, do you expect ICC to be high or low? Give an estimate?
 
-> 
+>
 
 
-Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides. 
+Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides.
 
 Note that you will need to use the original data (not the pivoted data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
 
 ```{r}
-
 
 ```
 
 
 Would you be comfortable going forward with data collection given this value for ICC?
 
-> 
+>
 
 
 ## Planning experiments
@@ -231,17 +225,15 @@ Use `cohen.ES()` from the `pwr` package to look up the effect size for a "small"
 
 ```{r}
 
-
 ```
 
 Before we do the calculation. Take a guess how many individuals you would need in each independent group (a "two-sample t-test") to detect a small effect size with alpha = 0.05 and power = 0.80.
 
-> 
+>
 
 Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
 
 ```{r}
-
 
 ```
 
@@ -249,19 +241,16 @@ Repeat the test above but for a paired *t*-test.
 
 ```{r}
 
-
 ```
 
 Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
 
 ```{r}
 
-
 ```
 
 Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
 
 ```{r}
-
 
 ```

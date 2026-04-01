@@ -62,17 +62,25 @@ There are only 39 observations total, so we may as well plot the raw data. Modif
 ```{r}
 #FIXME
 ggplot(HT, aes(x = Mismatch_Degree, y = Survival_Days)) +
-  geom_point(position = position_jitter(width = 0.05, seed = 384729),
-             size = 3, alpha = 0.5) +
+  geom_point(
+    position = position_jitter(width = 0.05, seed = 384729),
+    size = 3,
+    alpha = 0.5
+  ) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "firebrick") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "firebrick", linewidth = 0.7) +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1,
+    color = "firebrick",
+    linewidth = 0.7
+  ) +
   labs(x = "Mismatch Degree", y = "Survival (days)")
 ```
 
 Describe what you see in the plots. You would like to be able to use a linear model (one-way ANOVA) to compare the mean survival days between groups. In what way does the data not appear to satisfy the assumptions of ANOVA?
 
-> The good and medium quality match groups are strongly right skewed. One of the assumptions of ANOVA is equal variance across the groups. We could explicitly thest this assuption, but there isn't any reason to. The test will be significant for inequality. So we should just transform and go from there.
+> The good and medium quality match groups are strongly right skewed. One of the assumptions of ANOVA is equal variance across the groups. We could explicitly test this assumption, but there isn't any reason to. The test will be significant for inequality. So we should just transform and go from there.
 
 
 Find a transformation of `Survival_Days` that corrects the problems observed above. Plot your transformed data as above (copy and modify the code). Briefly explain why you chose the transformation that you chose.
@@ -84,8 +92,13 @@ HT <- HT |> mutate(log_Survival = log(Survival_Days))
 ggplot(HT, aes(x = Mismatch_Degree, y = log_Survival)) +
   geom_point(position = position_jitter(width = 0.1)) +
   stat_summary(fun = mean, geom = "point", size = 3, color = "firebrick") +
-  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.1,
-               color = "firebrick", linewidth = 0.7) +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1,
+    color = "firebrick",
+    linewidth = 0.7
+  ) +
   xlab("Mismatch Degree") +
   ylab("log Survival (d)")
 ```
@@ -149,8 +162,10 @@ Fit a linear model where species abundance is predicted by the other four variab
 
 ```{r}
 # FIXME
-fm <- lm(N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
-         data = PB)
+fm <- lm(
+  N_Species ~ Dist_to_Island + Elevation + Area + Dist_to_Ecuador,
+  data = PB
+)
 ```
 
 Use `summary()` to get information about the model fit.

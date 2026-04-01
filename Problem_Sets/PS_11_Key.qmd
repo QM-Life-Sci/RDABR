@@ -47,8 +47,10 @@ Using the code you wrote (or the code from the key), load the `NeandertalBrainSi
 ```{r}
 # FIXME
 
-NBS <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/NeandertalBrainSize.csv",
-                col_types = "ddc") |> 
+NBS <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/NeandertalBrainSize.csv",
+  col_types = "ddc"
+) |>
   mutate(Species = fct_relevel(Species, "Recent"))
 ```
 
@@ -57,13 +59,13 @@ Copy the code you wrote for making a scatterplot of the data to remind yourself 
 ```{r}
 # FIXME
 
-NBS |> ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+NBS |>
+  ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
   geom_point(size = 3) +
   geom_smooth(formula = y ~ x, se = FALSE, method = "lm") +
   scale_color_d3() +
   guides(color = guide_legend(position = "inside")) +
-  theme(legend.position = "inside",
-        legend.justification.inside = c(1, 0)) +
+  theme(legend.position = "inside", legend.justification.inside = c(1, 0)) +
   labs(x = "ln Body Mass", y = "ln Brain Size")
 ```
 
@@ -94,9 +96,13 @@ Use the `aictab()` function from the `AICcmodavg` to generate the AICc model com
 ```{r}
 # FIXME
 
-aictab(cand.set = list("~ ln_Mass" = fm1,
-                       "~ ln_Mass + Species" = fm2,
-                       "~ ln_Mass * Species" = fm3))
+aictab(
+  cand.set = list(
+    "~ ln_Mass" = fm1,
+    "~ ln_Mass + Species" = fm2,
+    "~ ln_Mass * Species" = fm3
+  )
+)
 ```
 
 Notice that the values of AICc are negative. This can happen and is not a problem at all or a sign that something has gone wrong. You have to think a little harder about what "lower" means (in this case *more negative*). The interpretation stays the same -- lower AICc is better.
@@ -118,10 +124,10 @@ Overall, what is your interpretation of the `Delta_AICc` column?
 
 Interpret the model weights in the `AICCWt` column. Remember that model weights can be interpreted as a probability that the model in that row is the best model for out-of-sample prediction.
 
-> The additive model has a weight of 0.61 and the interaction 0.3. These are clearly the best, but 10% of the weight is on the simplest model. 
+> The additive model has a weight of 0.61 and the interaction 0.3. These are clearly the best, but 10% of the weight is on the simplest model.
 
 
-If these were your data, how would you proceed in the "Results" and "Discussion" sections of your maunscript?
+If these were your data, how would you proceed in the "Results" and "Discussion" sections of your manuscript?
 
 > You answer may vary, but I would talk about all of them.
 
@@ -150,7 +156,7 @@ What is your interpretation of the LOO cross-validation model comparison?
 
 Considering both the AICc table and the cross-validation, do the results agree or disagree? Why or why not?
 
-> Generally they agree. Both find that the Mass + Species model is best but they also both show that all three models are pretty similar. 
+> Generally they agree. Both find that the Mass + Species model is best but they also both show that all three models are pretty similar.
 
 
 What do you interpret about the possible differences in brain scaling vs. body size in Recent humans vs. Neandertals based on these analyses?
@@ -178,7 +184,7 @@ Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so tha
 ```{r}
 # FIXME
 
-WSF <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") |> 
+WSF <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") |>
   mutate(Specimen = factor(Specimen))
 glimpse(WSF)
 ```
@@ -198,11 +204,13 @@ Change `eval: false` to `eval: true`. You might need to change the name `WSF` to
 #| eval: true
 # FIXME
 
-WSF_wide <- WSF |> 
-  pivot_wider(id_cols = Specimen,
-              values_from = Femur_length,
-              names_from = Measurement,
-              names_prefix = "Measurement_")
+WSF_wide <- WSF |>
+  pivot_wider(
+    id_cols = Specimen,
+    values_from = Femur_length,
+    names_from = Measurement,
+    names_prefix = "Measurement_"
+  )
 WSF_wide |> head()
 ```
 
@@ -240,7 +248,7 @@ Based on your plot, do you expect ICC to be high or low? Give an estimate?
 > The points are fairly close to the line, so ICC should be pretty good.
 
 
-Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides. 
+Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides.
 
 Note that you will need to use the original data (not the pivoted data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
 
