@@ -2,8 +2,8 @@
 title: 'Problem Set 05'
 author: "Your Name Here"
 date: 'Last updated: `r Sys.Date()`'
-output:
-  html_document:
+format:
+  html:
     toc: true
     toc_depth: 4
     toc_float: true
@@ -23,7 +23,7 @@ theme_set(theme_classic())
 
 ## Stalk-eyed flies
 
-Stalk-eyed flies are a group of flies whose eyes are at the ends of long projections ("stalks") on either side of their head. Shortly after emerging from the pupa, these flies ingest air through their mouth and pump it into these stalks to elongate them ([watch this amazing process here](https://www.youtube.com/watch?v=ZGdfIX5x8XM){target="_blank"}). 
+Stalk-eyed flies are a group of flies whose eyes are at the ends of long projections ("stalks") on either side of their head. Shortly after emerging from the pupa, these flies ingest air through their mouth and pump it into these stalks to elongate them ([watch this amazing process here](https://www.youtube.com/watch?v=ZGdfIX5x8XM){target="_blank"}).
 
 Females prefer males with wider eye spans. See the photo below:
 
@@ -40,7 +40,7 @@ Load the `Stalkies.csv` file and explicitly mutate `food_source` into a factor. 
 ```{r}
 # FIXME
 
-stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |> 
+stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |>
   mutate(food_source = factor(food_source))
 glimpse(stalk)
 ```
@@ -70,27 +70,30 @@ ggplot(stalk, aes(x = food_source, y = eye_span)) +
 #| fig-alt: "A scatterplot of Eye span versus Food Source with means and standard errors overlayed in purple. Eye span is longer on average and less variable on the corn food source compared to the cotton food source."
 
 ggplot(stalk, aes(x = food_source, y = eye_span)) +
-  geom_point(position = position_jitter(width = 0.2, seed = 423479),
-             alpha = 0.25, pch = 16) +
-  stat_summary(fun = mean,
-               geom = "point",
-               size = 3, color = "purple") + 
-  stat_summary(fun.data = mean_se,
-               geom = "errorbar",
-               width = 0.1,
-               linewidth = 1,
-               color = "purple") +
+  geom_point(
+    position = position_jitter(width = 0.2, seed = 423479),
+    alpha = 0.25,
+    pch = 16
+  ) +
+  stat_summary(fun = mean, geom = "point", size = 3, color = "purple") +
+  stat_summary(
+    fun.data = mean_se,
+    geom = "errorbar",
+    width = 0.1,
+    linewidth = 1,
+    color = "purple"
+  ) +
   labs(x = "Food Source", y = "Eye Span (mm)")
 ```
 
 Describe the distributions within each group and between groups. What do these plots tell you? Do you have a prediction for what your statistical tests will show? How does the information provided by the boxplot differ from the information conveyed by the second plot.
 
-> The mean eye span is higher for flies reared on corn than on cotton. The variation also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups. The boxplot hides all the data. There is no way to tell the sample sizes. One benefit is that it is easier to compare the spread of the data with a box. Hiding the data is the main reason that I prefer dots, means, and error bars to boxplots.
+> The mean eye span is higher for flies reared on corn than on cotton. The variation also appears to be greater for flies reared on cotton. Based on the standard errors, I predict there will be a significant difference between these groups. The boxplot hides all the data. There is no way to tell the sample sizes. One benefit is that it is easier to compare the spread of the data with a box. Hiding the data is the main reason that I prefer dots, means, and error bars to box plots.
 
 
 #### Summary statistics
 
-For each food source calculate: 
+For each food source calculate:
 
 - number of observations
 - mean
@@ -103,15 +106,19 @@ Use `group_by()` and `summarize()` as we have seen in the lecture slides. Rememb
 ```{r}
 # FIXME
 
-SEM <- function(x) {sd(x) / sqrt(length(x))}
+SEM <- function(x) {
+  sd(x) / sqrt(length(x))
+}
 
-stalk |> 
-  group_by(food_source) |> 
-  summarise(n = length(eye_span),
-            mean_eye_span = mean(eye_span),
-            sd_eye_span = sd(eye_span),
-            var_eye_span = var(eye_span),
-            SEM_eye_span = SEM(eye_span))
+stalk |>
+  group_by(food_source) |>
+  summarize(
+    n = length(eye_span),
+    mean_eye_span = mean(eye_span),
+    sd_eye_span = sd(eye_span),
+    var_eye_span = var(eye_span),
+    SEM_eye_span = SEM(eye_span)
+  )
 ```
 
 How do the number of observations, mean, standard deviation, variance, and SEM compare? Do they match your intuition above?
@@ -126,12 +133,14 @@ Calculate approximate 95% confidence intervals for the mean eye span for each gr
 ```{r}
 # FIXME
 
-stalk |> 
-  group_by(food_source) |> 
-  summarize(mean_eye_span = mean(eye_span),
-            SEM_eye_span = SEM(eye_span),
-            Lower = mean_eye_span - 2 * SEM_eye_span,
-            Upper = mean_eye_span + 2 * SEM_eye_span)
+stalk |>
+  group_by(food_source) |>
+  summarize(
+    mean_eye_span = mean(eye_span),
+    SEM_eye_span = SEM(eye_span),
+    Lower = mean_eye_span - 2 * SEM_eye_span,
+    Upper = mean_eye_span + 2 * SEM_eye_span
+  )
 ```
 
 What are the approximate 95% confidence intervals for the mean eye span for flies raised on corn and cotton? What is your hypothesis for whether the means differ or not? How confident are you in your hypothesis?
@@ -160,7 +169,7 @@ Examine the coefficients in the model summary. Try to reconcile the values in th
 > The intercept is identical to the mean for the corn group. The second row in the coefficients `food_sourceCotton` is the same value as the difference between the mean for Corn and the mean for Cotton. So this row represents the mean difference between Corn and Cotton.
 
 
-We will investigate the other parts of this summary in the coming units. 
+We will investigate the other parts of this summary in the coming units.
 
 Next, we will use a *t*-test to estimate the difference in means in the two treatments. A *t*-test is a very specific kind of linear model which compares the means of two (and only two) groups. One of the assumptions of a *t*-test is that the variances of the two groups are equal.
 
@@ -201,12 +210,12 @@ The order in which the levels are printed is the default order for determining w
 
 What is the base level? Relate this to the summary table you created above.
 
-> Corn is the base level. The table has a line for the Itercept, which represents the mean for Corn. The other line is the difference for cotton.
+> Corn is the base level. The table has a line for the Intercept, which represents the mean for Corn. The other line is the difference for cotton.
 
 
 The function `ifelse()` (and it's tidyverse counterpart `if_else()`, which are largely interchangeable) is useful for doing conditional assignment to a variable. It takes the general form: `ifelse(test, yes, no)`.
 
-The `test` parameter is an equality or inequality (==, <, >, etc.) which returns a `TRUE` or `FALSE`. For each element, if the result is TRUE, the value at `yes` is returned. If the result is FALSE, the value at `no` is returned. Study the following examples, and try out some other `iflese`s.
+The `test` parameter is an equality or inequality (==, <, >, etc.) which returns a `TRUE` or `FALSE`. For each element, if the result is TRUE, the value at `yes` is returned. If the result is FALSE, the value at `no` is returned. Study the following examples, and try out some other `ifelse`s.
 
 ```{r}
 x <- 1:10
@@ -223,9 +232,11 @@ Next we want to create a new column in the stalk-eyed flies data that has 0 wher
 ```{r}
 # FIXME
 
-stalk <- stalk |> 
-  mutate(food01 = ifelse(food_source == "Corn", 0, 1),
-         Intercept = rep(1, times = n()))
+stalk <- stalk |>
+  mutate(
+    food01 = ifelse(food_source == "Corn", 0, 1),
+    Intercept = rep(1, times = n())
+  )
 stalk |> print(n = 50)
 ```
 
