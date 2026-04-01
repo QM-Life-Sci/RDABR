@@ -22,6 +22,7 @@ library(broom)
 library(readxl)
 library(cowplot)
 
+
 theme_set(theme_classic())
 ```
 
@@ -143,16 +144,31 @@ The columns in this data set are:
 Use the function `read_excel()` from the package `readxl` to load the data and select only the self-reported females from the dataset.
 
 ```{r}
-
+NH <- read_excel("../data/NHANES_Triglycerides.xlsx") |> 
+  filter(Sex == "Female")
 ```
 
 To explore the data, make two histograms, one for waist circumference and one for triglycerides.
 
 ```{r}
-
+ggplot(NH, aes(Waist)) +
+  geom_histogram(bins = 30)
 ```
 
 ```{r}
+ggplot(NH, aes(Triglycerides)) +
+  geom_histogram(bins = 50)
+
+NH |> arrange(desc(Triglycerides))
+
+log(30)
+exp(3.40)
+
+log(3)
+log(300)
+
+ggplot(NH, aes(log(Triglycerides))) +
+  geom_histogram(bins = 50)
 
 ```
 
@@ -164,19 +180,22 @@ Now explore the relationship between these variables by making a scatterplot of 
 
 
 ```{r}
-
+ggplot(NH, aes(x = Waist, y = Triglycerides)) +
+  geom_point(color = "orchid") +
+  geom_smooth(method = "lm", formula = y ~ x, se=FALSE)
 ```
 
 Perform an OLS regression predicting triglycerides from waist circumference.
 
 ```{r}
-
+fm <- lm(Triglycerides ~ Waist, data = NH)
+summary(fm)
 ```
 
 Use `check_model` to check the diagnostics for your model.
 
 ```{r}
-
+check_model(fm)
 ```
 
 Do you have any concerns about whether these data meet the assumptions for OLS regression? If any diagnostics are concerning, explain what the problem appears to be.
