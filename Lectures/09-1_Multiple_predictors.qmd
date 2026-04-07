@@ -1,5 +1,5 @@
 ---
-title: "Unit 9: Multiple predictors"
+title: "Unit 9: Multiple categories and multiple predictors"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -9,7 +9,7 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
+    show-slide-number: all
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
@@ -44,9 +44,11 @@ theme_set(theme_classic(base_size = 20))
 
 - PC 2 check-in
     - Due Thursday. Let us know if you need more time.
+- Micropublication analysis plan due in a few weeks (4/21)
 
 
 # Prediction with categorical variables {background-color="#40666e"}
+
 
 ## Linear models with multiple categories
 
@@ -343,17 +345,7 @@ What role does within vs. between group variation have in determining *F*?
 
 Significant test (*P* = 0.004) only says that at least one mean is different.
 
-Many options are available for *post hoc* (unplanned) comparisons:
-
-- Scheffé test
-- Duncan's multiple range test
-- Fisher's least significant difference test
-- Newman-Keuls test
-- Tukey-Kramer test (Tukey's Honestly Significant
-Difference)
-
-
-## Tukey-Kramer test
+Tukey-Kramer test
 
 - AKA: "Tukey's Honestly Significant Difference"
 - Assumes that we have already performed an ANOVA and rejected the null hypothesis
@@ -363,7 +355,7 @@ Difference)
 
 ## Tukey-Kramer test
 
-`multcomp` has all the tools for carrying out *post-hoc* tests [@Bretz2010-cy]
+`multcomp` package has all the tools for carrying out *post-hoc* tests [@Bretz2010-cy]
 
 - `glht()` carries out general linear hypothesis tests
     - `linfct` is the linear hypothesis function
@@ -391,7 +383,9 @@ summary(tukey)
 
 post_hoc <- glht(
   fm,
-  mcp(Treatment = c("Eyes - Control = 0", "Knee - Control = 0"))
+  mcp(
+    Treatment = c("Eyes - Control = 0", "Knee - Control = 0")
+  )
 )
 summary(post_hoc)
 ```
@@ -629,19 +623,28 @@ New concerns with multiple predictors
 ## Relationships between variables
 
 
+> How much of the variation in the outcome variable is explained by the predictor variables?
+
 :::: {.columns}
 
-::: {.column width="30%"}
+::: {.column width="50%"}
 
-![](https://i.imgur.com/6nLlp1w.png){fig-align="center"}
+![](./images/TF_variance_fig.png){fig-align="center" width="65%"}
+
+
 :::
 
-::: {.column width="70%"}
-- What is the independent contribution of X1 to Y?
-- How much variation does X1 alone explain in Y?
+::: {.column width="50%"}
+
+![](https://i.imgur.com/6nLlp1w.png){fig-align="center" width="60%"}
+
 :::
 
 ::::
+
+:::{.right}
+Adapted from Tabachnick and Fidell [-@Tabachnick2019-tl]
+:::
 
 
 
@@ -654,7 +657,6 @@ New concerns with multiple predictors
 ![](https://images.fineartamerica.com/images-medium-large/goeldis-monkey-callimico-goeldii-thomas-marent.jpg){fig-align="center"}
 *Callimico goeldii*
 
-(photo by Thomas Marent)
 :::
 
 ::: {.column width="50%"}
@@ -668,11 +670,13 @@ What are the contributions of the fat and lactose content of primate milk to tot
 
 ::::
 
+[(photo by Thomas Marent)]{.absolute bottom="5%" right="0%"}
+
 
 ## Milk content in primates
 
 ```{r}
-#| echo: true
+#| echo: false
 
 tf <- tempfile()
 
@@ -684,10 +688,8 @@ download.file(
 Milk <- read_excel(tf, na = "NA") |>
   dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
   drop_na()
-Milk
+Milk |> knitr::kable(digits = 2)
 ```
-
-Ignore that these are comparative species-level data.
 
 
 ## Visualizing data
@@ -748,283 +750,6 @@ summary(fm)
 # Save the regression diagnostics for later
 PP <- performance::check_model(fm)
 ```
-
-
-## What does multiple regression *really* do?
-
-$$Y = \theta_0 + \theta_1 X_1 + \theta_2 X_2$$
-
-To estimate the coefficient of $X_1$:
-
-- Regress $X_1$ on $X_2$
-
-
-## Where do the coefficients come from?
-
-$$X_1 = \beta_0 + \beta_1 X_2$$
-
-- Calculate residuals for the model.
-- Regress $Y$ on the residuals.
-- The estimated coefficient is $\theta_1$.
-
-Repeat for all predictors (i.e., more than $X_1$ and $X_2$)
-
-
-## Estimate `Fat` coefficient
-
-1. Use `Lactose` to predict `Fat`, which will take the effect of `Lactose` out of the model when we predict `Milk_Energy`
-2. Extract the residuals and add them onto the data.
-
-```{r}
-#| echo: true
-
-fm_Lact <- lm(Fat ~ Lactose, data = Milk)
-
-Milk <- Milk |> mutate(resid_Lact = residuals(fm_Lact))
-Milk |> arrange(resid_Lact) |> slice(1:5)
-```
-
-
-## Estimate `Fat` coefficient
-
-```{r}
-#| echo: false
-
-desc <- 'Large negative residual'
-
-F_v_L <- ggplot(Milk, aes(Lactose, Fat)) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
-  geom_point() +
-  labs(x = "Percent Lactose", y = "Percent Fat")
-
-F_v_L +
-  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 1222) +
-  geom_mark_ellipse(
-    aes(filter = Species == "Callimico goeldii", description = desc),
-    label.buffer = unit(50, "mm")
-  )
-```
-
-
-## Estimate `Fat` coefficient
-
-```{r}
-#| echo: false
-
-pred_Lactose <- data.frame(
-  Lactose = seq(min(Milk$Lactose), max(Milk$Lactose), length.out = 200)
-)
-pred_Lactose$Fat <- predict(fm_Lact, newdata = pred_Lactose)
-
-ggplot(Milk, aes(Lactose, Fat)) +
-  geom_ribbon(
-    data = pred_Lactose,
-    aes(ymax = Fat),
-    ymin = 0,
-    fill = "gray80"
-  ) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
-  geom_point() +
-  labs(x = "Percent Lactose", y = "Percent Fat") +
-  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 1222) +
-  geom_mark_ellipse(
-    aes(filter = Species == "Callimico goeldii", description = desc),
-    label.buffer = unit(50, "mm")
-  ) +
-  annotate(
-    geom = "label",
-    x = 40,
-    y = 15,
-    label = "Less fat than predicted",
-    color = "firebrick4",
-    size = 5
-  )
-```
-
-
-## Estimate `Fat` coefficient
-
-```{r}
-#| echo: false
-
-milk_res_lact <- ggplot(Milk, aes(resid_Lact, Milk_Energy)) +
-  geom_rect(
-    aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
-    fill = "gray80"
-  ) +
-  geom_vline(xintercept = 0, color = "blue") +
-  geom_smooth(
-    formula = y ~ x,
-    method = "lm",
-    se = FALSE,
-    color = "darkgreen"
-  ) +
-  geom_point() +
-  labs(x = "Residual Fat Percent", y = "Milk Energy")
-
-milk_res_lact +
-  annotate(
-    geom = "label",
-    x = -5.4,
-    y = 0.97,
-    label = "Less fat than predicted",
-    color = "firebrick4",
-    size = 5
-  ) +
-  geom_text_repel(aes(label = Species), size = 3, force = 15) +
-  geom_mark_ellipse(
-    aes(filter = Species == "Callimico goeldii"),
-    label.fontsize = 8
-  )
-```
-
-
-## Estimate `Fat` coefficient
-
-Compare coefficients:
-
-```{r}
-#| echo: true
-
-coef(lm(Milk_Energy ~ resid_Lact, data = Milk))
-coef(fm)
-```
-
-
-## Estimate `Lactose` coefficient
-
-1. Use `Fat` to predict `Lactose`, which will take the effect of `Fat` out of the model when we predict `Milk_Energy`
-2. Extract the residuals and add them onto the data.frame `Milk`.
-
-```{r}
-fm_Fat <- lm(Lactose ~ Fat, data = Milk)
-Milk$resid_Fat <- residuals(fm_Fat)
-```
-
-
-## Estimate `Lactose` coefficient
-
-```{r}
-#| echo: false
-
-L_v_F <- ggplot(Milk, aes(Fat, Lactose)) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
-  geom_point() +
-  labs(y = "Percent Lactose", x = "Percent Fat")
-
-L_v_F +
-  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 23766)
-```
-
-
-## Estimate `Lactose` coefficient
-
-```{r}
-#| echo: false
-
-pred_Fat <- data.frame(
-  Fat = seq(min(Milk$Fat), max(Milk$Fat), length.out = 200)
-)
-pred_Fat$Lactose <- predict(fm_Fat, newdata = pred_Fat)
-
-ggplot(Milk, aes(Fat, Lactose)) +
-  geom_ribbon(
-    data = pred_Fat,
-    aes(ymax = Lactose),
-    ymin = 0,
-    fill = "gray80"
-  ) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
-  geom_point() +
-  labs(y = "Percent Lactose", x = "Percent Fat") +
-  geom_text_repel(aes(label = Species), size = 3, force = 15, seed = 23766) +
-  annotate(
-    geom = "label",
-    x = 20,
-    y = 35,
-    label = "Less lactose than predicted",
-    color = "firebrick4",
-    size = 5
-  )
-```
-
-
-## Estimate `Lactose` coefficient
-
-```{r}
-#| echo: false
-
-milk_res_fat <- ggplot(Milk, aes(resid_Fat, Milk_Energy)) +
-  geom_rect(
-    aes(xmin = -Inf, xmax = 0, ymin = -Inf, ymax = Inf),
-    fill = "gray80"
-  ) +
-  geom_vline(xintercept = 0, color = "blue") +
-  geom_smooth(
-    formula = y ~ x,
-    method = "lm",
-    se = FALSE,
-    color = "darkgreen"
-  ) +
-  geom_point() +
-  labs(x = "Residual Lactose Percent", y = "Milk Energy")
-print(
-  milk_res_fat +
-    annotate(
-      geom = "label",
-      x = -4.4,
-      y = 0.97,
-      label = "Less lactose than predicted",
-      color = "firebrick4",
-      size = 5
-    ) +
-    geom_text_repel(aes(label = Species), size = 3, force = 15)
-)
-```
-
-
-## Estimate `Lactose` coefficient
-
-Compare coefficients:
-
-```{r}
-coef(lm(Milk_Energy ~ resid_Fat, data = Milk))
-coef(fm)
-```
-
-
-## Compare
-
-```{r}
-#| echo: false
-
-plot_grid(
-  F_v_L + ggtitle("Estimate Fat coefficient"),
-  L_v_F + ggtitle("Estimate Lactose coefficient"),
-  ncol = 2
-)
-```
-
-
-## Compare
-
-```{r}
-#| echo: false
-
-plot_grid(milk_res_lact, milk_res_fat, ncol = 2)
-coef(fm)
-```
-
-
-## What does multiple regression *really* do?
-
-Determine the association of each predictor while "controlling" for the other predictors.
-
-How?
-
-- Allow the other variables to account for variation *in the predictor of interest*
-    - Multiple regression of the predictor of interest on the remaining predictors (response variable not involved)
-- Regress the response on the *residual* variance of the predictor of interest
 
 
 ## Visualizing multiple regression
@@ -1283,13 +1008,6 @@ CasteWorker  0.39334    0.14611   2.692   0.0112
 **Which model is best?**
 
 Model comparison in a few weeks...
-
-
-## Diagnostics
-
-```{r}
-performance::check_model(fm4)
-```
 
 
 # Questions {background-color="#f8c471"}
