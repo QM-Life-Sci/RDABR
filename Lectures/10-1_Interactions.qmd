@@ -14,7 +14,7 @@ code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
 knitr:
-  opts_chunk: 
+  opts_chunk:
     echo: true
 ---
 
@@ -34,7 +34,9 @@ library(plotly)
 library(cowplot)
 library(paletteer)
 
-source("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R")
+source(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/Lectures/QMLS_functions.R"
+)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -60,9 +62,7 @@ theme_set(theme_classic(base_size = 20))
 
 ::: {.column width="50%"}
 ![](https://images.fineartamerica.com/images-medium-large/goeldis-monkey-callimico-goeldii-thomas-marent.jpg){fig-align="center"}
-*Callimico goeldi*
-
-(photo by Thomas Marent)
+*Callimico goeldii*
 :::
 
 ::: {.column width="50%"}
@@ -76,6 +76,8 @@ What are the contributions of the fat and lactose content of primate milk to tot
 
 ::::
 
+[(photo by Thomas Marent)]{.absolute bottom="5%" right="0%"}
+
 
 ## Milk energy in primates
 
@@ -84,9 +86,12 @@ What are the contributions of the fat and lactose content of primate milk to tot
 #| echo: false
 
 tf <- tempfile()
-download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+download.file(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx",
+  destfile = tf
+)
 
-Milk <- read_excel(tf, na = "NA") |> 
+Milk <- read_excel(tf, na = "NA") |>
   dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
   drop_na()
 
@@ -144,20 +149,20 @@ High correlation between predictors leaves little residual variation to be used 
 #| echo: false
 
 L_v_F <- ggplot(Milk, aes(Fat, Lactose)) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
-              color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
   geom_point() +
   labs(y = "Percent Lactose", x = "Percent Fat")
 
 F_v_L <- ggplot(Milk, aes(Lactose, Fat)) +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
-              color = "blue") +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE, color = "blue") +
   geom_point() +
   labs(x = "Percent Lactose", y = "Percent Fat")
 
-plot_grid(F_v_L + ggtitle("Estimate Fat coefficient"),
-          L_v_F + ggtitle("Estimate Lactose coefficient"),
-          ncol = 2)
+plot_grid(
+  F_v_L + ggtitle("Estimate Fat coefficient"),
+  L_v_F + ggtitle("Estimate Lactose coefficient"),
+  ncol = 2
+)
 ```
 
 
@@ -201,11 +206,14 @@ But:
 
 tf <- tempfile()
 
-download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+download.file(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx",
+  destfile = tf
+)
 
-Milk <- read_excel(tf, na = "NA") |> 
+Milk <- read_excel(tf, na = "NA") |>
   select(Species, Milk_Energy, Mass, Neocortex) |>
-  mutate(log_Mass = log(Mass)) |> 
+  mutate(log_Mass = log(Mass)) |>
   drop_na()
 
 ggscatmat(Milk, columns = c(2, 4, 5))
@@ -296,8 +304,12 @@ ggplot(Milk, aes(resid_Neo, Milk_Energy)) +
   geom_vline(xintercept = 0, color = "blue") +
   geom_point(size = 3) +
   labs(x = "Residual Neocortex", y = "Milk Energy") +
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE,
-              color = "darkgreen") +
+  geom_smooth(
+    formula = y ~ x,
+    method = "lm",
+    se = FALSE,
+    color = "darkgreen"
+  ) +
   geom_text_repel(aes(label = Species), size = 4, force = 15)
 ```
 
@@ -313,13 +325,15 @@ ggplot(Milk, aes(resid_Neo, Milk_Energy)) +
 ```{r}
 #| echo: false
 
-NMR <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
-              col_types = c("cdd")) |> 
-  rename(Caste = caste,
-         Mass = ln.mass,
-         Energy= ln.energy) |> 
-  mutate(Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
-         Caste = factor(Caste))
+NMR <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
+  col_types = c("cdd")
+) |>
+  rename(Caste = caste, Mass = ln.mass, Energy = ln.energy) |>
+  mutate(
+    Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+    Caste = factor(Caste)
+  )
 
 fm4 <- lm(Energy ~ Mass + Caste, data = NMR)
 
@@ -328,8 +342,7 @@ ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred4, color = Caste), lwd = 2) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
-  theme(legend.position = "inside",
-        legend.position.inside = c(0.05, 1)) +
+  theme(legend.position = "inside", legend.position.inside = c(0.05, 1)) +
   labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
 ```
 
@@ -340,7 +353,7 @@ What if the the effect of body mass on energy expenditure depends on caste?
 
 - Different body mass to energy relationship for each caste
 
-How do we model that?  
+How do we model that?
 
 
 ## Interactions
@@ -357,10 +370,8 @@ ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
   geom_point(size = 4) +
   geom_line(aes(x = Mass, y = pred5, color = Caste), lwd = 2) +
   scale_color_manual(values = wes_palette("Cavalcanti1")) +
-  theme(legend.position = "inside",
-        legend.position.inside = c(0.05, 1)) +
-  labs(x = "ln Body Mass (g)",
-       y = "ln Daily Energy Expenditure (kJ)")
+  theme(legend.position = "inside", legend.position.inside = c(0.05, 1)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
 ```
 
 
@@ -372,7 +383,7 @@ $$Y = \theta_0 + \theta_1 X_1 + \theta_2 X_2 + \theta_3 (X_1 X_2) + \epsilon$$
 
 The value of $X_1$ varies with change in the value of $X_2$ and vice versa (these are not really separable).
 
-Example formula: 
+Example formula:
 
 - `Energy ~ Mass + Caste + Mass:Caste`
 - `Energy ~ Mass * Caste`
@@ -387,10 +398,12 @@ Example formula:
 
 set.seed(3423411)
 
-NMR |> 
-  mutate(`Caste 0/1` = as.integer(Caste) - 1,
-         `Mass:Caste` = Mass * `Caste 0/1`) |> 
-  dplyr::select(-starts_with("pred")) |> 
+NMR |>
+  mutate(
+    `Caste 0/1` = as.integer(Caste) - 1,
+    `Mass:Caste` = Mass * `Caste 0/1`
+  ) |>
+  dplyr::select(-starts_with("pred")) |>
   slice_sample(n = 10)
 ```
 
@@ -448,11 +461,11 @@ Balanced data is the best to work with.
 #| output-location: slide
 #| fig-align: center
 
-ggplot(BM, aes(x = Nitrogen,
-               y = Biomass,
-               color = Phosphorous)) +
-  geom_point(position = position_jitter(width = 0.1, seed = 34234),
-             size = 3) +
+ggplot(BM, aes(x = Nitrogen, y = Biomass, color = Phosphorous)) +
+  geom_point(
+    position = position_jitter(width = 0.1, seed = 34234),
+    size = 3
+  ) +
   scale_color_paletteer_d("ggsci::default_jco")
 ```
 
@@ -464,12 +477,15 @@ ggplot(BM, aes(x = Nitrogen,
 #| output-location: slide
 #| fig-align: center
 
-int_plot1 <- ggplot(BM, aes(x = Nitrogen,
-                            y = Biomass,
-                            color = Phosphorous,
-                            group = Phosphorous)) +
-  geom_point(position = position_jitter(width = 0.1, seed = 34234),
-             size = 3, alpha = 0.5) +
+int_plot1 <- ggplot(
+  BM,
+  aes(x = Nitrogen, y = Biomass, color = Phosphorous, group = Phosphorous)
+) +
+  geom_point(
+    position = position_jitter(width = 0.1, seed = 34234),
+    size = 3,
+    alpha = 0.5
+  ) +
   stat_summary(fun = mean, geom = "point", size = 6) +
   stat_summary(fun = mean, geom = "line", linewidth = 1.5) +
   scale_color_paletteer_d("ggsci::default_jco") +
@@ -484,12 +500,15 @@ int_plot1
 #| echo: false
 #| fig-align: center
 
-int_plot2 <- ggplot(BM, aes(x = Phosphorous,
-               y = Biomass,
-               color = Nitrogen,
-               group = Nitrogen)) +
-  geom_point(position = position_jitter(width = 0.1, seed = 34234),
-             size = 3, alpha = 0.5) +
+int_plot2 <- ggplot(
+  BM,
+  aes(x = Phosphorous, y = Biomass, color = Nitrogen, group = Nitrogen)
+) +
+  geom_point(
+    position = position_jitter(width = 0.1, seed = 34234),
+    size = 3,
+    alpha = 0.5
+  ) +
   stat_summary(fun = mean, geom = "point", size = 6) +
   stat_summary(fun = mean, geom = "line", linewidth = 1.5) +
   scale_color_paletteer_d("ggsci::default_jco") +
@@ -520,9 +539,8 @@ Many possible patterns of interactions between two variables:
 ```{r}
 #| echo: true
 
-BM |> 
-  summarize(mean = mean(Biomass),
-            .by = c(Nitrogen, Phosphorous))
+BM |>
+  summarize(mean = mean(Biomass), .by = c(Nitrogen, Phosphorous))
 ```
 
 
@@ -538,8 +556,7 @@ fm <- lm(Biomass ~ Nitrogen * Phosphorous, data = BM)
 #| eval: false
 #| echo: true
 
-fm <- lm(Biomass ~ Nitrogen + Phosphorous + Nitrogen:Phosphorous, 
-         data = BM)
+fm <- lm(Biomass ~ Nitrogen + Phosphorous + Nitrogen:Phosphorous, data = BM)
 ```
 
 - Main effects of `Nitrogen` and `Phosphorous`
@@ -582,7 +599,7 @@ int_plot1
 For a 2 X 2 design
 
 - Power to detect a main effect is 87%
-- Power to detect the interaction is 16% 
+- Power to detect the interaction is 16%
 
 ANOVA will suggest additivity of effects when in fact they are multiplicative
 
@@ -622,7 +639,7 @@ BM$interact <- BM$n_num * BM$p_num
 ```{r}
 #| echo: true
 
-BM |> slice(c(1,21,41,61,81))
+BM |> slice(c(1, 21, 41, 61, 81))
 ```
 
 
@@ -643,7 +660,7 @@ R does the factor $\rightarrow$ 0/1 conversion behind the scenes:
 #| echo: true
 
 mm <- model.matrix(Biomass ~ Nitrogen * Phosphorous, data = BM)
-mm[15:25,]
+mm[15:25, ]
 ```
 
 ## 0/1 variables are like switches
@@ -655,7 +672,7 @@ $$Y = \theta_0 + \theta_1 N + \theta_2 P + \theta_3 (N \times P ) + \epsilon$$
 ```{r}
 
 mm <- model.matrix(Biomass ~ Nitrogen * Phosphorous, data = BM)
-mm[15:25,]
+mm[15:25, ]
 ```
 
 ## Continuous interactions
@@ -697,9 +714,11 @@ $$Biomass = \theta_0 + ... + \theta_k (N \times P \times  K)$$
 ```{r}
 #| echo: false
 
-LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv", show_col_types = FALSE) |> 
-  rename(Age = age,
-         `Proportion Black` = proportion.black)
+LA <- read_csv(
+  "https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/heads/main/inst/extdata/datasets/17/17e1LionAges.csv",
+  show_col_types = FALSE
+) |>
+  rename(Age = age, `Proportion Black` = proportion.black)
 ```
 
 ```{r}
@@ -711,12 +730,12 @@ LA <- read_csv("https://raw.githubusercontent.com/Middleton-Lab/abdData/refs/hea
 library(ggstatsplot)
 
 ggscatterstats(
-  data  = LA,
-  x     = `Proportion Black`,
-  y     = Age,
+  data = LA,
+  x = `Proportion Black`,
+  y = Age,
   color = Caste,
-  xlab  = "Proportion of Black",
-  ylab  = "Age (y)",
+  xlab = "Proportion of Black",
+  ylab = "Age (y)",
   title = "Prediction of Age from Proportion Black in the Nose",
   bf.message = FALSE
 )
@@ -732,11 +751,9 @@ set.seed(3575575)
 
 Alive <- rnorm(n = 150, mean = 24.5, sd = 2.6)
 Dead <- rnorm(n = 30, mean = 22.0, sd = 2.7)
-Group <- c(rep("Alive", 150),
-           rep("Dead", 30))
+Group <- c(rep("Alive", 150), rep("Dead", 30))
 
-HL <- tibble(Horn_Length = c(Alive, Dead),
-             Group = factor(Group))
+HL <- tibble(Horn_Length = c(Alive, Dead), Group = factor(Group))
 ```
 
 ```{r}
@@ -746,14 +763,14 @@ HL <- tibble(Horn_Length = c(Alive, Dead),
 
 library(tidyplots)
 
-HL |> 
-  tidyplot(x = Group, y = Horn_Length) |> 
-  add_mean_dash(linewidth = 1) |> 
-  add_sem_errorbar(linewidth = 0.5) |> 
-  add_data_points_beeswarm(color = "firebrick4") |> 
-  add_test_pvalue(hide_info = TRUE, label.size = 4) |> 
-  adjust_size(200, 100) |> 
-  theme_tidyplot(fontsize = 12)+
+HL |>
+  tidyplot(x = Group, y = Horn_Length) |>
+  add_mean_dash(linewidth = 1) |>
+  add_sem_errorbar(linewidth = 0.5) |>
+  add_data_points_beeswarm(color = "firebrick4") |>
+  add_test_pvalue(hide_info = TRUE, label.size = 4) |>
+  adjust_size(200, 100) |>
+  theme_tidyplot(fontsize = 12) +
   ylab("Horn Length (mm)")
 ```
 
@@ -765,4 +782,3 @@ HL |>
 
 ::: {#refs}
 :::
-
