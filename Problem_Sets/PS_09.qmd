@@ -36,9 +36,12 @@ The data in `Heart_Transplants.xlsx` contains data on survivorship (in days; `Su
 Load the data from the Excel file and look at the structure with either `str()` or `glimpse()`.
 
 ```{r}
+library(readxl)
+library(tidyverse)
+HT <- read_excel("../data/Heart_Transplants.xlsx")
+HT <- HT |> mutate(Mismatch_Degree = factor(Mismatch_Degree))
 
-
-
+levels(HT$Mismatch_Degree)
 ```
 
 Notice that `Mismatch_Degree` is currently a character vector. To use it in a linear model, we should convert it to a factor.^[R will do this automatically, but it is good practice to do the conversion, in this case to get the levels of the factor in the order we want.]
