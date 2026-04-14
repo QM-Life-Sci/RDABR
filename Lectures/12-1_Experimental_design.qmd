@@ -1,6 +1,5 @@
 ---
-title: "Unit 12: Multiple comparisons procedures"
-subtitle: "PCA"
+title: "Unit 12: Experimental Design"
 html-math-method:
   method: mathjax
   url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
@@ -10,12 +9,12 @@ format:
     chalkboard: false
     standalone: true
     slide-number: true
-    show-slide-number: print
+    show-slide-number: all
 code-annotations: hover
 bibliography: QMLS_Bibliography.bib
 csl: evolution.csl
 knitr:
-  opts_chunk: 
+  opts_chunk:
     echo: true
 ---
 
@@ -34,6 +33,8 @@ library(GGally)
 library(smatr)
 library(cowplot)
 library(factoextra)
+library(ICC)
+library(glue)
 
 theme_set(theme_classic(base_size = 20))
 ```
@@ -52,6 +53,531 @@ theme_set(theme_classic(base_size = 20))
 # Questions {background-color="#f8c471"}
 
 
+# Experimental Design {background-color="#40666e"}
+
+
+## Planning experiments
+
+- Define (and write down) your main question
+    - What do I want to learn?
+- Define useful models
+
+Key questions to ask at every step:
+
+1. **What question am I trying to answer?**
+1. **What processes could have produced the pattern I am observing?**
+    - Don't fool yourself
+
+
+## Parsing real variation vs. measurement error
+
+How good are my observations?
+
+1. Continuous measurements: **intraclass correlation coefficient** (ICC)
+1. Discrete measurements: **interrater reliability** (IRR)
+
+## Visualizing ANOVA
+
+![](https://i.imgur.com/dNF4ph0.png){fig-align="center"}
+
+$$F = \frac{\mbox{Between Group Variation}}{\mbox{Within Group Variation}}$$
+
+
+## Collecting data for ICC
+
+- Measure the same individual or sample multiple times (*technical replicates*)
+- Randomize the order of samples
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+tf <- tempfile()
+download.file(
+  "https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/G44_Morphometrics.xlsx",
+  destfile = tf
+)
+
+G44 <- read_excel(tf) |>
+  mutate(MouseID = factor(MouseID))
+
+G44_long <- G44 |>
+  dplyr::select(MouseID, Len1, Len2) |>
+  pivot_longer(cols = -MouseID, names_to = "Replicate", values_to = "Length")
+
+icc <- ICCest(x = G44_long$MouseID, y = G44_long$Length)$ICC |>
+  round(digits = 3)
+
+ggplot(G44, aes(Len1, Len2)) +
+  geom_abline(slope = 1, linetype = "dotted") +
+  geom_point(size = 2) +
+  coord_equal() +
+  scale_x_continuous(
+    limits = c(14.5, 17.5),
+    breaks = seq(14.5, 17.5, by = 0.5)
+  ) +
+  scale_y_continuous(
+    limits = c(14.5, 17.5),
+    breaks = seq(14.5, 17.5, by = 0.5)
+  ) +
+  labs(
+    x = "Length #1 (mm)",
+    y = "Length #2 (mm)",
+    title = glue("ICC = {icc}")
+  )
+
+```
+
+
+## Intraclass Correlation Coefficient
+
+Uses the results of the linear model (ANOVA):
+
+$$\mbox{Measurement} \sim \mbox{Sample ID}$$
+
+or the multilevel model
+
+$$\mbox{Measurement} \sim 1 + (1 | \mbox{Sample ID})$$
+
+
+## Intraclass Correlation Coefficient
+
+For continuously varying measurements:
+
+$$\mbox{ICC} =\frac{\sigma_{A}^{2}}{\sigma_{A}^{2}+MS_{error}}$$
+
+$$\sigma_{A}^{2}=\frac{MS_{group}-MS_{error}}{n}$$
+
+- $n$ = Number of measurements per specimen (*not the sample size*).
+
+
+## Repeatability of lipid levels in the same sample
+
+![](https://i.imgur.com/6nkJATA.png){fig-align="center"}
+
+
+## Calculation of ICC
+
+What is the ICC of repeated measurements of lipid levels in fruit flies?
+
+```{r}
+#| echo: false
+#| message: false
+
+MM <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/macromol_optim.csv",
+  show_col_types = FALSE
+) |>
+  mutate(replicate = rep(paste0("rep", c(1, 2)), 439), Line = factor(Line))
+glimpse(MM)
+
+```
+
+
+## Pairs of measurements
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+wideM <- MM |>
+  select(replicate, Line, Lipid.per.Fly) |>
+  pivot_wider(names_from = replicate, values_from = Lipid.per.Fly)
+
+ggplot(wideM, aes(rep1, rep2)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dotted") +
+  geom_point() +
+  xlab("Lipid Level #1") +
+  ylab("Lipid Level #2") +
+  coord_equal() +
+  scale_x_continuous(limits = c(0, 3)) +
+  scale_y_continuous(limits = c(0, 3)) +
+  theme(text = element_text(size = 20))
+
+```
+
+
+## ICC via ANOVA
+
+```{r}
+#| echo: true
+
+fm <- lm(Lipid.per.Fly ~ Line, data = MM)
+print(anova(fm), digits = 5)
+
+var_a <- (0.39597 - 0.10035) / 2
+var_a / (var_a + 0.10035)
+
+```
+
+ICC is 0.60 for these measurements.
+
+
+## With `ICCest()`
+
+```{r}
+#| echo: true
+
+library(ICC)
+
+ICCest(Line, Lipid.per.Fly, data = MM, alpha = 0.05, CI.type = "Smith")
+
+```
+
+
+## Additional utility functions in `ICC` package
+
+`Nest()`: Given a predicted ICC and *k* measures per individual/group, this function will calculate the *N* individuals/groups required to obtain a desired confidence interval
+
+`effort()`: Given a fixed researcher effort (e.g., total number of assays able to be run), this function plots the optimum *k* measurements per individual to use in order to obtain the smallest confidence interval at an expected intraclass correlation coefficient (ICC) estimate.
+
+
+## Interrater reliability
+
+How well do observers agree on an observation or categorization?
+
+- Different observers (should be randomized and blinded)
+- Same observer on different occasions (should be randomized and blinded; hours/days/weeks apart)
+
+Measured by Cohen's $\kappa$. See Fleiss [-@Fleiss1971-pa] for details.
+
+- Fleiss's method generalizes Cohen's method to more than two observers (but works fine for only two).
+
+
+## Scoring archosaur suture morphology
+
+![](https://i.imgur.com/y9SByTR.png){fig-align="center"}
+
+From Bailleul et al. [-@Bailleul2016-tk]
+
+
+## Characters
+
+```{r}
+#| echo: true
+
+tf <- tempfile()
+download.file(
+  "https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/GatorObs.xlsx",
+  destfile = tf
+)
+
+MM <- read_excel(tf)
+MM |> filter(Specimen == "MOR-OST-1645")
+```
+
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+#| echo: true
+
+Obs1 <- MM |>
+  select(-Specimen) |>
+  filter(Observer == 1) |>
+  as.matrix() |>
+  as.numeric()
+
+Obs2 <- MM |>
+  select(-Specimen) |>
+  filter(Observer == 2) |>
+  as.matrix() |>
+  as.numeric()
+```
+
+
+## Data wrangling
+
+Extract observations as numeric vectors:
+
+```{r}
+#| echo: true
+
+Obs1[1:20]
+Obs2[1:20]
+```
+
+
+## Calculating IRR with `CohenKappa()`
+
+```{r}
+#| echo: true
+#| warning: false
+
+library(DescTools)
+CohenKappa(Obs1, Obs2, conf.level = 0.95)
+```
+
+Arbitrary categorizations:
+
+- Over 0.75 = excellent
+- Between 0.75 and 0.4 = good to fair
+- Less than 0.4 = poor
+
+
+## Additional diagnostics
+
+```{r}
+#| echo: true
+
+cor.test(Obs1, Obs2, method = "spearman", exact = FALSE)
+sum(Obs1 != Obs2) / length(Obs1) # Percent disagreement
+```
+
+
+# Questions {background-color="#f8c471"}
+
+
+# Power {background-color="#40666e"}
+
+
+## Decision errors
+
+Mistake #1: Concluding predictor(s) is important when it really isn't.
+
+```{r}
+#| echo: true
+
+set.seed(10)
+nn <- 10
+group1.mean <- 6
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+gg <- c(rep('a', nn), rep('b', nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type I error = A false positive = A false discovery
+
+
+## Decision errors
+
+Mistake #2: predictor(s) is not important when it really is.
+
+```{r}
+#| echo: true
+
+set.seed(93)
+nn <- 10
+group1.mean <- 5
+group2.mean <- 6
+yy <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+gg <- c(rep('a', nn), rep('b', nn))
+summary(lm(yy ~ gg))$coefficients
+```
+
+This is a Type II error = False Negative
+
+
+## Types of errors and statistical power {.smaller}
+
+|               | Reject H~0~    | Fail to reject H~0~   |
+|--------------:|:--------------:|:---------------------:|
+|H~0~ is true   | Type I error   | *Correct*             |
+|H~0~ is false  | *Correct*      | Type II error         |
+
+Type I error occurs when:
+
+- *P* is small by *random chance*, given that $\alpha$ is chosen ahead of the test
+
+Type II error probability depends on:
+
+- The value of $\alpha$
+- How "wrong" H~0~ is
+
+
+## Power
+
+- Given a true effect, the probability that a random sample will lead to a rejection of H~0~
+    - The proportion of times you **DO NOT** make a Type II error
+- Dependent on how different the truth is from the null hypothesis
+- Inversely related to type II errors
+    - High power $\rightarrow$ low type II errors
+    - Low power $\rightarrow$ high type II errors
+
+
+## Power depends on effect size
+
+*Effect size*: The standardized magnitude of the deviation from H~0~.
+
+If we can estimate effect size *before we do the study*, we can estimate the power.
+
+- Use previous information
+    - Your own pilot studies
+    - Other similar studies
+- Determine how big a difference we *want* to be able to detect
+    - How small of a difference is not biologically meaningful?
+
+
+## Effect size
+
+> "a standardized measure that quantifies the size of the difference between two groups or the strength of an association between two variables." [@Button2013-vg]
+
+Measures of effect size:
+
+1. Pearson's *r*
+1. *R*^2^: but note caveats of *R*^2^
+1. Cohen's *d*: *t*-tests [@Cohen1960-kq]
+1. Cohen's $f^2$, $\eta^2$: ANOVA-like [@Olejnik2003-km]
+1. Odds ratio (logistic regression)
+
+
+## Example calculation of effect size (~2,500 mice)
+
+```{r}
+#| warning: false
+#| message: false
+#| echo: false
+
+tf <- tempfile()
+download.file(
+  "https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/Mouse_Weaning_Data.xlsx",
+  destfile = tf
+)
+
+M <- read_excel(tf) |>
+  mutate(Sex = ifelse(Sex == 0, "Female", "Male"), Sex = factor(Sex)) |>
+  select(Sex, WnMass) |>
+  drop_na()
+
+ggplot(M, aes(x = WnMass)) +
+  geom_histogram(bins = 30) +
+  facet_grid(Sex ~ .) +
+  labs(x = "Weaning Mass (g)", y = "Count")
+```
+
+
+## Cohen's *d*
+
+Standardized differences measured in standard deviations.
+
+General guide for *t*-tests [also see @Sullivan2012-rr]:
+
+- 0.2 = "Small"
+- 0.5 = "Medium"
+- 0.8 = "Large"
+
+What you do with "small", "medium", and "large" is up to you.
+
+
+## According to Cohen
+
+> "there is a certain risk inherent in offering conventional operational definitions for those terms for use in power analysis in as diverse a field of inquiry as behavioral science"
+
+$$ d = \frac{\bar{Y_F} - \bar{Y_M}}{s_{\mbox{pooled}}} $$
+
+
+## Cohen's *d* using the `DescTools` package
+
+```{r}
+library(DescTools)
+Females <- M |> filter(Sex == "Female") |> pull(WnMass)
+Males <- M |> filter(Sex == "Male") |> pull(WnMass)
+CohenD(Females, Males)
+```
+
+But...
+
+```{r}
+t.test(WnMass ~ Sex, data = M, var.equal = TRUE)
+```
+
+
+## $\eta^2$ for jet lag data with `EtaSq()`
+
+Also in `DescTools`:
+
+```{r}
+#| echo: true
+
+JL <- read_csv("../data/JetLag.csv", col_types = "cd") |>
+  mutate(Treatment = factor(Treatment))
+fm <- lm(Shift ~ Treatment, data = JL)
+EtaSq(fm)
+```
+
+
+## Power analysis is used for planning
+
+1. What sample size do I need for some level of power?
+1. What is my power for some sample size?
+1. How large of a difference can I detect for some power and sample size?
+
+How much power is enough power? Some say 0.8.
+
+
+## Post-analysis power calculations
+
+Hoenig and Heisey [-@Hoenig2001-hz]:
+
+> "There is a large literature advocating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statistically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
+
+- Don't be tempted to calculate power after the data is collected (and no significant effect is found)
+
+
+## Power analysis in R
+
+1. `pwr` package
+    - `pwr.t.test()`
+    - `pwr.anova.test()`
+    - `pwr.r.test()`
+1. Do it yourself. For all but the simplest experimental designs, this is the only option.
+    - Simulate data across a range of sample sizes and effect sizes.
+
+
+## Commonalities
+
+1. *n* samples (*k* groups)
+1. *d* or *f* for hypothesized effect size (*r* hypothesized correlation)
+1. $\alpha$ level
+1. Power
+
+```{r}
+#| echo: true
+
+library(pwr)
+cohen.ES(test = "anov", size = "medium")
+```
+
+
+## Power analysis for a *t*-test
+
+Possible questions:
+
+1. What sample size do I need for a given effect size, $\alpha$, and power?
+1. What will my power be, for a given effect size, $\alpha$, and sample?
+1. What effect size will I be able to detect for a given sample, power, and $\alpha$? (This is difficult, because how do you know power?)
+
+
+## What sample size?
+
+```{r}
+#| echo: true
+
+pwr.t.test(d = 0.5, sig.level = 0.05, power = 0.80, type = "two.sample")
+```
+
+
+## What is my power?
+
+```{r}
+#| echo: true
+
+pwr.t.test(d = 0.5, sig.level = 0.05, n = 15, type = "two.sample")
+```
+
+
+## What effect size can I detect?
+
+```{r}
+#| echo: true
+
+pwr.t.test(power = 0.80, sig.level = 0.05, n = 1227, type = "two.sample")
+```
+
+
 # Making decisions with data {background-color="#40666e"}
 
 [Cochrane](https://www.cochrane.org/){target="_blank"}
@@ -64,7 +590,7 @@ theme_set(theme_classic(base_size = 20))
 
 If you set a Type I error rate ($\alpha$) of 0.05 for any one test and then perform more than one such test on related data:
 
-- The overall Type I error rate for all your tests together (familywise) is *greater than* 0.05
+- The overall Type I error rate for all your tests together (family-wise) is *greater than* 0.05
     - You will be more likely than 5% to erroneously reject a _true_ null hypothesis.
     - You will claim a significant effect when one does not exist.
 
@@ -82,12 +608,14 @@ group1.mean <- 6
 group2.mean <- 6
 niter <- 10000
 
-ps <- data.frame('p1' = numeric(length = niter), 
-                 'p2' = numeric(length = niter))
+ps <- data.frame(
+  'p1' = numeric(length = niter),
+  'p2' = numeric(length = niter)
+)
 
-for(ii in 1:niter) {
-  yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-  yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+for (ii in 1:niter) {
+  yy1 <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+  yy2 <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
   gg <- c(rep(c('a', 'b'), each = nn))
 
   ps[ii, 1] <- summary(lm(yy1 ~ gg))$coefficients[2, 4]
@@ -135,7 +663,11 @@ What is the probability of a false positive for `yy1` **or** `yy2`?
 
 ```{r}
 sm.set <- ps[c(8, 12, 13), ]
-sm.set$FP <- ifelse((sm.set[, 'p1'] <= 0.05 | sm.set[, 'p2'] <= 0.05),"Yes","No")
+sm.set$FP <- ifelse(
+  (sm.set[, 'p1'] <= 0.05 | sm.set[, 'p2'] <= 0.05),
+  "Yes",
+  "No"
+)
 
 length(which(ps[, 'p1'] <= 0.05 | ps[, 'p2'] <= 0.05)) / niter
 ```
@@ -186,7 +718,7 @@ $$\lim_{k \to \infty} \mbox{FWER} = 1$$
 
 library(Rmpfr)
 alpha <- 0.05
-1 - ((1 - alpha) ^ 20)
+1 - ((1 - alpha)^20)
 ```
 
 . . .
@@ -194,7 +726,7 @@ alpha <- 0.05
 100 tests:
 
 ```{r}
-1 - ((1 - alpha) ^ 100)
+1 - ((1 - alpha)^100)
 ```
 
 . . .
@@ -202,44 +734,48 @@ alpha <- 0.05
 1000 tests:
 
 ```{r}
-options(scipen=0)
-mpfr(1 - mpfr(((1 - alpha) ^ 1000), 128),128)
+options(scipen = 0)
+mpfr(1 - mpfr(((1 - alpha)^1000), 128), 128)
 
 ```
 
 
-## Probability of a Type I Error  
+## Probability of a Type I Error
 
 ```{r FWER_figure}
 #| echo: false
 #| fig-align: center
 
-calcFWER <- function(k, alpha){
-  return(round(1 - (1 - alpha) ^ k, 3))
+calcFWER <- function(k, alpha) {
+  return(round(1 - (1 - alpha)^k, 3))
 }
 
 k <- seq(1, 200, by = 1)
 alpha <- c(0.05, 0.01, 0.001)
 FWERs <- crossing(k, alpha)
-FWERs <- FWERs |> 
-  mutate(FWER = pmap_dbl(.l = FWERs, .f = calcFWER),
-         alpha = factor(alpha))
+FWERs <- FWERs |>
+  mutate(FWER = pmap_dbl(.l = FWERs, .f = calcFWER), alpha = factor(alpha))
 
 ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
-  geom_hline(yintercept = 1, color = "firebrick4",
-             linetype = "dotted",
-             linewidth = 2) +
+  geom_hline(
+    yintercept = 1,
+    color = "firebrick4",
+    linetype = "dotted",
+    linewidth = 2
+  ) +
   geom_path(lwd = 1.5) +
   ylab("Familywise Error Rate") +
   xlab("k Tests") +
-  scale_color_manual(values = wes_palette("Moonrise3"),
-                     name = "Alpha",
-                     breaks = c("0.05", "0.01", "0.001")) +
-  scale_x_continuous(limits = c(1, 200),
-                                expand = c(0, 0.05)) +
-  scale_y_continuous(limits = c(0, 1.05),
-                     expand = expansion(mult = c(0, 0.05),
-                                        add = c(0, 0)))
+  scale_color_manual(
+    values = wes_palette("Moonrise3"),
+    name = "Alpha",
+    breaks = c("0.05", "0.01", "0.001")
+  ) +
+  scale_x_continuous(limits = c(1, 200), expand = c(0, 0.05)) +
+  scale_y_continuous(
+    limits = c(0, 1.05),
+    expand = expansion(mult = c(0, 0.05), add = c(0, 0))
+  )
 ```
 
 
@@ -252,13 +788,13 @@ ggplot(FWERs, aes(x = k, y = FWER, color = alpha)) +
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-    - Not an option 
+    - Not an option
 2. Methods to control the Family-Wise Error Rate (FWER):
     - MCs within a single linear model (e.g., Tukey HSD)
     - <s>Bonferroni correction</s>
       - Not recommended - overly conservative
     - Sequential Bonferroni procedure
-    - Randomization procedures to empirically control FWER 
+    - Randomization procedures to empirically control FWER
 6. Methods to control the False Discovery Rate (FDR)
     - False Discovery Rate Methods
     - _Positive_ False Discovery Rate Methods
@@ -314,7 +850,7 @@ e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
 Note: $FPR = \frac{\mbox{n False Positives}}{\mbox{n All Tests}}$
 
 
-## Distribution of *P*-values 
+## Distribution of *P*-values
 
 *P*-values resulting from chance alone have a uniform distribution
 
@@ -328,12 +864,14 @@ nn <- 10
 group1.mean <- 6
 group2.mean <- 6
 niter <- 10000
-ps <- data.frame('p1' = numeric(length = niter),
-                 'p2' = numeric(length = niter))
+ps <- data.frame(
+  'p1' = numeric(length = niter),
+  'p2' = numeric(length = niter)
+)
 
-for(ii in 1:niter) {
-  yy1 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
-  yy2 <- c(rnorm(nn, group1.mean, 1),rnorm(nn, group2.mean, 1))
+for (ii in 1:niter) {
+  yy1 <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
+  yy2 <- c(rnorm(nn, group1.mean, 1), rnorm(nn, group2.mean, 1))
   gg <- c(rep('a', nn), rep('b', nn))
   ps[ii, 1] <- summary(lm(yy1 ~ gg))$coefficients[2, 4]
   ps[ii, 2] <- summary(lm(yy2 ~ gg))$coefficients[2, 4]
@@ -345,7 +883,7 @@ ggplot(ps, aes(x = p1)) +
 ```
 
 
-## Distribution of *P*-values 
+## Distribution of *P*-values
 
 *P*-values resulting from chance alone have a uniform distribution
 
@@ -355,10 +893,12 @@ ggplot(ps, aes(x = p1)) +
 #| echo: false
 
 Ps <- ps |> arrange(-log10(p1))
-Pp <- data.frame("P"= -log10(Ps$p1),
-                 "X" = sort(-log10(runif(nrow(ps), 0, 1)))) 
+Pp <- data.frame(
+  "P" = -log10(Ps$p1),
+  "X" = sort(-log10(runif(nrow(ps), 0, 1)))
+)
 
-ggplot(Pp, aes(x = X, y = P)) + 
+ggplot(Pp, aes(x = X, y = P)) +
   geom_point(size = 2, color = "firebrick4") +
   geom_abline(intercept = 0, slope = 1) +
   xlim(c(0, 5)) +
@@ -369,13 +909,16 @@ ggplot(Pp, aes(x = X, y = P)) +
 ```
 
 
-## Example *P*-values to work with 
+## Example *P*-values to work with
 
 Turning kinematics in hummingbirds
 
 ```{r}
 tf <- tempfile()
-download.file("https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/P_values.xlsx", destfile = tf)
+download.file(
+  "https://github.com/QM-Life-Sci/QMLS_1/raw/refs/heads/main/data/P_values.xlsx",
+  destfile = tf
+)
 
 Ps <- read_excel(tf)
 glimpse(Ps)
@@ -391,7 +934,7 @@ range(Ps$P)
 #| echo: false
 #| fig-align: center
 
-ggplot(Ps, aes(P)) + 
+ggplot(Ps, aes(P)) +
   geom_histogram(bins = 20, fill = "firebrick4") +
   labs(x = "P-value", y = "Count")
 ```
@@ -407,8 +950,7 @@ We have disproportionately more nominally significant tests. Otherwise relativel
 #| fig-align: center
 
 Ps <- Ps |> arrange(-log10(P))
-Pp <- data.frame(P = -log10(Ps$P),
-                 X = sort(-log10(runif(nrow(Ps), 0, 1))))
+Pp <- data.frame(P = -log10(Ps$P), X = sort(-log10(runif(nrow(Ps), 0, 1))))
 
 ggplot(Pp, aes(x = X, y = P)) +
   geom_point(size = 2, color = "firebrick4") +
@@ -468,7 +1010,7 @@ If the inequality is *ever* false:
 `p.adjust()` can do some multiple comparisons procedures, given a vector of *P*.
 
 ```{r}
-Ps$Seq_Bonf <- p.adjust(Ps$P, "holm") < 0.05   # Sequential Bonferroni
+Ps$Seq_Bonf <- p.adjust(Ps$P, "holm") < 0.05 # Sequential Bonferroni
 sum(Ps$Seq_Bonf)
 ```
 
@@ -556,8 +1098,9 @@ pFDR is implemented in `qvalue`. Installation is a little different, because it 
 ```{r}
 #| eval: false
 
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+if (!require("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
 
 BiocManager::install("qvalue")
 ```
@@ -570,10 +1113,8 @@ BiocManager::install("qvalue")
 #| echo: false
 
 ggplot(Ps, aes(P)) +
-  geom_histogram(aes(y = after_stat(density)),
-                 fill = "gray", bins = 20) +
-  geom_hline(yintercept = 1, color = "navy",
-             linewidth = 1.5) +
+  geom_histogram(aes(y = after_stat(density)), fill = "gray", bins = 20) +
+  geom_hline(yintercept = 1, color = "navy", linewidth = 1.5) +
   labs(x = "P-value", y = "Density")
 ```
 
@@ -700,13 +1241,13 @@ Ps |> slice(32:47)
 ## A menu of MCPs
 
 1. <s>Do nothing</s>
-    - Not an option 
+    - Not an option
 2. Methods to control the Family-Wise Error Rate (FWER):
     - MCs within a single linear model (e.g., Tukey HSD)
     - <s>Bonferroni correction</s>
       - Not recommended - overly conservative
     - Sequential Bonferroni procedure
-    - Randomization procedures to empirically control FWER 
+    - Randomization procedures to empirically control FWER
 6. Methods to control the False Discovery Rate (FDR)
     - False Discovery Rate Methods
     - _Positive_ False Discovery Rate Methods
@@ -745,10 +1286,13 @@ Multiple regression makes a composite variable
 #| echo: false
 
 tf <- tempfile()
-download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx", destfile = tf)
+download.file(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Milk.xlsx",
+  destfile = tf
+)
 
-Milk <- read_excel(tf, na = "NA") |> 
-  dplyr::select(Species, Milk_Energy, Fat, Lactose) |> 
+Milk <- read_excel(tf, na = "NA") |>
+  dplyr::select(Species, Milk_Energy, Fat, Lactose) |>
   drop_na()
 
 ggscatmat(Milk[, 2:4])
@@ -761,16 +1305,22 @@ ggscatmat(Milk[, 2:4])
 #| echo: false
 
 fig <- plot_ly() |>
-  add_markers(data = Milk,
-              x = ~ Fat,
-              y = ~ Lactose,
-              z = ~ Milk_Energy,
-              size = 3,
-              showlegend = FALSE) |>
+  add_markers(
+    data = Milk,
+    x = ~Fat,
+    y = ~Lactose,
+    z = ~Milk_Energy,
+    size = 3,
+    showlegend = FALSE
+  ) |>
   hide_colorbar() |>
-  layout(scene = list(xaxis = list(title = 'Fat'),
-                      yaxis = list(title = 'Lactose'),
-                      zaxis = list(title = 'Milk Energy')))
+  layout(
+    scene = list(
+      xaxis = list(title = 'Fat'),
+      yaxis = list(title = 'Lactose'),
+      zaxis = list(title = 'Milk Energy')
+    )
+  )
 
 fig
 ```
@@ -782,14 +1332,14 @@ fig
 
 1. Create a set of composite variables that encompasses the shared variation among variables
 1. Reduce the dimensionality of a set of variables: from considering all variables separately to considering fewer composite variables, while
-1. Accounting for as much of the original variation as possible in the data set 
+1. Accounting for as much of the original variation as possible in the data set
 
 No predictor or outcome variable: a *one sided equation*.
 
 
 ## Principal components
 
-- Sequential linear combinations of the original variables 
+- Sequential linear combinations of the original variables
 - The resulting composite variables *are uncorrelated with one another*
 - The first few usually account for *most* of the variation in the original data
 
@@ -802,18 +1352,18 @@ For *n* variables, you get *n* PCs
 - Each in turn maximizes remaining variance *while remaining uncorrelated*
 
 
-## Milk investment 
+## Milk investment
 
 ```{r}
 #| echo: false
 
-ggplot(Milk, aes(Fat, Lactose)) + 
+ggplot(Milk, aes(Fat, Lactose)) +
   geom_point(size = 3) +
   coord_fixed()
 ```
 
 
-## Milk investment 
+## Milk investment
 
 Find the indices of the minimum and maximum of `Fat`
 
@@ -830,7 +1380,7 @@ maxpt <- data.frame(x1 = Milk$Fat[themax], x2 = Milk$Lactose[themax])
 ```
 
 
-## Milk investment 
+## Milk investment
 
 Orange = Low Fat, High Lactose
 
@@ -840,9 +1390,10 @@ Blue = High Fat, Low Lactose
 #| echo: false
 #| fig-align: center
 
-ma <- line.cis(Milk$Lactose, Milk$Fat,  method = "MA")
+ma <- line.cis(Milk$Lactose, Milk$Fat, method = "MA")
 
-p <- ggplot(Milk, aes(Fat, Lactose)) + geom_point() +
+p <- ggplot(Milk, aes(Fat, Lactose)) +
+  geom_point() +
   geom_point(data = minpt, aes(x1, x2), col = "orange", size = 4) +
   geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 4) +
   coord_fixed()
@@ -861,9 +1412,12 @@ Blue = High Fat, Low Lactose
 #| fig-align: center
 
 MA_plot <- p +
-  geom_abline(slope = ma[2, 1], intercept = ma[1, 1],
-              color = "red",
-              linewidth = 1.5)
+  geom_abline(
+    slope = ma[2, 1],
+    intercept = ma[1, 1],
+    color = "red",
+    linewidth = 1.5
+  )
 print(MA_plot)
 ```
 
@@ -879,10 +1433,12 @@ Blue = High Fat, Low Lactose
 #| fig-align: center
 
 raw_plot <- MA_plot +
-  geom_abline(slope = -1/ma[2, 1],
-              intercept = mean(Milk$Lactose) - -1/ma[2, 1] * mean(Milk$Fat),
-              color = "red",
-              size = 1.5)
+  geom_abline(
+    slope = -1 / ma[2, 1],
+    intercept = mean(Milk$Lactose) - -1 / ma[2, 1] * mean(Milk$Fat),
+    color = "red",
+    size = 1.5
+  )
 print(raw_plot)
 ```
 
@@ -893,10 +1449,8 @@ print(raw_plot)
 #| fig-align: center
 #| echo: false
 
-z <- prcomp(~ Fat + Lactose, data = Milk,
-            center = TRUE, scale. = TRUE)
-PC <- data.frame(pc1 = z$x[, 1],
-                 pc2 = -1 * z$x[, 2])
+z <- prcomp(~ Fat + Lactose, data = Milk, center = TRUE, scale. = TRUE)
+PC <- data.frame(pc1 = z$x[, 1], pc2 = -1 * z$x[, 2])
 
 minpt <- data.frame(x1 = PC$pc1[themin], x2 = PC$pc2[themin])
 maxpt <- data.frame(x1 = PC$pc1[themax], x2 = PC$pc2[themax])
@@ -928,9 +1482,7 @@ plot_grid(raw_plot, pc_plot, ncol = 2)
 `prcomp()` is the preferred function for PCA (*not* `princomp()`):
 
 ```{r}
-z <- prcomp(~ Fat + Lactose, data = Milk,
-            center = TRUE,
-            scale. = TRUE)
+z <- prcomp(~ Fat + Lactose, data = Milk, center = TRUE, scale. = TRUE)
 ```
 
 - One sided formula: `~ Fat + Lactose`
@@ -975,8 +1527,7 @@ print(z)
 ## Extracting PC scores
 
 ```{r}
-PC <- data.frame(pc1 = z$x[, 1],
-                 pc2 = z$x[, 2])
+PC <- data.frame(pc1 = z$x[, 1], pc2 = z$x[, 2])
 PC
 ```
 
@@ -991,9 +1542,8 @@ Blue = High Fat, Low Lactose
 #| echo: false
 #| fig-align: center
 
-PC <- data.frame(pc1 = z$x[, 1],
-                 pc2 = z$x[, 2])
-PC[1,]
+PC <- data.frame(pc1 = z$x[, 1], pc2 = z$x[, 2])
+PC[1, ]
 
 pc_plot <- ggplot(PC, aes(pc1, pc2)) +
   geom_vline(xintercept = 0, color = "red", size = 1.5) +
@@ -1001,14 +1551,30 @@ pc_plot <- ggplot(PC, aes(pc1, pc2)) +
   geom_point() +
   geom_point(data = minpt, aes(x1, x2), col = "orange", size = 4) +
   geom_point(data = maxpt, aes(x1, x2), col = "blue", size = 4) +
-  geom_point(data = data.frame(x = -1.785, y = -0.0636),
-             aes(x, y), col = "purple", size = 4) +
-  geom_segment(x = -1.785, xend = -1.785,
-               y = -1, yend = -0.0636, col = 'purple', lty = 3,
-               linewidth = 1.2) +
-  geom_segment(x = -3, xend = -1.785,
-               y = -0.0636, yend = -0.0636, col = 'purple', lty = 3,
-               linewidth = 1.2) +
+  geom_point(
+    data = data.frame(x = -1.785, y = -0.0636),
+    aes(x, y),
+    col = "purple",
+    size = 4
+  ) +
+  geom_segment(
+    x = -1.785,
+    xend = -1.785,
+    y = -1,
+    yend = -0.0636,
+    col = 'purple',
+    lty = 3,
+    linewidth = 1.2
+  ) +
+  geom_segment(
+    x = -3,
+    xend = -1.785,
+    y = -0.0636,
+    yend = -0.0636,
+    col = 'purple',
+    lty = 3,
+    linewidth = 1.2
+  ) +
   coord_fixed() +
   labs(x = "PC1", y = "PC2")
 print(pc_plot)
@@ -1020,7 +1586,7 @@ print(pc_plot)
 Do fat and lactose *together* predict milk energy?
 
 ```{r}
-Milk <- Milk |> 
+Milk <- Milk |>
   mutate(PC1 = z$x[, 1])
 
 summary(lm(Milk_Energy ~ PC1, data = Milk))
@@ -1041,19 +1607,26 @@ summary(fm_Multi)
 
 ```{r}
 tf <- tempfile()
-download.file("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/mammals.xlsx", destfile = tf)
+download.file(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/mammals.xlsx",
+  destfile = tf
+)
 
 M <- read_excel(tf, na = "NA") |>
-  dplyr::select(litter_size,
-                adult_body_mass_g,
-                neonate_body_mass_g,
-                max_longevity_m,
-                sexual_maturity_age_d) |> 
-  rename(Litter_Size = litter_size,
-         Adult_Mass = adult_body_mass_g,
-         Neonate_Mass = neonate_body_mass_g,
-         Longevity = max_longevity_m,
-         Maturity_Age = sexual_maturity_age_d) |> 
+  dplyr::select(
+    litter_size,
+    adult_body_mass_g,
+    neonate_body_mass_g,
+    max_longevity_m,
+    sexual_maturity_age_d
+  ) |>
+  rename(
+    Litter_Size = litter_size,
+    Adult_Mass = adult_body_mass_g,
+    Neonate_Mass = neonate_body_mass_g,
+    Longevity = max_longevity_m,
+    Maturity_Age = sexual_maturity_age_d
+  ) |>
   drop_na()
 ```
 
@@ -1065,10 +1638,7 @@ M <- read_excel(tf, na = "NA") |>
 ```{r}
 #| echo: true
 
-z <- prcomp(~ .,
-            data = M,
-            center = TRUE,
-            scale. = TRUE)
+z <- prcomp(~., data = M, center = TRUE, scale. = TRUE)
 ```
 
 Centering and scaling are critical
@@ -1151,4 +1721,3 @@ PC1:
 
 ::: {#refs}
 :::
-

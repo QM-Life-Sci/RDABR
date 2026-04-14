@@ -1,0 +1,661 @@
+---
+title: "Unit 11: Model Comparison"
+html-math-method:
+  method: mathjax
+  url: "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+format:
+  clean-revealjs:
+    self-contained: true
+    chalkboard: false
+    standalone: true
+    slide-number: true
+    show-slide-number: all
+code-annotations: hover
+bibliography: QMLS_Bibliography.bib
+csl: evolution.csl
+knitr:
+  opts_chunk:
+    echo: true
+---
+
+```{r}
+#| label: setup
+#| echo: false
+
+library(tidyverse)
+library(readxl)
+library(wesanderson)
+library(ggrepel)
+
+options(scipen = 999)
+
+theme_set(theme_classic(base_size = 20))
+```
+
+
+# Housekeeping {background-color="#40666e"}
+
+- Micropublication *plan* due Thursday
+    - Figure
+    - Table
+    - Planned analysis
+- Reminder
+    - Presentation day food
+
+
+# Outline {background-color="#40666e"}
+
+- Model Comparison
+    - Information criteria
+    - Cross-validation
+- Experimental design
+    - "Repeatability"
+    - Power
+    - Planning experiments
+
+# Model Comparison {background-color="#40666e"}
+
+
+## No model represents the true biological process
+
+- This is actually good. We want abstraction.
+
+Which model comes *closest* to the true biological process from a *(small) set of working hypotheses*?
+
+- What is "close"?
+- How should we designate "preferred"?
+- How good is good enough?
+- How should we compare among them?
+
+
+## Tradeoff in model specification
+
+**Underfitting** ("bias"):
+
+- Model doesn't describe the observed sample *well enough*.
+- Leads to poor prediction
+
+**Overfitting** ("variance")
+
+- Model describes the observed sample *too well*.
+- Leads to poor prediction
+
+
+## Balancing overfitting and underfitting
+
+- Think of models as "learning" about the observed data
+- Find a balance between *regular* features (what we want to model) and *irregular* features (noise we want to ignore).
+
+
+## Brain volume and (estimated) body mass in hominins (*Homo*)
+
+```{r}
+#| echo: false
+Species <- c(
+  "afarensis",
+  "africanus",
+  "habilis",
+  "boisei",
+  "rudolfensis",
+  "ergaster",
+  "sapiens"
+)
+Brain_Vol <- c(438, 452, 612, 521, 752, 871, 1350)
+Mass <- c(37, 35.5, 34.5, 41.5, 55.5, 61, 53.3)
+M <- data.frame(Species, Brain_Vol, Mass)
+M |>
+  knitr::kable(
+    col.names = c("Species", "Brain Volume (cc)", "Mass (kg)"),
+    format = "html"
+  )
+```
+
+
+## Brain volume and body mass in hominins
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol, label = Species)) +
+  geom_point(size = 4) +
+  geom_text_repel(
+    size = 4,
+    force = 15,
+    fontface = "italic",
+    box.padding = unit(0.5, "lines"),
+    point.padding = unit(0.5, "lines"),
+    seed = 29
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 6 polynomial models {.smaller}
+
+1. $BV \sim \theta_0 + \theta_1 M$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3 + \theta_4 M^4$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3 + \theta_4 M^4 + \theta_5 M^5$
+1. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2 + \theta_3 M^3 + \theta_4 M^4 + \theta_5 M^5 + \theta_6 M^6$
+
+Compare *R*^2^ among these models.
+
+
+## 1: $BV \sim \theta_0 + \theta_1 M$
+
+```{r}
+fm1 <- lm(Brain_Vol ~ Mass, data = M)
+coef(fm1)
+summary(fm1)$r.squared
+```
+
+
+## 1: $BV \sim \theta_0 + \theta_1 M$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(
+    formula = y ~ x,
+    method = "lm",
+    color = "firebrick4",
+    lwd = 1.5
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 2. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2$
+
+```{r}
+fm2 <- lm(Brain_Vol ~ Mass + I(Mass^2), data = M)
+coef(fm2)
+summary(fm2)$r.squared
+```
+
+
+## 2. $BV \sim \theta_0 + \theta_1 M + \theta_2 M^2$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(
+    method = "lm",
+    formula = 'y ~ poly(x, 2)',
+    color = "firebrick4",
+    lwd = 1.5
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 3. $BV \sim \theta_0 + ... + \theta_3 M^3$
+
+```{r}
+fm3 <- lm(Brain_Vol ~ Mass + I(Mass^2) + I(Mass^3), data = M)
+coef(fm3)
+summary(fm3)$r.squared
+```
+
+
+## 3. $BV \sim \theta_0 + ... + \theta_3 M^3$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(
+    method = "lm",
+    formula = 'y ~ poly(x, 3)',
+    color = "firebrick4",
+    lwd = 1.5
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 4. $BV \sim \theta_0 + ... + \theta_4 M^4$
+
+```{r}
+fm4 <- lm(Brain_Vol ~ Mass + I(Mass^2) + I(Mass^3) + I(Mass^4), data = M)
+coef(fm4)
+summary(fm4)$r.squared
+```
+
+
+## 4. $BV \sim \theta_0 + ... + \theta_4 M^4$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(
+    method = "lm",
+    formula = 'y ~ poly(x, 4)',
+    color = "firebrick4",
+    lwd = 1.5
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 5. $BV \sim \theta_0 + ... + \theta_5 M^5$
+
+```{r}
+fm5 <- lm(
+  Brain_Vol ~ Mass + I(Mass^2) + I(Mass^3) + I(Mass^4) + I(Mass^5),
+  data = M
+)
+coef(fm5)
+summary(fm5)$r.squared
+```
+
+
+## 5. $BV \sim \theta_0 + ... + \theta_5 M^5$
+
+```{r}
+#| echo: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(
+    method = "lm",
+    formula = 'y ~ poly(x, 5)',
+    color = "firebrick4",
+    lwd = 1.5
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## 6. $BV \sim \theta_0 + ... + \theta_6 M^6$
+
+```{r}
+fm6 <- lm(
+  Brain_Vol ~ Mass +
+    I(Mass^2) +
+    I(Mass^3) +
+    I(Mass^4) +
+    I(Mass^5) +
+    I(Mass^6),
+  data = M
+)
+coef(fm6)
+summary(fm6)$r.squared
+```
+
+
+## 6. $BV \sim \theta_0 + ... + \theta_6 M^6$
+
+```{r}
+#| echo: false
+#| warning: false
+
+ggplot(M, aes(Mass, Brain_Vol)) +
+  geom_point(size = 4) +
+  geom_smooth(
+    method = "lm",
+    formula = 'y ~ poly(x, 6)',
+    color = "firebrick4",
+    lwd = 1.5,
+    se = FALSE
+  ) +
+  labs(x = "Body Mass (kg)", y = "Brain Volume (cc)")
+```
+
+
+## Summary R^2^
+
+Polynomial Degree  | R^2^  |
+------------------:|------:|
+1                  | `r round(summary(fm1)$r.squared, 2)`
+2                  | `r round(summary(fm2)$r.squared, 2)`
+3                  | `r round(summary(fm3)$r.squared, 2)`
+4                  | `r round(summary(fm4)$r.squared, 2)`
+5                  | `r round(summary(fm5)$r.squared, 2)`
+6                  | `r round(summary(fm6)$r.squared, 2)`
+
+
+## Which model(s) balance under- vs. overfitting?
+
+Model 0: Mean only
+
+- Poor *in-sample* prediction
+- Poor *out-of-sample* prediction
+
+. . .
+
+Model 1: Maybe enough information?
+
+. . .
+
+Model 6: Clearly overfit
+
+- Perfect *in-sample* prediction
+- Poor *out-of-sample* prediction
+
+
+## Methods for model comparison
+
+1. Likelihood ratio tests (not covered here)
+2. Information criteria
+3. Cross validation
+
+
+# Information Criteria {background-color="#40666e"}
+
+
+## Tradeoff in model specification
+
+> "Overfitting: **fitting is easy; prediction is hard**. Future data will not be exactly like past data, and so any model that is unaware of this fact tends to make worse predictions than it could. So if we wish to make good predictions, we cannot judge our models simply on how well they fit our data. **Information criteria** provide estimates of predictive accuracy, rather than merely fit. So they compare models where it matters." [@McElreath2015-no]
+
+
+## Kullback-Leibler information
+
+**No model represents the true process that generated the outcomes.**
+
+**Information** is the distance between a proposed model and reality
+
+  - Information lost when trying to approximate the true model
+  - Amount of "surprise" when a model predicts new data
+
+K-L information doesn't aid directly in model evaluation (what is the true model?)
+
+
+## Estimation of K-L information
+
+Hirotugu Akaike ("Ah-ka-ee-kay") [-@Akaike1974-iw]
+
+- Maximized log-likelihood could be used to estimate the *expected* K-L divergence between the candidate model and the true model.
+
+![](https://i.imgur.com/WLVjbKW.jpg){fig-align="center"}
+
+
+## Akaike's Information Criterion
+
+"An Information Criterion": AIC is proportional to the *relative* K-L information of a model:
+
+$$\mbox{AIC} = -2 LL + 2 k$$
+
+- $LL$ is model log-likelihood
+- $-2$ comes in "for historical reasons" having to do with the $\chi^2$ distribution.
+
+
+## Calculating AIC
+
+log-likelihood for the intercept only (overall mean) model for the naked mole rats data:
+
+```{r}
+#| echo: true
+
+logLik(fm1)
+-2 * as.numeric(logLik(fm1)) + 2 * 2
+AIC(fm1)
+```
+
+
+## AIC
+
+- AIC is a measure of the *lack* of model fit
+    - Smaller AIC is better
+- No notion of "significance".
+    - Comparison is the key
+
+
+## AIC
+
+- Negative twice the log-likelihood + 2 X *number of estimated parameters*
+    - Penalization of models with large number of estimated parameters, because they will always fit the observed data better
+    - Parsimony as a side-effect
+- AIC was defined for large sample sizes
+
+
+## AICc
+
+- AICc adapts AIC for small samples
+    - AICc is asymptotic with AIC for large samples but less biased for small *n*
+
+$$AICc = -2 LL + 2 k + \frac{2k(k+1)}{n - k - 1}$$
+
+- $LL$ is log-likelihood
+- Added "parameter" $\rightarrow$ 0 as $n \rightarrow \infty$
+- Use AICc except when n/k > ~40 [@Burnham2002-xt]
+
+
+## Comparing models with AIC (AICc)
+
+1. Fit a set of candidate models (hypotheses)
+1. Rank models according to AIC
+1. Find the model with the lowest AIC
+1. $\Delta$AIC is the value of AIC~lowest~ - AIC~model~
+
+
+## Comparing models with AIC (AICc)
+
+Rules of thumb:
+
+- $\Delta$AIC $\leq$ 2: Substantial support
+- $\leq$ 4 $\Delta$AIC $\leq$ 7: Considerably less support
+- $\Delta$AIC $\geq$ 10: very little support
+
+In practice:
+
+- $\Delta$AIC < 4: Equally well supported
+
+**This does not mean that the model you have ranked highest is a good model for the data in any absolute sense.**
+
+
+## Akaike weights: evidence ratios
+
+Back-transforming the logged likelihoods allows us to standardize AICs:
+
+$$w_i = \frac{e^{-\Delta_i / 2}}{\sum_{r=1}^R e^{-\Delta_r / 2}}$$
+
+$w$ is a rescaled AIC on a scale of 0 $\rightarrow$ 1, giving the probability of a model actually being the best K-L model among *R* models.
+
+- Still conditional on the data and the models
+    - Maybe a better model is not in the sample of models
+
+
+## Energy expenditure in naked mole rats
+
+```{r}
+#| echo: false
+
+NMR <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Molerats.csv",
+  col_types = c("cdd")
+) |>
+  rename(Caste = caste, Mass = ln.mass, Energy = ln.energy) |>
+  mutate(
+    Caste = if_else(Caste == "worker", "Worker", "Non-worker"),
+    Caste = factor(Caste)
+  )
+
+ggplot(NMR, aes(x = Mass, y = Energy, color = Caste)) +
+  geom_point(size = 4) +
+  scale_color_manual(values = wes_palette("Cavalcanti1")) +
+  theme(legend.position = "inside", legend.position.inside = c(0.15, 0.85)) +
+  labs(x = "ln Body Mass (g)", y = "ln Daily Energy Expenditure (kJ)")
+```
+
+
+## Fit different models to these data
+
+1. Grand mean (overall mean, no body mass)
+1. Categorical only (group mean, no body mass)
+1. Continuous only (body mass only, no grouping)
+1. Mixed predictors, intercepts varying
+1. Interaction model, slopes varying & intercepts varying
+
+
+## Models
+
+```{r}
+fm1 <- lm(Energy ~ 1, data = NMR)
+fm2 <- lm(Energy ~ Caste, data = NMR)
+fm3 <- lm(Energy ~ Mass, data = NMR)
+fm4 <- lm(Energy ~ Mass + Caste, data = NMR)
+fm5 <- lm(Energy ~ Mass * Caste, data = NMR)
+```
+
+
+## Working with AIC
+
+AIC is built-in to R:
+
+```{r}
+#| echo: true
+
+AIC(fm1)
+```
+
+AICc is not:
+
+```{r}
+#| echo: true
+
+library(AICcmodavg)
+AICc(fm1)
+```
+
+Get in the habit of using AICc.
+
+
+## AIC Tables
+
+`AICcmodavg::aictab()` for model comparison:
+
+```{r}
+#| echo: true
+
+aictab(
+  cand.set = list(
+    "~ 1" = fm1,
+    "~ Caste" = fm2,
+    "~ Mass" = fm3,
+    "~ Mass + Caste" = fm4,
+    "~ Mass * Caste" = fm5
+  )
+)
+```
+
+`Mass + Caste` and `Mass * Caste` are not that different
+
+:::{.center}
+:::{.alert}
+What should we do?
+:::
+:::
+
+
+## General approach
+
+1. Define hypotheses (models)
+1. Calculate AICc for each.
+1. Sort by AICc. Calculate $\Delta$AICc.
+1. Models with $\Delta$AICc within ~4 are all roughly equivalent
+1. Decide what to do.
+    - Describe multiple models
+    - Compare Akaike weights
+
+AIC answers the question: what model is most likely to have best out-of-sample prediction
+
+
+# Cross-Validation {background-color="#40666e"}
+
+## Logic of cross-validation
+
+For each candidate model:
+
+- Use part of the data to fit a model (split into groups: *folds*)
+- Use the model to predict the values of the rest of the data
+- Calculate some estimate of error for each split
+- Average the error
+
+Compare the models
+
+
+## Prediction for a model
+
+Drop 1 observation:
+
+```{r}
+fm1_cv <- lm(Energy ~ 1, data = NMR |> slice(-1))
+```
+
+Predict that observation using the model:
+
+```{r}
+(pred <- predict(fm1_cv, newdata = NMR |> slice(1)))
+```
+
+Calculate squared error:
+
+```{r}
+(NMR$Energy[1] - pred)^2
+```
+
+
+## Types of Cross-validation
+
+Leave-one-out (LOO)
+
+- Sequentially drop each observation
+- Calculate prediction error for each
+- Square-root of the mean squared error (RMSE)
+- Can be slow (approximations available)
+
+$k$-fold
+
+- Split the data into $k$ equal groups
+- Calculate the square-root of the *mean* error for each fold
+    - Mean of means across folds
+- 5-fold or 10-fold are common
+- Better for large datasets and/or slow analyses
+
+
+## Cross-validation with `cvFit()`
+
+```{r}
+library(cvTools)
+
+cvFit(fm1, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+```
+
+. . .
+
+```{r}
+cvFit(fm2, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+```
+
+. . .
+
+```{r}
+cvFit(fm3, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+cvFit(fm4, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+cvFit(fm5, data = NMR, y = NMR$Energy, K = nrow(NMR), seed = 113)
+```
+
+
+## More Resources
+
+[James, G., D. Witten, T. Hastie, and R. Tibshirani. 2013. *An Introduction to Statistical Learning*](https://www.statlearning.com/)
+
+![](https://images.squarespace-cdn.com/content/v1/5ff2adbe3fe4fe33db902812/1611294680091-25SIDM9AHA8ECIFFST23/Screen+Shot+2021-01-21+at+11.02.06+AM.png){width=35% fig-align="center"}
+
+
+# Questions {background-color="#f8c471"}
+
+
+## References
+
+::: {#refs}
+:::
