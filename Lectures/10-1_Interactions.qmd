@@ -46,10 +46,11 @@ theme_set(theme_classic(base_size = 20))
 
 - PC 2
     - Working on grading
-    - Key posted to canvas soon
-- Micropublication *plan* due
-    - Figure
-    - Table
+    - Key posted to Canvas soon
+- Micropublication *plan* due next Tuesday
+    - Ideas
+    - Figure(s)
+    - Table(s)
     - Planned analysis
 
 
@@ -127,7 +128,8 @@ Example formula:
 
 ## Interactions are new predictor variables
 
-- 0/1 representations of factors * continuous variables
+- 0/1 representations of factors $\times$ continuous variables
+- Just multiplication, nothing more complicated
 
 ```{r}
 #| echo: false
@@ -247,7 +249,7 @@ int_plot2 <- ggplot(
   ) +
   stat_summary(fun = mean, geom = "point", size = 6) +
   stat_summary(fun = mean, geom = "line", linewidth = 1.5) +
-  scale_color_paletteer_d("ggsci::default_jco") +
+  scale_color_paletteer_d("ggsci::default_aaas") +
   theme(legend.position = "bottom")
 int_plot2
 ```
