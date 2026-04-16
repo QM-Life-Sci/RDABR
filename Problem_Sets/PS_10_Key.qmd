@@ -27,84 +27,189 @@ theme_set(theme_classic())
 ```
 
 
-## Predicting height from limb lengths
+## Effects of calcium and vitamin D on bone mineral density
 
-We should be able to predict someone's height from the lengths of their limbs. Based on measurements from a very large number of people, we know that limb length is about 40-50% of total height. So we should be able to develop a linear model for prediction.
+```{r}
+#| echo: false
 
-The file `Limb_Lengths.csv` contains data for 100 heights and associated left and right limb lengths.
+# Simulate data
+# FIXME
 
+library(tidyverse)
+library(glue)
+
+set.seed(2389472)
+n <- 500
+
+d <- tibble(
+  age = round(runif(n, 25, 75)),
+  calcium = pmax(round(rnorm(n, 900, 400)), 100),
+  vitamin_d = pmax(round(rnorm(n, 60, 25), 1), 10)
+) |>
+  mutate(
+    bmd_raw = 0.8 +
+      0.00005 * calcium +
+      0.0008 * vitamin_d +
+      0.00001 * calcium * vitamin_d -
+      0.006 * age +
+      rnorm(n, 0, 0.1),
+    bmd = as.numeric(scale(bmd_raw))
+  )
+
+write_csv(d, file = "../data/Human_BMD.csv")
+```
+
+Bone mineral density (BMD) is a measure of the amount of mineral (primarily a type of calcium phosphate) in a small of bone. BMD measured at the hip is a primary indicator of osteoporosis and risk of fracture in a fall.
+
+BMD follows a predictable pattern: it increases through adolescence, reaches a peak in the late twenties, remains relatively stable through middle adulthood, then declines gradually, accelerating following menopause as estrogen levels drop in those who menstruate.
+
+Two dietary factors strongly influence this BMD trajectory: calcium provides the mineral for making bone, and vitamin D regulates calcium absorption.
+
+In this problem, you will use simulated data loosely based on reference ranges from NHANES to model BMD as a function of age, calcium intake, vitamin D status, and their interactions.
 
 ### Activity
 
-Load the data for limb lengths. Try to use the function `summarize_all()` to calculate the mean and standard deviation for each column. Look at the help to figure out how to apply two different functions to each column
+Import the data `Human_BMD.csv`. You will find 5 columns:
+
+- `age`: Age in years
+- `calcium`: Dietary calcium level in mg/dL
+- `vitamin_d`: Blood serum Vitamin D in nmol/L
+- `bmd_raw`: Raw BMD measured by [DXA](https://my.clevelandclinic.org/health/diagnostics/10683-dexa-dxa-scan-bone-density-test) in g/cm^2^
+- `bmd`: Standardized BMD (no units). The raw BMD score is standardized into a Z-score (subtracting the mean and dividing by the standard deviation) for comparison. Because these data are simulated, the BMD values here are not directly comparable to a fully calibrated clinical DXA scanner (but they are close).
 
 ```{r}
 # FIXME
 
-LL <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Limb_Lengths.csv")
-LL |> head()
-LL |> summarize_all(.funs = c("mean", "sd"))
+BMD <- read_csv("../data/Human_BMD.csv", show_col_types = FALSE)
 ```
 
-Make two plots, one for left limb length vs. height and one for right limb length vs. height. Add an OLS regression line to each using `geom_smooth(). Use `cowplot::plot_grid()` to put them side by side.
+Make a scatterplot of BMD vs. Age.
+
+- Add a regression line with `geom_smooth()`
+- Add axis labels.
 
 ```{r}
 # FIXME
 
-p1 <- ggplot(LL, aes(left_limb, height)) + 
-  geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
+ggplot(BMD, aes(x = age, y = bmd)) +
   geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Left Limb")
-p2 <- ggplot(LL, aes(right_limb, height)) + 
   geom_smooth(formula = y ~ x, method = "lm", se = FALSE) +
-  geom_point() +
-  labs(x = "Limb Length (cm)", y = "Height (cm)") +
-  ggtitle("Right Limb")
-plot_grid(p1, p2, ncol = 2)
+  labs(x = "Age (years)", y = "BMD (Z)")
 ```
 
-Based on the plots, what do you think the relationship between limb length and height is (positive, negative, or no relationship)?
+What pattern do you observe in the scatterplot and the regression line? Does that pattern agree with the biological description above?
 
-> There appears to be a positive relationship between limb length and height. People with longer legs are taller.
+> There is an overall negative relationship between BMD and age. As people age their BMD decreases.
 
-
-Fit a single linear model in which height is predicted by both left and right limb lengths (this is an "additive" model). Print out the summary of the model.
+- Fit a linear model where BMD is predicted by age.
+- Print the summary.
 
 ```{r}
 # FIXME
 
-fm_LR <- lm(height ~ left_limb + right_limb, data = LL)
-summary(fm_LR)
+fm <- lm(bmd ~ age, data = BMD)
+summary(fm)
 ```
 
-Explain the results that you find. Why do you think that neither left nor right limb length is a good predictor of height in the model you fit? Use `ggscatmat()` and `check_model()` to help diagnose the problem.
+Interpret the results of the linear model. Do they support your interpretation of the plot? Do they agree with predictions based on the biology?
+
+> There is a significant negative slope of age (BMD decreases by -0.014 for each year). The P-value is ~0.000001. This is a small effect but significant.
+
+The code chunk below makes a plot of BMD as a function of calcium with the points colored by vitamin D level.
+
+- You might have to install the `colorspace` package.
+- Change `eval` to `true`
+- Run the chunk.
+
+```{r}
+#| eval: true
+
+# FIXME ^^^
+
+library(colorspace)
+
+BMD |>
+  ggplot(aes(x = calcium, y = bmd, color = vitamin_d)) +
+  geom_point(size = 3) +
+  scale_color_continuous_diverging(
+    palette = "Purple-Green",
+    name = "Serum Vitamin D"
+  ) +
+  labs(x = "Dietary Calcium (mg/dL)", y = "BMD (Z)")
+```
+
+What pattern do you observe in the relationship between BMD and calcium? What pattern do you observe between BMD and vitamin D?
+
+> There is a positive relationship between BMD and calcium. At any level of calcium, higher values of vitamin D are associated with higher BMD.
+
+- Fit a linear model where BMD is predicted by calcium, vitamin D, and the calcium by vitamin D interaction. Assign this model to the object `fm2` (we will use this model below).
+- Print the model summary.
 
 ```{r}
 # FIXME
 
-ggscatmat(LL)
-check_model(fm_LR)
+fm2 <- lm(bmd ~ calcium * vitamin_d, data = BMD)
+summary(fm2)
 ```
 
-> The correlation between left and right limb lengths is > 0.99. When we fit a model that includes both limb lengths, there is extreme multicollinearity. All of the variation in Height is predicted by the 1st variable in the multiple regression, so there is no variation left for the 2nd variable to predict (and vice versa when the variables are reversed).
+Based on the linear model, what is your interpretation of the relationship between the two predictors and their interaction with BMD?
 
+> All of the coefficients are small in the summary. Neither the coefficient for calcium nor vitamin D is different from zero (P = 0.809 and 0.519). The only significant coefficient is the interaction.
 
-Fit separate linear models in which height is predicted by left and then right limb length. Look at the summaries of these linear models.
+It's pretty difficult to figure out what the numbers mean in the regression table. We can make a plot using specific values of vitamin D to see the relationship.
+
+- In the chunk below, change `eval` to `true`. Run the chunk to make the plot.
+- Work through the code line by line and try to write comments of what you think each section is doing. Print vd_cuts and grid to see what they contain.
 
 ```{r}
-# FIXME
+#| eval: true
 
-fm_L <- lm(height ~ left_limb, data = LL)
-summary(fm_L)
+# FIXME ^^^^
 
-fm_R <- lm(height ~ right_limb, data = LL)
-summary(fm_R)
+# Find the Q1, median, and Q3 quantiles for vitamin D
+vd_cuts <- quantile(BMD$vitamin_d, probs = c(0.25, 0.50, 0.75))
+
+# Create a grid of values where calcium has 100 values between the minimum
+# and maximum value.
+grid <- crossing(
+  calcium = seq(min(BMD$calcium), max(BMD$calcium), length.out = 100),
+  vitamin_d = vd_cuts,
+  age = median(BMD$age)
+)
+
+# Calculate predicted values of BMD for each row of grid.
+# Make Vitamin D into a factor
+grid <- grid |>
+  mutate(
+    predicted_bmd = predict(fm2, newdata = grid),
+    vitamin_d_level = factor(
+      vitamin_d,
+      levels = vd_cuts,
+      labels = glue(
+        "{c('25th Percentile', '50th Percentile', '75th Percentile')} ({round(vd_cuts)} nmol/L)"
+      )
+    )
+  )
+
+# Make the plot
+ggplot() +
+  geom_line(
+    data = grid,
+    aes(x = calcium, y = predicted_bmd, color = vitamin_d_level),
+    linewidth = 1
+  ) +
+  scale_color_manual(values = c("#B3E0A6", "#64AC59", "#24693D")) +
+  labs(
+    x = "Dietary Calcium (mg/dL)",
+    y = "BMD (Z)",
+    color = "Serum Vitamin D (nmol/L)"
+  ) +
+  theme_classic()
 ```
 
-Do these models make more sense?
+Try to interpret the plot in the context of the first plot of BMD vs. calcium and the linear model. Where does the significant interaction term come from?
 
-> Yes, for each limb length is a significant predictor of height. This result is what we expect to see.
+> As calcium level increases, increased values of Vitamin D result in larger values of BMD. When calcium is low the effect is really small. This is where the significant interaction term comes from.
 
 
 ## Neandertal Brains
@@ -115,18 +220,20 @@ There are well-known differences in both body size between modern humans and Nea
 
 The file `NeandertalBrainSize.csv` contains data on estimated log body mass, log brain size, and `Species`. Load the file, and then:
 
-1. Convert `Species` to a factor.
-2. Re-level `Species` so that "Recent" is the base level of the factor.
+- Convert `Species` to a factor.
+- Re-level `Species` so that "Recent" is the base level of the factor.
     - Or do both steps at the same time.
 
 ```{r}
 # FIXME
-NBS <- read_csv("https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/NeandertalBrainSize.csv",
-                col_types = "ddc") |> 
+NBS <- read_csv(
+  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/NeandertalBrainSize.csv",
+  col_types = "ddc"
+) |>
   mutate(Species = fct_relevel(Species, "Recent"))
 ```
 
-Make a scatterplot of brain size vs. body mass, with points colored by species. 
+Make a scatterplot of brain size vs. body mass, with points colored by species.
 
 - See if you can find information on the internet about how to move the legend from the side of the plot into the lower right hand corner.
 - Add a linear regression line to the plots
@@ -134,13 +241,16 @@ Make a scatterplot of brain size vs. body mass, with points colored by species.
 ```{r}
 # FIXME
 
-NBS |> ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
+NBS |>
+  ggplot(aes(ln_Mass, ln_Brain, color = Species)) +
   geom_point(size = 3) +
   geom_smooth(formula = y ~ x, se = FALSE, method = "lm") +
   scale_color_d3() +
   guides(color = guide_legend(position = "inside")) +
-  theme(legend.position = "inside",
-        legend.justification.inside = c(1, 0)) +
+  theme(
+    legend.position = "inside",
+    legend.justification.inside = c(1, 0.05)
+  ) +
   labs(x = "ln Body Mass", y = "ln Brain Size")
 
 # Alternately
@@ -162,9 +272,9 @@ What is your interpretation of the plot? What patterns do you observe?
 
 Fit three linear models and assign each to an object:
 
-1. Brain size modeled by body mass
-2. Brain size modeled by body mass and species (additive)
-3. Brain size modeled by body mass and species with the mass X species interaction
+- Brain size modeled by body mass
+- Brain size modeled by body mass and species (additive)
+- Brain size modeled by body mass and species with the mass X species interaction
 
 Then print the summary for each model.
 
