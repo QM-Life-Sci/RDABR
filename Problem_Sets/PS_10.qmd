@@ -32,7 +32,9 @@ In this problem, you will use simulated data loosely based on reference ranges f
 
 ### Activity
 
-Import the data `Human_BMD.csv`. You will find 5 columns:
+Import the data `Human_BMD.csv` into an R object `BMD` (This will make code later work more easily.).
+
+You will find 5 columns:
 
 - `age`: Age in years
 - `calcium`: Dietary calcium level in mg/dL
@@ -91,7 +93,7 @@ BMD |>
 
 What pattern do you observe in the relationship between BMD and calcium? What pattern do you observe between BMD and vitamin D?
 
-> There is a positive relationship between BMD and calcium. At any level of calcium, higher values of vitamin D are associated with higher BMD.
+> 
 
 - Fit a linear model where BMD is predicted by calcium, vitamin D, and the calcium by vitamin D interaction. Assign this model to the object `fm2` (we will use this model below).
 - Print the model summary.

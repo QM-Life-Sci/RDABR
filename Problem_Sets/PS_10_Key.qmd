@@ -69,7 +69,9 @@ In this problem, you will use simulated data loosely based on reference ranges f
 
 ### Activity
 
-Import the data `Human_BMD.csv`. You will find 5 columns:
+Import the data `Human_BMD.csv` into an R object `BMD` (This will make code later work more easily.).
+
+You will find 5 columns:
 
 - `age`: Age in years
 - `calcium`: Dietary calcium level in mg/dL
