@@ -15,7 +15,6 @@ format:
 #| echo: false
 #| message: false
 #| warning: false
-
 library(tidyverse)
 library(readxl)
 library(cowplot)
@@ -31,7 +30,6 @@ theme_set(theme_classic())
 
 ```{r}
 #| echo: false
-
 # Simulate data
 # FIXME
 
@@ -125,7 +123,6 @@ The code chunk below makes a plot of BMD as a function of calcium with the point
 
 ```{r}
 #| eval: true
-
 # FIXME ^^^
 
 library(colorspace)
@@ -165,7 +162,6 @@ It's pretty difficult to figure out what the numbers mean in the regression tabl
 
 ```{r}
 #| eval: true
-
 # FIXME ^^^^
 
 # Find the Q1, median, and Q3 quantiles for vitamin D
@@ -264,7 +260,6 @@ NBS |>
 #   theme(legend.position = "inside",
 #         legend.position.inside = c(0.75, 0.12)) +
 #   labs(x = "ln Body Mass", y = "ln Brain Size")
-
 ```
 
 What is your interpretation of the plot? What patterns do you observe?
@@ -303,3 +298,12 @@ Which model do the lines in the figure above represent?
 What does each line in the summary of Model 3 represent?
 
 > (intercept): The intercept for the Recent group. ln_Mass: The slope for the recent group. SpeciesNeanderthal: The change in (Intercept) for being in the Neandertal group. ln_Mass:SpeciesNeanderthal: The change in the ln_Mass slope for being in the Neandertal group.
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
+>

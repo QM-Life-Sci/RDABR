@@ -15,7 +15,6 @@ format:
 #| echo: false
 #| message: false
 #| warning: false
-
 library(tidyverse)
 library(modelsummary)
 
@@ -124,7 +123,6 @@ For cross-references (i.e., automatically writing "Figure 1" or "Table 1"), one 
 #| fig-width: 6
 #| fig-cap: "Scatterplot of lion age (y) vs. the proportion of black coloration in the lion's nose (range 0-1). The gray line shows the ordinary least squares regression."
 #| fig_alt: "Scatterplot of lion age vs. the proportion of black coloration in the lion's nose."
-
 LA <- read_csv("../data/LionAges.csv", show_col_types = FALSE)
 
 ggplot(LA, aes(y = age, x = proportion.black)) +
@@ -149,7 +147,6 @@ Write a sentence or two describing the plot that includes a cross-reference to y
 #| fig-width: 6
 #| fig-cap: "Eyespan measured in stalk-eyed flies raised on two different food treatments: corn and cotton. The gray points are individual observations (jittered to remove overplotting), and the purple points are group means with +1 SEM error bars."
 #| fig-alt: "Scatterplot showing eyespan measured in stalk-eyed flies raised on two different food treatments: corn and cotton."
-
 stalk <- read_csv("../data/Stalkies.csv", show_col_types = FALSE) |>
   mutate(food_source = factor(food_source))
 
@@ -186,7 +183,6 @@ Make a data table of your choosing. This can be just a table of the raw data or 
 #| warning: false
 #| message: false
 #| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
-
 datasummary_skim(
   LA |>
     rename(`Age (y)` = age, `Proportion Black` = proportion.black),
@@ -211,7 +207,6 @@ datasummary_skim(
 #| warning: false
 #| message: false
 #| tbl-cap: "Summary statistics for observations of lion age and proportion of black coloration in the nose."
-
 datasummary_balance(~food_source, data = stalk)
 ```
 
@@ -224,7 +219,6 @@ Create a results table for the linear model using `modelsummary()`.
 #| warning: false
 #| message: false
 #| tbl-cap: "Summary statistical table for the linear model predicting lion age by proportion of black nose coloration."
-
 fm_LA <- lm(age ~ proportion.black, data = LA)
 modelsummary(
   list("Age ~ Proportion Black" = fm_LA),
@@ -241,7 +235,6 @@ modelsummary(
 #| warning: false
 #| message: false
 #| tbl-cap: "Summary statistical table for the linear model predicting eyespan in stalk-eyed flies by food source."
-
 fm_stalk <- lm(eye_span ~ food_source, data = stalk)
 
 modelsummary(
@@ -251,7 +244,6 @@ modelsummary(
   gof_omit = ".*",
   fmt = 2
 )
-
 ```
 
 Create a model plot for the linear model using `modelplot()`.
@@ -263,9 +255,7 @@ Create a model plot for the linear model using `modelplot()`.
 #| message: false
 #| fig-cap: "Coefficient plot for the linear model predicting lion age by proportion of black nose coloration."
 #| fig-alt: "Coefficient plot for the linear model predicting lion age by proportion of black nose coloration."
-
 modelplot(fm_LA)
-
 ```
 
 
@@ -276,9 +266,7 @@ modelplot(fm_LA)
 #| message: false
 #| fig-cap: "Coefficient plot for the linear model predicting eyespan in stalk-eyed flies by food source."
 #| fig-alt: "Coefficient plot for the linear model predicting eyespan in stalk-eyed flies by food source."
-
 modelplot(fm_stalk)
-
 ```
 
 
@@ -305,3 +293,12 @@ Write your statistical results:
 > Results of the linear model predicting lion's age from proportion black in the nose showed a significant positive slope in which age increases 10.65 y (95% CI: 7.6 - 13.7) for each unit of increase in proportion black (t~30~ = 7.05; P < 0.001; @tbl-model_summary_LA; @fig-model_plot_LA).
 
 > Results of the linear model predicting eyespan by diet treatment showed a significant difference in mean eyespan between the two groups (t~43~ = 7.9; P < 0.001; @tbl-model_summary_stalk). Flies raised in cotton have eyespan, on average, 0.5 mm narrower than those raised on corn (95% CI of the difference: 0.37 - 0.63; @fig-model_plot_stalk).
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
+
+>

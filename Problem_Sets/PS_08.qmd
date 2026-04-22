@@ -15,7 +15,6 @@ format:
 #| echo: false
 #| message: false
 #| warning: false
-
 library(tidyverse)
 ```
 
@@ -166,5 +165,14 @@ Write your data summary results (n, mean, SEM/sd, etc.):
 
 
 Write your statistical results:
+
+>
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 >

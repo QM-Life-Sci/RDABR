@@ -78,7 +78,6 @@ The code chunk below makes a plot of BMD as a function of calcium with the point
 
 ```{r}
 #| eval: false
-
 library(colorspace)
 
 BMD |>
@@ -93,7 +92,7 @@ BMD |>
 
 What pattern do you observe in the relationship between BMD and calcium? What pattern do you observe between BMD and vitamin D?
 
-> 
+>
 
 - Fit a linear model where BMD is predicted by calcium, vitamin D, and the calcium by vitamin D interaction. Assign this model to the object `fm2` (we will use this model below).
 - Print the model summary.
@@ -113,7 +112,6 @@ It's pretty difficult to figure out what the numbers mean in the regression tabl
 
 ```{r}
 #| eval: false
-
 #
 vd_cuts <- quantile(BMD$vitamin_d, probs = c(0.25, 0.50, 0.75))
 
@@ -211,5 +209,14 @@ Which model do the lines in the figure above represent?
 
 
 What does each line in the summary of Model 3 represent?
+
+>
+
+
+## AI Statement
+
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
+
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
 >
