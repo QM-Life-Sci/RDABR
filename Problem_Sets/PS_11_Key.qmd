@@ -15,7 +15,6 @@ format:
 #| echo: false
 #| message: false
 #| warning: false
-
 library(tidyverse)
 library(readxl)
 library(ggsci)
@@ -30,8 +29,6 @@ theme_set(theme_classic())
 
 Packages you will need for this problem set:
 
-- `ICC`
-- `pwr`
 - `AICcmodavg`
 - `cvTools`
 
@@ -83,7 +80,6 @@ Copy your model code from PS 10 and fit the models:
 fm1 <- lm(ln_Brain ~ ln_Mass, data = NBS)
 fm2 <- lm(ln_Brain ~ ln_Mass + Species, data = NBS)
 fm3 <- lm(ln_Brain ~ ln_Mass * Species, data = NBS)
-
 ```
 
 We had left off at this point: fitting the models but not deciding which was the best fit to the data.
@@ -91,7 +87,7 @@ We had left off at this point: fitting the models but not deciding which was the
 
 ### Information criteria
 
-Use the `aictab()` function from the `AICcmodavg` to generate the AICc model comparison table for the three models.
+Use the `aictab()` function from the `AICcmodavg` to generate the AICc model comparison table for the three models. Follow the template in the lecture slides. For example, `aictab()` expects to recieve a `list()` of model objects (with optional names).
 
 ```{r}
 # FIXME
@@ -105,7 +101,9 @@ aictab(
 )
 ```
 
-Notice that the values of AICc are negative. This can happen and is not a problem at all or a sign that something has gone wrong. You have to think a little harder about what "lower" means (in this case *more negative*). The interpretation stays the same -- lower AICc is better.
+Notice that the values of AICc are negative. This can happen and is not a problem at all or a sign that something has gone wrong.
+
+You have to think a little harder about what "lower" means (in this case *more negative*). The interpretation stays the same -- lower AICc is better.
 
 Which model has the lowest AICc value?
 
@@ -122,25 +120,30 @@ Overall, what is your interpretation of the `Delta_AICc` column?
 > All the models are within 4 units of each other, so there is not one that is clearly superior.
 
 
-Interpret the model weights in the `AICCWt` column. Remember that model weights can be interpreted as a probability that the model in that row is the best model for out-of-sample prediction.
+Interpret the model weights in the `AICcWt` column. Remember that model weights can be interpreted as a probability that the model in that row is the best model for out-of-sample prediction.
 
 > The additive model has a weight of 0.61 and the interaction 0.3. These are clearly the best, but 10% of the weight is on the simplest model.
 
 
 If these were your data, how would you proceed in the "Results" and "Discussion" sections of your manuscript?
 
-> You answer may vary, but I would talk about all of them.
+> You answer may vary, but we would probably discuss all of the models. Clearly the models with species are better than just Mass, but that model still has some support.
 
 
 ### Cross-validation
 
-Follow the example in the lecture slides to carry out leave-one-out cross validation on these models using the `cvFit()` function from the `cvTools()` package. Cross-validation uses the data to determine the root-mean-squared prediction error for a model (RMSE).
+Follow the example in the lecture slides to carry out *leave-one-out* cross validation on these models using the `cvFit()` function from the `cvTools()` package. Cross-validation uses the data to determine the root-mean-squared prediction error for a model (RMSE).
 
 ```{r}
 # FIXME
 
+# ~ ln_Mass
 cvFit(fm1, data = NBS, y = NBS$ln_Brain, K = nrow(NBS))
+
+# ~ ln_Mass + Species
 cvFit(fm2, data = NBS, y = NBS$ln_Brain, K = nrow(NBS))
+
+# ~ ln_Mass * Species
 cvFit(fm3, data = NBS, y = NBS$ln_Brain, K = nrow(NBS))
 ```
 
@@ -164,153 +167,10 @@ What do you interpret about the possible differences in brain scaling vs. body s
 > If there is a difference in scaling, it is not very large.
 
 
-## Repeatability: Intraclass correlation coefficient
+## AI Statement
 
-The model you use to calculate the intraclass correlation coefficient *is* a type of multilevel model -- you have repeated measurements for a single specimen. Those measurements are obviously not independent from one another (that is the point of repeated measurements -- to estimate the consistency of measurements as compared to the differences between individuals). In this case, we can use the non-independence to get as estimate of the relative between *measurement* variation vs. between *specimen* variation?
+Please indicate whether you used any generative AI tools to help you with this problem set and explain how you used these. An example of how to structure this statement is below. If you did not use generative AI, you can simply state: "I did not use AI for this problem set."
 
-The data we will be working with includes repeated measurements of the "femur" of Walking Sticks:
+Example statement structure: "I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I utilized AI, specifically [LLM], as a tool to support my work. For this assignment, I employed [LLM] to [describe the specific purpose or task]. To do so I crafted the following prompts: [List prompts used]"
 
-![](https://i.imgur.com/CVTtMkJ.png){fig-width=50%}
-
-Because the measurements are small (~ 0.25 cm), you are concerned that they will not be very repeatable. Before collecting all the data, you want to estimate the intraclass correlation coefficient of these measurements using a small, preliminary dataset.
-
-You take 2 measurements each on 25 different walking stick femurs, which are included in the files `WalkingStickFemurs.csv`.
-
-
-### Activity
-
-Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
-
-```{r}
-# FIXME
-
-WSF <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") |>
-  mutate(Specimen = factor(Specimen))
-glimpse(WSF)
-```
-
-Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
-
-The code block below pivots the data to wide format. The steps are:
-
-- Use `Specimen` as the `id_cols`
-- Take values from `Femur_length`
-- Take column names from `Measurement`
-- Use the `names_prefix =` option to place the string "Measurement_" before the column name
-
-Change `eval: false` to `eval: true`. You might need to change the name `WSF` to match your object name from above.
-
-```{r}
-#| eval: true
-# FIXME
-
-WSF_wide <- WSF |>
-  pivot_wider(
-    id_cols = Specimen,
-    values_from = Femur_length,
-    names_from = Measurement,
-    names_prefix = "Measurement_"
-  )
-WSF_wide |> head()
-```
-
-The top of the resulting tibble should look like:
-
-```
-# A tibble: 25 × 3
-   Specimen Measurement_1 Measurement_2
-   <fct>            <dbl>         <dbl>
- 1 1                 0.26          0.26
- 2 2                 0.23          0.19
- 3 3                 0.25          0.23
- ```
-
-There will be 25 rows total.
-
-Using the "wide" data, plot the pairs of observations as a scatterplot. We have to use the wide data because we need the two measurements in different columns.
-
-- Add a line with a slope of 1 and intercept of 0 using `geom_abline()`
-- Set the axis coordinates to equal scaling with `coord_equal()`
-
-```{r}
-# FIXME
-
-ggplot(WSF_wide, aes(Measurement_1, Measurement_2)) +
-  geom_point() +
-  geom_abline(slope = 1, intercept = 0) +
-  coord_equal() +
-  labs(x = "Measurement 1", y = "Measurement 2")
-```
-
-
-Based on your plot, do you expect ICC to be high or low? Give an estimate?
-
-> The points are fairly close to the line, so ICC should be pretty good.
-
-
-Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides.
-
-Note that you will need to use the original data (not the pivoted data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
-
-```{r}
-# FIXME
-
-ICCest(x = WSF$Specimen, y = WSF$Femur_length)
-```
-
-
-Would you be comfortable going forward with data collection given this value for ICC?
-
-> Maybe or maybe not. If we expect fairly large differences between groups, then it's probably fine. But if the differences are small, then there may be so much variation associated with taking measurements that it will swamp out the variation between groups. It's probably fine.
-
-
-## Planning experiments
-
-Consider that you are planning some experiments, use the `pwr` package to calculate the unknown quantity for each of the following situations. Assume that $\alpha$ = 0.05 for all tests.
-
-
-### Activity
-
-Use `cohen.ES()` from the `pwr` package to look up the effect size for a "small" effect for a *t*-test.
-
-```{r}
-# FIXME
-
-cohen.ES(test = "t", size = "small")
-```
-
-Before we do the calculation. Take a guess how many individuals you would need in each independent group (a "two-sample t-test") to detect a small effect size with alpha = 0.05 and power = 0.80.
-
-> You answer may vary. I was pretty surprised by the answer.
-
-Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
-
-```{r}
-# FIXME
-
-pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
-```
-
-Repeat the test above but for a paired *t*-test.
-
-```{r}
-# FIXME
-
-pwr.t.test(d = 0.2, power = 0.80, type = "paired")
-```
-
-Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
-
-```{r}
-# FIXME
-
-pwr.r.test(r = 0.6, power = 0.8)
-```
-
-Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
-
-```{r}
-# FIXME
-
-pwr.r.test(r = 0.4, n = 15)
-```
+>
