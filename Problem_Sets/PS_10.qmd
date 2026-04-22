@@ -108,7 +108,7 @@ Based on the linear model, what is your interpretation of the relationship betwe
 It's pretty difficult to figure out what the numbers mean in the regression table. We can make a plot using specific values of vitamin D to see the relationship.
 
 - In the chunk below, change `eval` to `true`. Run the chunk to make the plot.
-- Work through the code line by line and try to write comments of what you think each section is doing. Print vd_cuts and grid to see what they contain.
+- Work through the code line by line and try to write comments of what you think each section is doing. Print `vd_cuts` and `grid` to see what they contain.
 
 ```{r}
 #| eval: false
