@@ -18,10 +18,8 @@ format:
 library(tidyverse)
 library(readxl)
 library(ggsci)
-library(ICC)
 library(AICcmodavg)
 library(cvTools)
-library(pwr)
 
 theme_set(theme_classic())
 ```
