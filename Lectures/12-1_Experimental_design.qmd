@@ -42,12 +42,7 @@ theme_set(theme_classic(base_size = 20))
 
 # Housekeeping {background-color="#40666e"}
 
-- Micropublication *plan* due last Thursday
-    - Figure
-    - Table
-    - Planned analysis
-- Reminder
-    - Presentation day food
+- Micropublication progress
 
 
 # Experimental Design {background-color="#40666e"}
@@ -120,16 +115,12 @@ ggplot(G44, aes(Len1, Len2)) +
 ```
 
 
-## Calculating ICC
+## What is ICC
 
-Uses the results of the linear model (ANOVA):
-
-$$\mbox{Measurement} \sim \mbox{Sample ID}$$
-
-or the multilevel model
-
-$$\mbox{Measurement} \sim 1 + (1 | \mbox{Sample ID})$$
-
+- Calculated using an ANOVA
+- Compares the variation within measurements to the variation between measurements
+- Generally 0 $\rightarrow$ 1
+    - Can be negative (bad)
 
 ## Repeatability of lipid levels in the same sample
 
@@ -459,15 +450,6 @@ EtaSq(fm)
 How much power is enough power? Some say 0.8.
 
 
-## Post-analysis power calculations
-
-Hoenig and Heisey [-@Hoenig2001-hz]:
-
-> "There is a large literature advocating that power calculation be made whenever one performs a statistical test of a hypothesis and one obtains a statistically nonsignificant result. ... This approach, which appears in various forms, is fundamentally flawed."
-
-- Don't be tempted to calculate power after the data is collected (and no significant effect is found)
-
-
 ## Power analysis in R
 
 1. `pwr` package
@@ -759,10 +741,6 @@ Type I and Type II errors will trade-off.
 ## General procedure
 
 1. Complete an entire "family" of tests
-    - A set of tests on related data
-    - A single publication
-    - A single thesis
-    - All of science?
 1. Collect the resulting *P*-values into a single vector.
 1. Perform a multiple comparisons procedure (directly adjust or calculate new $\alpha$ level)
 1. Assess significance of your tests *as a whole*
@@ -837,7 +815,6 @@ head(Ps)
 tail(Ps)
 ```
 
-
 ## Sequential Bonferroni
 
 - Sort the *P*-values from smallest ($p_1$) to largest ($p_k$)
@@ -886,28 +863,11 @@ Only 33 of the original 62 significant tests remain.
 
 ## False discovery rate
 
-- Sort the *P*-values from largest ($p_k$) to smallest ($p_1$)
-- Starting at the *largest* *P*-value ($p_k$), calculate the critical significance level ($d_k^*$) for that *P*-value:
+$$\mbox{FDR} = \frac{\mbox{n False Positives}}{\mbox{n All Positives}}$$
 
-$$d_k^* = q^* \frac{k}{k}$$
+e.g., I'm OK with 5% false positives *among the tests I judge as significant*.
 
-Where $q^*$ is the desired false discovery rate (e.g., 0.05).
-
-- If $p_k \leq d_k^*$, then reject the null hypothesis for this and all remaining tests.
-    - 1st comparison is vs. $q^*$
-    - Rarely will the largest *P*-value be less than $q^*$.
-
-
-## False discovery rate
-
-- Move to the 2nd largest *P*-value and calculate the critical significance level
-
-$$d_k^* = q^* \frac{k - 1}{k}$$
-
-- 2nd test vs. $q^* \times 202/203 = 0.04975$
-- Continue until $p_k \leq d_k^*$ then call that and all remaining tests (smaller *P*-values) significant.
-    - Last test vs. $q^* \times 1/203 = 0.00025$
-
+- Estimated based on the distribution of p-values
 
 ## False discovery rate
 
