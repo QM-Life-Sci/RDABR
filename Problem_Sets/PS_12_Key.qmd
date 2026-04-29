@@ -15,9 +15,11 @@ format:
 #| echo: false
 #| message: false
 #| warning: false
+
 library(tidyverse)
 library(readxl)
-library(factoextra)
+library(ICC)
+library(pwr)
 
 theme_set(theme_classic())
 ```
@@ -317,72 +319,6 @@ How many significant tests remain?
 How many of these could be *false positives*?
 
 > 19 * 0.05 = 0.95 = 1
-
-
-## Sole
-
-The Common Sole (*Solea solea*) is a commercially important fish (but also potentially threatened due to unsustainable fisheries practices). The file `Sole.xlsx` contains data for the presence/absence of Common Sole in different areas of the Tagus River estuary near Lisbon, Portugal.
-
-![](https://www.nw-ifca.gov.uk/app/uploads/Solea_solea_1-800x600.jpg){fig-align="center"}
-
-These data were collected to help determine the seasonal patterns of sole movement as well as their substrate preferences (i.e., what type of seafloor surface they prefer).
-
-Load the data and look at the structure of the data using `str()` or `glimpse()`.
-
-```{r}
-tf <- tempfile()
-download.file(
-  "https://raw.githubusercontent.com/QM-Life-Sci/QMLS_1/refs/heads/main/data/Sole.xlsx",
-  destfile = tf
-)
-
-Sole <- read_excel(tf)
-str(Sole)
-```
-
-The columns `gravel`, `large_sand`, `med_fine_sand`, and `mud` represent the percentages of these four types of substrate of the sea floor for each sample (they sum to 100).
-
-Use `prcomp()` to carry out a PCA of these four columns. This procedure will calculate a composite score for "substrate".
-
-```{r}
-# FIXME
-
-z <- prcomp(
-  ~ gravel + large_sand + med_fine_sand + mud,
-  data = Sole,
-  scale. = TRUE,
-  center = TRUE
-)
-```
-
-Use the `summary()` and `print()` methods to determine the percent of variance accounted for by each PC and the relative loadings of each variable.
-
-```{r}
-# FIXME
-
-summary(z)
-print(z)
-```
-
-Use the `fviz_pca_var()` function from the `factoextra` package to make a plot of the PCs.
-
-```{r}
-# FIXME
-
-fviz_pca_var(z)
-```
-
-
-What is your interpretation of the PCA?
-
-> PC 1 accounts for 62% of the variation, which is fairly high. Mud loads positively, whereas two kinds of sand load negatively. Gravel doesn't load at all really on PC 1. So PC 1 represents a mud vs. sand axis. PC 2 represents gravel.
-
-
-A regression model predicting the presence of sole by PC 1 showed a significantly *negative* coefficient. This means that as PC 1 increases, sole are *less* likely to be present.
-
-What type of substrate do sole appear to prefer? Sandy or muddy? Briefly explain your reasoning.
-
-> PC 1 is basically as axis of sand with values in negative PC 1 scores to mud in positive PC 1 scores. Gravel doesn't load appreciably on PC 1. Logistic regression shows that as PC 1 score increases, sole are less likely to be present (negative coefficient estimate). So sole are less likely to be present as the substrate gets more muddy and are more likely to be present as the substrate gets more sandy.
 
 
 ## AI Statement
