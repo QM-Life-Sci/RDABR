@@ -27,7 +27,6 @@ theme_set(theme_classic())
 
 Packages you will need for this problem set:
 
-- `factoextra`
 - `ICC`
 - `pwr`
 
@@ -36,11 +35,13 @@ Install them now using the "Packages" pane (if you haven't already).
 
 ## Repeatability: Intraclass correlation coefficient
 
-The model you use to calculate the intraclass correlation coefficient *is* a type of multilevel model -- you have repeated measurements for a single specimen. Those measurements are obviously not independent from one another (that is the point of repeated measurements -- to estimate the consistency of measurements as compared to the differences between individuals). In this case, we can use the non-independence to get as estimate of the relative between *measurement* variation vs. between *specimen* variation?
+The model you use to calculate the intraclass correlation coefficient *is* a type of ANOVA model, except that you have repeated measurements for a single specimen or sample (so each specimen/sample is a "group").
+
+Those measurements are obviously not independent from one another (that is the point of repeated measurements -- to estimate the consistency of measurements as compared to the differences between individuals). In this case, we can use the non-independence to get as estimate of the relative between *measurement* variation vs. between *specimen* variation?
 
 The data we will be working with includes repeated measurements of the "femur" of Walking Sticks:
 
-![](https://i.imgur.com/CVTtMkJ.png){fig-width=50%}
+![](https://i.imgur.com/CVTtMkJ.png){fig-width=50% fig-alt="Photograph of a walking stick insect."}
 
 Because the measurements are small (~ 0.25 cm), you are concerned that they will not be very repeatable. Before collecting all the data, you want to estimate the intraclass correlation coefficient of these measurements using a small, preliminary dataset.
 
@@ -49,7 +50,9 @@ You take 2 measurements each on 25 different walking stick femurs, which are inc
 
 ### Activity
 
-Load the data in `WalkingStickFemurs.csv`. Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
+Load the data in `WalkingStickFemurs.csv`.
+
+- Convert `Specimen` to a factor so that R will treat it as categorical rather than as numeric.
 
 ```{r}
 # FIXME
@@ -59,7 +62,7 @@ WSF <- read_csv("../data/WalkingStickFemurs.csv", col_types = "ddd") |>
 glimpse(WSF)
 ```
 
-Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the paired relationship. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
+Look at the structure of the data. The data are in long format, with one measurement per row. We want to be able to plot Measurement 1 vs. Measurement 2 to visualize the pairs of measurements. To do so, we need to convert the data into wide format, with 2 columns per Specimen: Measurement 1 and Measurement 2.
 
 The code block below pivots the data to wide format. The steps are:
 
@@ -81,7 +84,7 @@ WSF_wide <- WSF |>
     names_from = Measurement,
     names_prefix = "Measurement_"
   )
-WSF_wide |> head()
+WSF_wide
 ```
 
 The top of the resulting tibble should look like:
@@ -109,7 +112,7 @@ ggplot(WSF_wide, aes(Measurement_1, Measurement_2)) +
   geom_point() +
   geom_abline(slope = 1, intercept = 0) +
   coord_equal() +
-  labs(x = "Measurement 1", y = "Measurement 2")
+  labs(x = "Measurement 1 (cm)", y = "Measurement 2 (cm)")
 ```
 
 
@@ -120,7 +123,7 @@ Based on your plot, do you expect ICC to be high or low? Give an estimate?
 
 Calculate ICC of the femur length (`Femur_length`) measurement using `ICCest()` from the `ICC` package. Follow the example in the lecture slides.
 
-Note that you will need to use the original data (not the pivoted data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
+Note that you will need to use the original data (not the "wide" data), because we need one column for the `Specimen` and one for `Femur_length` for `ICCest()`.
 
 ```{r}
 # FIXME
@@ -128,10 +131,13 @@ Note that you will need to use the original data (not the pivoted data), because
 ICCest(x = WSF$Specimen, y = WSF$Femur_length)
 ```
 
+What are the intraclass correlation of measurements of femur length and its 95% confidence interval?
 
-Would you be comfortable going forward with data collection given this value for ICC?
+> 0.75 (0.51 - 0.88)
 
-> Maybe or maybe not. If we expect fairly large differences between groups, then it's probably fine. But if the differences are small, then there may be so much variation associated with taking measurements that it will swamp out the variation between groups. It's probably fine.
+Based on the result of the ICC analysis, would you be comfortable going forward with data collection and subsequent analysis?
+
+> Maybe or maybe not. If we expect medium to large differences between groups, then it's probably fine. But if the differences are small, then there may be so much variation associated with taking measurements that it will swamp out the variation between groups. In the end, it's probably repeatable enough.
 
 
 ## Planning experiments
@@ -151,7 +157,7 @@ cohen.ES(test = "t", size = "small")
 
 Before we do the calculation. Take a guess how many individuals you would need in each independent group (a "two-sample t-test") to detect a small effect size with alpha = 0.05 and power = 0.80.
 
-> You answer may vary. I was pretty surprised by the answer.
+> Your answer may vary.
 
 Calculate the sample size (*n*) needed in each group of a two-sample *t*-test with power = 0.80 to detect a small effect (use the effect size from above).
 
@@ -161,7 +167,7 @@ Calculate the sample size (*n*) needed in each group of a two-sample *t*-test wi
 pwr.t.test(d = 0.2, power = 0.80, type = "two.sample")
 ```
 
-Repeat the test above but for a paired *t*-test.
+Repeat the test above but for a paired *t*-test. Look at the help for `pwr.t.test()` to figure out how.
 
 ```{r}
 # FIXME
@@ -169,7 +175,7 @@ Repeat the test above but for a paired *t*-test.
 pwr.t.test(d = 0.2, power = 0.80, type = "paired")
 ```
 
-Calculate the number of observations for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80.
+Calculate the required sample size for a correlation test where you estimate a correlation coefficient of 0.6. Power should be 0.80, and alpha 0.05.
 
 ```{r}
 # FIXME
@@ -177,7 +183,7 @@ Calculate the number of observations for a correlation test where you estimate a
 pwr.r.test(r = 0.6, power = 0.8)
 ```
 
-Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4, for a sample size of 15.
+Calculate the power for a correlation test where you estimate the correlation coefficient to be 0.4 for a sample size of 15. Again, alpha is 0.05.
 
 ```{r}
 # FIXME
@@ -190,14 +196,14 @@ pwr.r.test(r = 0.4, n = 15)
 
 Glanville Fritillary butterflies are a model organism for studying dispersal and metapopulation dynamics, because they live in isolated meadows.
 
-![](https://i0.wp.com/www.dorsetbutterflies.com/wordpress/wp-content/uploads/2021/05/Glanville-Fritillary-Mark-Pike-2021-03.jpeg){fig-width=50%}
+![](https://i0.wp.com/www.dorsetbutterflies.com/wordpress/wp-content/uploads/2021/05/Glanville-Fritillary-Mark-Pike-2021-03.jpeg){fig-width=50% alt-txt="Photograph of a Glanville Fritillary butterfly"}
 
 
 ### Activities
 
 Load in the Butterfly Gene Expression data (`Butterfly_Gene_Expression.csv`). This is a `tibble` of sample id, sex, and 100 normalized gene expression measures (this is trimmed down from an original over 8,000 expression measures). We will perform 100 regressions using `lm()`, predicting each gene expression measure from the sex variable. The `lm()` function can fit multiple Y's at once. See the code below to see how this works for this dataset.
 
-Note this method produces a list of `lm()` results. I have written a function (`getP()` see above) to extract the relevant P-value from a list of this type. We will do this for this set of models and assign the p-values to an object, `obsP`.
+Note this method produces a list of `lm()` results. We have provided a function (`getP()`) to extract the relevant P-value from a list of this type. We will do this for this set of models and assign the p-values to an object, `obsP`.
 
 Change `eval: false` to `eval: true` and run the chunk below. You can either change the path to `Butterfly_Gene_Expression.csv` or just load it directly from the web, which is set up for you below.
 
@@ -231,8 +237,7 @@ What is the range of P-values?
 range(obsP$P)
 ```
 
-
-We will visualize the *P*-values by plotting a histogram and a q-q plot. First plot a histogram with 20 `bins`. This will conveniently make bins that have a width of 0.05.
+We will visualize the *P*-values by plotting a histogram. First plot a histogram with 20 `bins`. This will conveniently make bins that have a width of 0.05.
 
 ```{r}
 # FIXME
@@ -242,54 +247,27 @@ ggplot(obsP, aes(P)) +
   labs(x = "P-value", y = "Count")
 ```
 
-Does it look like there is a signal in the data? I.e., are there more observations in the 0 - 0.05 bin than in the other bins? Or does the distribution look uniform across the range 0 to 1?
+Remember that, if all the null hypotheses are true for all 100 tests, the histogram will look uniform.
+
+Based on the appearance of the histogram, does it look like there is a signal in the data? I.e., are there more observations in the 0 - 0.05 bin than in the other bins? Or does the distribution look uniform across the range 0 to 1?
 
 > Yes, the first bin is about 2x as large as the next largest. There are more values near 0 than elsewhere.
-
-
-We will now make a q-q plot, which shows the observed P-values plotted against expected P-values *if the P-values were drawn from a Uniform distribution*.
-
-Make a new tibble `qqP`, with two columns:
-
-1. `observed`: The observed *P*-values converted to -log10(P) and then sorted (`sort()`). This will be the observed values rescaled to make them easier to visualize.
-2. `expected`: Randomly generated values drawn from a uniform distribution using `runif(length(obsP$P), 0, 1)`, also log10 transformed and sorted smallest to largest (`sort()`).
-
-This object now has values for observed and expected P-values.
-
-Finally, plot observed versus expected values and add a 1:1 line (intercept = 0, slope = 1).
-
-```{r}
-# FIXME
-set.seed(273645)
-
-qqP <- tibble(
-  'observed' = sort(-log10(obsP$P)),
-  'expected' = sort(-log10(runif(length(obsP$P), 0, 1)))
-)
-
-ggplot(qqP, aes(x = expected, y = observed)) +
-  geom_point() +
-  geom_abline(intercept = 0, slope = 1)
-```
-
-If there is no "signal" in the data, then the points (observed vs. predicted) will all fall on the 1:1 line. Based on this visualization, do you think there are *true positives* in this data set?
-
-> Probably. The P-values deviate pretty strongly from the expected line.
 
 
 - Use R's built-in `p.adjust()` function to adjust the P-values using the sequential Bonferroni correction ("Holm" procedure). You don't have to sort the P-values first, but it can make it easier to pick out ones that remain significant.
 - Print a `tibble` with the observed P-value and sequential Bonferroni corrected P-value.
 - Finally, count the number of P-values that are less than 0.05.
 
-Look at the help for `p.adjust()` for the appropriate syntax.
+Look at the help for `p.adjust()` (or the lecture slides) for the appropriate syntax.
 
 ```{r}
 # FIXME
-seq_bonf <- p.adjust(obsP$P, method = "holm")
-tibble(P = obsP$P, seq_bonf) |>
-  arrange(P) |>
-  filter(seq_bonf <= 0.05)
-sum(seq_bonf < 0.05)
+
+obsP <- obsP |>
+  mutate(seq_bonf = p.adjust(obsP$P, method = "holm")) |>
+  arrange(P)
+
+sum(obsP$seq_bonf < 0.05)
 ```
 
 There were 28 significant P-value in the original data set ($\alpha = 0.05$). How many remain after this procedure?
@@ -305,16 +283,21 @@ Repeat the procedure above, but now use the false discovery rate procedure of Be
 
 ```{r}
 # FIXME
-fdr <- p.adjust(obsP$P, method = "fdr")
-tibble(P = obsP$P, fdr) |>
-  arrange(P) |>
-  filter(fdr <= 0.05)
-sum(fdr < 0.05)
+
+obsP <- obsP |>
+  mutate(fdr = p.adjust(obsP$P, method = "fdr"))
+
+sum(obsP$fdr < 0.05)
 ```
 
 How many significant tests remain?
 
 > 19
+
+
+What percentage of these significant tests could be false positives?
+
+> 5%
 
 How many of these could be *false positives*?
 
