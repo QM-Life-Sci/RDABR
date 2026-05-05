@@ -130,7 +130,7 @@ If these were your data, how would you proceed in the "Results" and "Discussion"
 
 ### Cross-validation
 
-Follow the example in the lecture slides to carry out *leave-one-out* cross validation on these models using the `cvFit()` function from the `cvTools()` package. Cross-validation uses the data to determine the root-mean-squared prediction error for a model (RMSE).
+Follow the example in the lecture slides to carry out *leave-one-out* cross validation on these models using the `cvFit()` function from the `cvTools()` package. Cross-validation uses the data to determine the root-mean-squared prediction error for a model (RMSE). By default, `cvFit()` use RMSE as its "cost" function.
 
 ```{r}
 # FIXME
