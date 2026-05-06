@@ -33,7 +33,7 @@ library(knitr)
 
 theme_set(theme_cowplot())
 
-font_size <- 9
+font_size <- 12
 my_theme <- theme(
   axis.text = element_text(size = font_size),
   axis.title = element_text(size = font_size + 1, face = "bold"),
@@ -52,15 +52,14 @@ Consectetur fringilla fringilla curabitur vitae vulputate aliquam interdum eros 
 #| echo: false
 #| warning: false
 #| message: false
-#| cache: true
-#| fig-height: 3
+#| fig-height: 4
 #| fig-width: 10
 #| fig-cap: "Scelerisque vitae sodales sapien sed lobortis mauris Glasspool and Scott [-@Glasspool2010-ci]. Lorem erat condimentum platea risus non porta tortor nam libero. Accumsan varius magnis habitasse senectus egestas torquent porttitor praesent condimentum phasellus turpis class praesent Nesbitt [-@Nesbitt2011-uc]."
 
 set.seed(361263)
 
 tibble(x = runif(200),
-       y = 2 * x + rnorm(200)) %>% 
+       y = 2 * x + rnorm(200)) |>  
   ggplot(aes(x = x, y = y)) +
   geom_point() +
   my_theme
@@ -71,10 +70,9 @@ Lorem primis tortor aptent montes nisi dui magnis netus? Fusce aptent auctor eni
 
 ```{r}
 #| label: fig-scatter2
-#| echo: FALSE
-#| warning: FALSE
-#| cache: TRUE
-#| message: FALSE
+#| echo: false
+#| warning: false
+#| message: true
 #| fig.height: 3
 #| fig.width: 10
 #| fig.cap: "Sit luctus magna lacinia proin mi venenatis orci torquent suspendisse lobortis leo est urna. Praesent volutpat mattis mattis tellus aliquet Glasspool and Scott [-@Glasspool2010-ci]."
@@ -97,7 +95,7 @@ P3 <- ggplot(DD, aes(x)) +
 
 P1 + (P2 / P3) +
   plot_annotation(tag_levels = 'a', tag_suffix = ".") &
-    theme(plot.tag = element_text(size = 9))
+    theme(plot.tag = element_text(size = font_size))
 ```
 
 Adipiscing convallis non conubia vehicula magnis nisi nisl. Ligula ultrices phasellus imperdiet habitasse etiam etiam tellus duis malesuada lacinia tellus felis. Luctus faucibus mus at aenean cum ligula augue molestie lacus sagittis. Sociis congue velit lacus taciti vulputate nostra interdum cum netus aliquet lectus sodales etiam. Mollis id diam aptent dis etiam arcu. Penatibus sodales sociosqu sed montes maecenas praesent molestie venenatis mauris blandit! Magnis arcu varius lacinia duis turpis nascetur ridiculus curabitur. Egestas platea tincidunt duis pulvinar pulvinar proin malesuada.
@@ -170,7 +168,7 @@ p3 <- ggplot(tibble(x = rnorm(10), y = rnorm(10)), aes(x, y)) +
 
 (p1 + p2) / (img + p3) +
   plot_annotation(tag_levels = 'a', tag_suffix = ".") &
-    theme(plot.tag = element_text(size = 9))
+    theme(plot.tag = element_text(size = font_size))
 ```
 
 Lorem nec phasellus justo integer dapibus nibh vel himenaeos eu. Placerat erat curae neque accumsan potenti quam scelerisque dapibus (@fig-cat2)? Netus natoque at senectus hendrerit donec vestibulum taciti? Praesent aliquet habitasse cum praesent eleifend quisque!
