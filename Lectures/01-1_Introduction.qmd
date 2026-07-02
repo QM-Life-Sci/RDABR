@@ -25,6 +25,29 @@ library(ggtext)
 ggplot2::theme_set(cowplot::theme_cowplot())
 ```
 
+# Notes
+
+Tues
+- Introduce selves & students
+- Introduce class goals
+    - show with sci paper activity
+    - in class writing reflection (how do we know things? what am i interested in?)
+- Expectations & guidelines
+
+Thurs
+- Introduce R
+- Show whats possible
+- jump into coding
+    - make a plot
+    - run the model from the paper 
+
+- take away assignment - revise reflection & reading for next week
+
+
+
+
+
+
 
 # Welcome {background-color="#40666e"}
 

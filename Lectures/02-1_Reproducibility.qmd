@@ -23,6 +23,23 @@ library(tidyverse)
 theme_set(theme_classic(base_size = 20))
 ```
 
+# Notes
+
+Tues
+- How is science verified?
+    - show with sci paper activity (read as hw)
+    - in class writing reflection (how is sci verified? What questions do i want to contribute to & how to do so rigorously)
+- Introduce databases & concepts of open data & reproducible code
+- Coding activity fetching from a database
+
+Thurs
+- PS together in groups (choose mascot)
+- run code from paper?
+
+- take away assignment - revise reflection (above ?s?) & coding check for understanding
+
+
+
 
 # How is science verified? {background-color="#40666e"}
 
