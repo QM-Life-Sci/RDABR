@@ -24,6 +24,23 @@ library(tidyverse)
 theme_set(theme_classic(base_size = 20))
 ```
 
+# Notes
+
+Tues
+- Sampling populations & distributions
+- Activity with globe
+- Watch rabbit video for HW?
+- Begin PS  
+
+Thurs
+- PS together in groups 
+- Explore databases and choose dataset in class
+
+- take away assignment - describe sampling of your chosen dataset - population, sample, etc etc
+
+
+
+
 
 # Housekeeping {background-color="#40666e"}
 

@@ -94,6 +94,20 @@ ssPlot <- function(X, Y, b, do.plot = TRUE, do.labels = TRUE) {
 
 ```
 
+# Notes
+
+Tues
+- Continuous predictors interactive lecture 
+- HW read paper with continuous 
+- In class - analyze fig legends
+
+Thurs
+- PS together in groups 
+
+- take away assignment - code challenge independent & understanding questions
+
+
+
 
 # Housekeeping {background-color="#40666e"}
 
